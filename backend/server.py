@@ -1771,7 +1771,7 @@ async def get_land(land_id: str):
     return Land(**land_data)
 
 @api_router.post("/lands", response_model=Land)
-async def create_land(land_data: LandCreate, current_user: User = Depends(get_current_user)):
+async def create_land(land_data: LandCreate, current_user: User = Depends(get_current_admin)):
     """Create new land - Admin only"""
     land_dict = land_data.dict()
     if land_dict.get("area") and land_dict.get("price"):
