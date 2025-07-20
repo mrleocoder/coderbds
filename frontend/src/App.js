@@ -137,9 +137,7 @@ const Header = () => {
             >
               <i className="fas fa-envelope"></i>
               <span>Liên hệ</span>
-            </button>e="fas fa-phone"></i>
-              <span>Liên hệ</span>
-            </Link>
+            </button>
           </nav>
           
           <div className="md:hidden">
