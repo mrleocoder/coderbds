@@ -354,6 +354,56 @@ const AdminDashboard = () => {
     });
   };
 
+  const resetTicketForm = () => {
+    setTicketForm({
+      status: 'open',
+      priority: 'medium',
+      admin_notes: '',
+      assigned_to: ''
+    });
+  };
+
+  // Chart configurations
+  const getTrafficChartData = () => {
+    return {
+      labels: trafficData.map(item => item._id),
+      datasets: [
+        {
+          label: 'Lượt xem trang',
+          data: trafficData.map(item => item.views),
+          borderColor: 'rgb(16, 185, 129)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.1,
+        },
+        {
+          label: 'Khách truy cập',
+          data: trafficData.map(item => item.unique_visitors),
+          borderColor: 'rgb(59, 130, 246)',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.1,
+        }
+      ],
+    };
+  };
+
+  const getPopularPagesChartData = () => {
+    return {
+      labels: popularPages.slice(0, 5).map(page => page._id.replace(/^\//, '') || 'Trang chủ'),
+      datasets: [
+        {
+          data: popularPages.slice(0, 5).map(page => page.views),
+          backgroundColor: [
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(147, 51, 234, 0.8)',
+          ],
+        }
+      ],
+    };
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
