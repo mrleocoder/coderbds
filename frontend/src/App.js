@@ -10,6 +10,7 @@ import SimCard from './components/SimCard';
 import LandCard from './components/LandCard';
 import SimStorePage from './components/SimStorePage';
 import LandDetailPage from './components/LandDetailPage';
+import ContactForm from './components/ContactForm';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -20,8 +21,10 @@ const Header = () => {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showLandDropdown, setShowLandDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
 
   return (
+    <>
     <header className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
