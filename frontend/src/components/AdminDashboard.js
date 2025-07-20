@@ -637,6 +637,20 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => {
+                  setActiveTab('members');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'members'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-users mr-2"></i>
+                Quản lý Thành viên ({members.length})
+              </button>
+              <button
+                onClick={() => {
                   setActiveTab('tickets');
                   setShowForm(false);
                 }}
