@@ -1214,6 +1214,108 @@ class BDSVietnamAPITester:
             self.log_test("Get All Lands", False, f"Error: {str(e)}")
             return False
     
+    def test_admin_statistics_issue(self):
+        """Test admin statistics API issue - focus on data verification"""
+        print("\n🔍 FOCUSED TEST: Admin Statistics API Issue Investigation")
+        print("-" * 80)
+        
+        # Test 1: Check what admin dashboard statistics endpoints are available
+        try:
+            response = self.session.get(f"{self.base_url}/admin/dashboard/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                self.log_test("Admin Dashboard Stats Endpoint", True, f"Endpoint accessible, returned {len(stats)} fields")
+                print(f"📊 Admin Dashboard Stats Data: {json.dumps(stats, indent=2)}")
+            elif response.status_code == 401:
+                self.log_test("Admin Dashboard Stats Endpoint", False, "Authentication required - need admin token")
+            elif response.status_code == 403:
+                self.log_test("Admin Dashboard Stats Endpoint", False, "Admin access required - current user not admin")
+            else:
+                self.log_test("Admin Dashboard Stats Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Dashboard Stats Endpoint", False, f"Error: {str(e)}")
+        
+        # Test 2: Check public stats endpoint
+        try:
+            # Remove auth header for public endpoint
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.get(f"{self.base_url}/stats")
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if response.status_code == 200:
+                stats = response.json()
+                self.log_test("Public Stats Endpoint", True, f"Endpoint accessible, returned {len(stats)} fields")
+                print(f"📈 Public Stats Data: {json.dumps(stats, indent=2)}")
+            else:
+                self.log_test("Public Stats Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Public Stats Endpoint", False, f"Error: {str(e)}")
+        
+        # Test 3: Check database data existence
+        print("\n🗄️ Checking Database Data Existence...")
+        
+        # Check properties data
+        try:
+            response = self.session.get(f"{self.base_url}/properties")
+            if response.status_code == 200:
+                properties = response.json()
+                self.log_test("Properties Data Check", True, f"Found {len(properties)} properties in database")
+            else:
+                self.log_test("Properties Data Check", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Properties Data Check", False, f"Error: {str(e)}")
+        
+        # Check news data
+        try:
+            response = self.session.get(f"{self.base_url}/news")
+            if response.status_code == 200:
+                news = response.json()
+                self.log_test("News Data Check", True, f"Found {len(news)} news articles in database")
+            else:
+                self.log_test("News Data Check", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("News Data Check", False, f"Error: {str(e)}")
+        
+        # Check sims data
+        try:
+            response = self.session.get(f"{self.base_url}/sims")
+            if response.status_code == 200:
+                sims = response.json()
+                self.log_test("Sims Data Check", True, f"Found {len(sims)} sims in database")
+            else:
+                self.log_test("Sims Data Check", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sims Data Check", False, f"Error: {str(e)}")
+        
+        # Check lands data
+        try:
+            response = self.session.get(f"{self.base_url}/lands")
+            if response.status_code == 200:
+                lands = response.json()
+                self.log_test("Lands Data Check", True, f"Found {len(lands)} lands in database")
+            else:
+                self.log_test("Lands Data Check", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Lands Data Check", False, f"Error: {str(e)}")
+        
+        # Check tickets data
+        try:
+            response = self.session.get(f"{self.base_url}/tickets")
+            if response.status_code == 200:
+                tickets = response.json()
+                self.log_test("Tickets Data Check", True, f"Found {len(tickets)} tickets in database")
+            elif response.status_code == 401:
+                self.log_test("Tickets Data Check", False, "Authentication required for tickets endpoint")
+            else:
+                self.log_test("Tickets Data Check", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Tickets Data Check", False, f"Error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend API tests"""
         print("🚀 Starting BDS Vietnam Backend API Tests - COMPREHENSIVE ENHANCED VERSION")
