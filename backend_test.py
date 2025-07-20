@@ -798,6 +798,245 @@ class BDSVietnamAPITester:
             return False
 
     # ========================================
+    # MEMBER MANAGEMENT TESTING
+    # ========================================
+
+    def test_admin_member_management_complete(self):
+        """Test complete admin member management functionality"""
+        print("\n🔍 FOCUSED TEST: Admin Member Management Complete Workflow")
+        print("-" * 80)
+        
+        # Step 1: Test GET /api/admin/members - List all members
+        try:
+            response = self.session.get(f"{self.base_url}/admin/members")
+            if response.status_code == 200:
+                members = response.json()
+                self.log_test("Admin Get All Members", True, f"Retrieved {len(members)} members")
+                
+                # Test with pagination
+                paginated_response = self.session.get(f"{self.base_url}/admin/members", params={"skip": 0, "limit": 5})
+                if paginated_response.status_code == 200:
+                    paginated_members = paginated_response.json()
+                    self.log_test("Admin Get Members with Pagination", True, f"Retrieved {len(paginated_members)} members (limit 5)")
+                else:
+                    self.log_test("Admin Get Members with Pagination", False, f"Status: {paginated_response.status_code}")
+                
+                # Test with role filter
+                role_response = self.session.get(f"{self.base_url}/admin/members", params={"role": "member"})
+                if role_response.status_code == 200:
+                    role_members = role_response.json()
+                    self.log_test("Admin Get Members by Role", True, f"Retrieved {len(role_members)} members with role 'member'")
+                else:
+                    self.log_test("Admin Get Members by Role", False, f"Status: {role_response.status_code}")
+                
+                # Test with status filter
+                status_response = self.session.get(f"{self.base_url}/admin/members", params={"status": "active"})
+                if status_response.status_code == 200:
+                    status_members = status_response.json()
+                    self.log_test("Admin Get Members by Status", True, f"Retrieved {len(status_members)} active members")
+                else:
+                    self.log_test("Admin Get Members by Status", False, f"Status: {status_response.status_code}")
+                
+            else:
+                self.log_test("Admin Get All Members", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Get All Members", False, f"Error: {str(e)}")
+            return False
+        
+        # Step 2: Find a test member for detailed testing
+        test_member_id = None
+        test_member_data = None
+        
+        # First try to find existing testmember
+        for member in members:
+            if member.get("username") == "testmember":
+                test_member_id = member.get("id")
+                test_member_data = member
+                break
+        
+        # If no testmember found, create one
+        if not test_member_id:
+            # Create a test member first
+            test_user_data = {
+                "username": "testmember_admin",
+                "email": "testmember_admin@example.com", 
+                "password": "test123",
+                "full_name": "Test Member for Admin",
+                "phone": "0987654321"
+            }
+            
+            try:
+                # Remove auth header for registration
+                headers = self.session.headers.copy()
+                if 'Authorization' in self.session.headers:
+                    del self.session.headers['Authorization']
+                
+                reg_response = self.session.post(f"{self.base_url}/auth/register", json=test_user_data)
+                
+                # Restore auth header
+                self.session.headers.update(headers)
+                
+                if reg_response.status_code == 200:
+                    reg_data = reg_response.json()
+                    test_member_data = reg_data.get("user", {})
+                    test_member_id = test_member_data.get("id")
+                    self.log_test("Create Test Member for Admin Testing", True, f"Created test member: {test_member_id}")
+                elif reg_response.status_code == 400 and "already registered" in reg_response.text:
+                    # Try to find the existing user
+                    members_refresh = self.session.get(f"{self.base_url}/admin/members").json()
+                    for member in members_refresh:
+                        if member.get("username") == "testmember_admin":
+                            test_member_id = member.get("id")
+                            test_member_data = member
+                            break
+                    self.log_test("Create Test Member for Admin Testing", True, f"Test member already exists: {test_member_id}")
+                else:
+                    self.log_test("Create Test Member for Admin Testing", False, f"Status: {reg_response.status_code}")
+                    return False
+            except Exception as e:
+                self.log_test("Create Test Member for Admin Testing", False, f"Error: {str(e)}")
+                return False
+        
+        if not test_member_id:
+            self.log_test("Member Management Testing", False, "No test member available for detailed testing")
+            return False
+        
+        # Step 3: Test GET /api/admin/members/{user_id} - Get individual member details
+        try:
+            response = self.session.get(f"{self.base_url}/admin/members/{test_member_id}")
+            if response.status_code == 200:
+                member_details = response.json()
+                required_fields = ["id", "username", "email", "role", "status", "wallet_balance", "created_at"]
+                missing_fields = [field for field in required_fields if field not in member_details]
+                
+                if not missing_fields:
+                    self.log_test("Admin Get Member Details", True, f"Retrieved member details with all required fields: {member_details.get('username')}")
+                else:
+                    self.log_test("Admin Get Member Details", False, f"Missing fields: {missing_fields}")
+            elif response.status_code == 404:
+                self.log_test("Admin Get Member Details", False, f"Member not found: {test_member_id}")
+                return False
+            else:
+                self.log_test("Admin Get Member Details", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Get Member Details", False, f"Error: {str(e)}")
+            return False
+        
+        # Step 4: Test PUT /api/admin/members/{user_id} - Update member information
+        update_data = {
+            "full_name": "Updated Test Member Name",
+            "phone": "0123456789",
+            "address": "123 Updated Address, Ho Chi Minh City",
+            "admin_notes": "Updated by admin during testing"
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/admin/members/{test_member_id}", json=update_data)
+            if response.status_code == 200:
+                updated_member = response.json()
+                
+                # Verify updates
+                checks = [
+                    updated_member.get("full_name") == update_data["full_name"],
+                    updated_member.get("phone") == update_data["phone"],
+                    updated_member.get("address") == update_data["address"]
+                ]
+                
+                if all(checks):
+                    self.log_test("Admin Update Member Information", True, f"Member information updated successfully")
+                else:
+                    self.log_test("Admin Update Member Information", False, f"Update verification failed: {updated_member}")
+            elif response.status_code == 404:
+                self.log_test("Admin Update Member Information", False, f"Member not found: {test_member_id}")
+                return False
+            else:
+                self.log_test("Admin Update Member Information", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Update Member Information", False, f"Error: {str(e)}")
+            return False
+        
+        # Step 5: Test PUT /api/admin/users/{user_id}/status - Update member status
+        status_tests = ["suspended", "active", "pending"]
+        
+        for new_status in status_tests:
+            try:
+                # Use the existing endpoint for status updates
+                response = self.session.put(
+                    f"{self.base_url}/admin/users/{test_member_id}/status",
+                    params={"status": new_status, "admin_notes": f"Status changed to {new_status} during testing"}
+                )
+                
+                if response.status_code == 200:
+                    self.log_test(f"Admin Update Member Status to {new_status}", True, f"Status updated successfully")
+                    
+                    # Verify status change by getting member details
+                    verify_response = self.session.get(f"{self.base_url}/admin/members/{test_member_id}")
+                    if verify_response.status_code == 200:
+                        member_data = verify_response.json()
+                        if member_data.get("status") == new_status:
+                            self.log_test(f"Verify Status Update to {new_status}", True, f"Status verified: {new_status}")
+                        else:
+                            self.log_test(f"Verify Status Update to {new_status}", False, f"Status not updated: {member_data.get('status')}")
+                    else:
+                        self.log_test(f"Verify Status Update to {new_status}", False, f"Could not verify status update")
+                        
+                elif response.status_code == 404:
+                    self.log_test(f"Admin Update Member Status to {new_status}", False, f"Member not found: {test_member_id}")
+                else:
+                    self.log_test(f"Admin Update Member Status to {new_status}", False, f"Status: {response.status_code}, Response: {response.text}")
+            except Exception as e:
+                self.log_test(f"Admin Update Member Status to {new_status}", False, f"Error: {str(e)}")
+        
+        # Step 6: Test DELETE /api/admin/members/{user_id} - Check if delete endpoint exists
+        try:
+            response = self.session.delete(f"{self.base_url}/admin/members/{test_member_id}")
+            if response.status_code == 200:
+                self.log_test("Admin Delete Member", True, f"Member deleted successfully")
+                
+                # Verify deletion
+                verify_response = self.session.get(f"{self.base_url}/admin/members/{test_member_id}")
+                if verify_response.status_code == 404:
+                    self.log_test("Verify Member Deletion", True, f"Member deletion verified (404 as expected)")
+                else:
+                    self.log_test("Verify Member Deletion", False, f"Member still exists after deletion")
+                    
+            elif response.status_code == 404:
+                self.log_test("Admin Delete Member", False, f"Member not found for deletion: {test_member_id}")
+            elif response.status_code == 405:
+                self.log_test("Admin Delete Member", False, f"DELETE endpoint not implemented (405 Method Not Allowed)")
+            else:
+                self.log_test("Admin Delete Member", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Delete Member", False, f"Error: {str(e)}")
+        
+        # Step 7: Test admin authentication requirement
+        try:
+            # Remove auth header to test unauthorized access
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            unauth_response = self.session.get(f"{self.base_url}/admin/members")
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if unauth_response.status_code == 401:
+                self.log_test("Admin Authentication Required", True, f"Unauthorized access properly blocked (401)")
+            elif unauth_response.status_code == 403:
+                self.log_test("Admin Authentication Required", True, f"Unauthorized access properly blocked (403)")
+            else:
+                self.log_test("Admin Authentication Required", False, f"Unauthorized access not blocked: {unauth_response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Authentication Required", False, f"Error: {str(e)}")
+        
+        self.log_test("Complete Admin Member Management", True, "✅ ADMIN MEMBER MANAGEMENT TESTING COMPLETED")
+        return True
+
+    # ========================================
     # NEW ENHANCED FEATURES TESTING
     # ========================================
 
