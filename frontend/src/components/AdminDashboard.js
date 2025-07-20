@@ -82,25 +82,11 @@ const AdminDashboard = () => {
     description: ''
   });
 
-  const [landForm, setLandForm] = useState({
-    title: '',
-    description: '',
-    land_type: 'residential',
-    status: 'for_sale',
-    price: '',
-    area: '',
-    width: '',
-    length: '',
-    address: '',
-    district: '',
-    city: '',
-    legal_status: 'Sổ đỏ',
-    orientation: 'Đông',
-    road_width: '',
-    contact_phone: '',
-    contact_email: '',
-    agent_name: '',
-    featured: false
+  const [ticketForm, setTicketForm] = useState({
+    status: 'open',
+    priority: 'medium',
+    admin_notes: '',
+    assigned_to: ''
   });
 
   useEffect(() => {
@@ -110,22 +96,44 @@ const AdminDashboard = () => {
   const fetchAdminData = async () => {
     try {
       setLoading(true);
-      const [propertiesRes, newsRes, simsRes, landsRes, statsRes] = await Promise.all([
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, statsRes] = await Promise.all([
         axios.get(`${API}/properties?limit=100`),
         axios.get(`${API}/news?limit=100`),
         axios.get(`${API}/sims?limit=100`),
         axios.get(`${API}/lands?limit=100`),
+        axios.get(`${API}/tickets?limit=100`, { headers }),
         axios.get(`${API}/stats`)
       ]);
+      
       setProperties(propertiesRes.data);
       setNews(newsRes.data);
       setSims(simsRes.data);
       setLands(landsRes.data);
+      setTickets(ticketsRes.data);
       setStats(statsRes.data);
+      
+      // Fetch analytics data
+      await fetchAnalyticsData(headers);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnalyticsData = async (headers) => {
+    try {
+      const [trafficRes, popularRes] = await Promise.all([
+        axios.get(`${API}/analytics/traffic?period=week&limit=7`, { headers }),
+        axios.get(`${API}/analytics/popular-pages?limit=10`, { headers })
+      ]);
+      setTrafficData(trafficRes.data.data || []);
+      setPopularPages(popularRes.data || []);
+    } catch (error) {
+      console.error('Error fetching analytics data:', error);
     }
   };
 
