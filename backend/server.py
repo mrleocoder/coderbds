@@ -1457,7 +1457,28 @@ async def get_news_articles(
         filter_query["category"] = category
     
     articles = await db.news_articles.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
-    return [NewsArticle(**article) for article in articles]
+    
+    # Process articles and handle missing fields
+    processed_articles = []
+    for article in articles:
+        # Ensure required fields exist
+        if "slug" not in article or not article["slug"]:
+            article["slug"] = article.get("title", "").lower().replace(" ", "-").replace("--", "-")
+        if "excerpt" not in article or not article["excerpt"]:
+            # Generate excerpt from content or title
+            content = article.get("content", "")
+            if content:
+                article["excerpt"] = content[:150] + "..." if len(content) > 150 else content
+            else:
+                article["excerpt"] = article.get("title", "")[:100] + "..."
+        
+        try:
+            processed_articles.append(NewsArticle(**article))
+        except Exception as e:
+            print(f"Error processing article {article.get('id', 'unknown')}: {e}")
+            continue
+    
+    return processed_articles
 
 @api_router.get("/news/{article_id}", response_model=NewsArticle)
 async def get_news_article(article_id: str):
