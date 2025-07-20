@@ -1803,7 +1803,7 @@ async def update_land(land_id: str, land_update: LandUpdate, current_user: User 
     return Land(**updated_land)
 
 @api_router.delete("/lands/{land_id}")
-async def delete_land(land_id: str, current_user: User = Depends(get_current_user)):
+async def delete_land(land_id: str, current_user: User = Depends(get_current_admin)):
     """Delete land - Admin only"""
     result = await db.lands.delete_one({"id": land_id})
     if result.deleted_count == 0:
