@@ -629,10 +629,11 @@ async def login(user_credentials: UserLogin):
         }
     }
 
+# Enhanced Authentication Routes
 @api_router.post("/auth/register")
 async def register(user_data: UserCreate):
     """Register new user"""
-    # Check if user already exists
+    # Check if username already exists
     existing_user = await db.users.find_one({"username": user_data.username})
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -649,22 +650,84 @@ async def register(user_data: UserCreate):
         "username": user_data.username,
         "email": user_data.email,
         "hashed_password": hashed_password,
+        "role": "member",
+        "status": "active",
+        "wallet_balance": 0.0,
+        "full_name": user_data.full_name,
+        "phone": user_data.phone,
         "is_active": True,
-        "created_at": datetime.utcnow()
+        "email_verified": False,
+        "created_at": datetime.utcnow(),
+        "profile_completed": bool(user_data.full_name and user_data.phone)
     }
     
     await db.users.insert_one(user_dict)
-    return {"message": "User registered successfully", "user_id": user_dict["id"]}
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user_data.username}, expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": UserProfile(**user_dict),
+        "message": "User registered successfully"
+    }
 
-@api_router.get("/auth/me")
+@api_router.post("/auth/login")
+async def login(user_credentials: UserLogin):
+    """Login user and return access token"""
+    user = await db.users.find_one({"username": user_credentials.username})
+    if not user or not verify_password(user_credentials.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if user["status"] == "suspended":
+        raise HTTPException(
+            status_code=403,
+            detail="Account is suspended. Please contact administrator."
+        )
+    
+    # Update last login
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": UserProfile(**user)
+    }
+
+@api_router.get("/auth/me", response_model=UserProfile)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
-    return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "email": current_user.email,
-        "is_active": current_user.is_active
-    }
+    return UserProfile(**current_user.dict())
+
+@api_router.put("/auth/profile", response_model=UserProfile)
+async def update_profile(user_update: UserUpdate, current_user: User = Depends(get_current_user)):
+    """Update user profile"""
+    update_data = {k: v for k, v in user_update.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    # Check if profile is completed
+    if update_data.get("full_name") and update_data.get("phone"):
+        update_data["profile_completed"] = True
+    
+    await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    updated_user = await db.users.find_one({"id": current_user.id})
+    return UserProfile(**updated_user)
 
 @api_router.get("/properties", response_model=List[Property])
 async def get_properties(
