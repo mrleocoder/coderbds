@@ -1,6 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from './AuthContext';
 import axios from "axios";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+} from 'chart.js';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement
+);
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -11,9 +36,12 @@ const AdminDashboard = () => {
   const [news, setNews] = useState([]);
   const [sims, setSims] = useState([]);
   const [lands, setLands] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [stats, setStats] = useState({});
+  const [trafficData, setTrafficData] = useState([]);
+  const [popularPages, setPopularPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout } = useAuth();
 
