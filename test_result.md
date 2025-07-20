@@ -251,6 +251,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ LANDS CRUD FULLY WORKING: Complete Lands management system implemented and tested. GET /api/lands working with filtering by land_type, status, city, district, price/area ranges, featured status. GET /api/lands/{id} working with view increment. POST /api/lands (admin) working for creating new lands. PUT /api/lands/{id} (admin) working for updates. DELETE /api/lands/{id} (admin) working. GET /api/lands/featured and /api/lands/search working. All CRUD operations tested successfully."
+      - working: true
+        agent: "testing"
+        comment: "✅ ADMIN LANDS CRUD AUTHORIZATION FIX VERIFIED: Tested admin lands CRUD operations after authorization fix. All operations working perfectly with admin authentication (get_current_admin): CREATE (POST) ✅, UPDATE (PUT) ✅, DELETE ✅. No 403 Forbidden errors found. Authorization fix successful."
 
 frontend:
   - task: "Professional header with navigation"
