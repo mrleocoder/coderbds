@@ -859,6 +859,278 @@ async def update_profile(user_update: UserUpdate, current_user: User = Depends(g
     updated_user = await db.users.find_one({"id": current_user.id})
     return UserProfile(**updated_user)
 
+# Member Post Management Routes
+@api_router.post("/member/posts", response_model=MemberPost)
+async def create_member_post(
+    post_data: MemberPostCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create new post by member (requires approval)"""
+    # Check if user has sufficient balance (post fee = 50,000 VND)
+    POST_FEE = 50000.0
+    
+    if current_user.wallet_balance < POST_FEE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient balance. Required: {POST_FEE:,.0f} VNĐ, Available: {current_user.wallet_balance:,.0f} VNĐ"
+        )
+    
+    # Create post
+    post_dict = post_data.dict()
+    post_dict["id"] = str(uuid.uuid4())
+    post_dict["author_id"] = current_user.id
+    post_dict["status"] = "pending"
+    post_dict["created_at"] = datetime.utcnow()
+    post_dict["updated_at"] = datetime.utcnow()
+    
+    # Set expiration date (30 days from approval)
+    post_dict["expires_at"] = datetime.utcnow() + timedelta(days=30)
+    
+    post_obj = MemberPost(**post_dict)
+    await db.member_posts.insert_one(post_obj.dict())
+    
+    # Deduct post fee and create transaction
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$inc": {"wallet_balance": -POST_FEE}}
+    )
+    
+    # Create transaction record
+    transaction_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "amount": POST_FEE,
+        "transaction_type": "post_fee",
+        "status": "completed",
+        "description": f"Post fee for: {post_data.title}",
+        "reference_id": post_obj.id,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "completed_at": datetime.utcnow()
+    }
+    
+    await db.transactions.insert_one(transaction_dict)
+    
+    return post_obj
+
+@api_router.get("/member/posts", response_model=List[MemberPost])
+async def get_member_posts(
+    current_user: User = Depends(get_current_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    status: Optional[PostStatus] = None
+):
+    """Get current member's posts"""
+    filter_query = {"author_id": current_user.id}
+    if status:
+        filter_query["status"] = status
+    
+    posts = await db.member_posts.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [MemberPost(**post) for post in posts]
+
+@api_router.get("/member/posts/{post_id}", response_model=MemberPost)
+async def get_member_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get specific member post"""
+    post = await db.member_posts.find_one({"id": post_id, "author_id": current_user.id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return MemberPost(**post)
+
+@api_router.put("/member/posts/{post_id}", response_model=MemberPost)
+async def update_member_post(
+    post_id: str,
+    post_update: MemberPostCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update member post (only if pending or rejected)"""
+    post = await db.member_posts.find_one({"id": post_id, "author_id": current_user.id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post["status"] not in ["pending", "rejected"]:
+        raise HTTPException(status_code=400, detail="Cannot edit approved posts")
+    
+    # Update post
+    update_data = post_update.dict()
+    update_data["status"] = "pending"  # Reset to pending after edit
+    update_data["updated_at"] = datetime.utcnow()
+    update_data["rejection_reason"] = None  # Clear rejection reason
+    update_data["admin_notes"] = None  # Clear admin notes
+    
+    await db.member_posts.update_one({"id": post_id}, {"$set": update_data})
+    updated_post = await db.member_posts.find_one({"id": post_id})
+    return MemberPost(**updated_post)
+
+@api_router.delete("/member/posts/{post_id}")
+async def delete_member_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete member post (only if not approved)"""
+    post = await db.member_posts.find_one({"id": post_id, "author_id": current_user.id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post["status"] == "approved":
+        raise HTTPException(status_code=400, detail="Cannot delete approved posts. Contact admin.")
+    
+    await db.member_posts.delete_one({"id": post_id})
+    return {"message": "Post deleted successfully"}
+
+# Admin Post Approval Routes
+@api_router.get("/admin/posts/pending", response_model=List[MemberPost])
+async def get_pending_posts(
+    current_admin: User = Depends(get_current_admin),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, le=200),
+    post_type: Optional[PostType] = None
+):
+    """Get all pending posts for approval - Admin only"""
+    filter_query = {"status": "pending"}
+    if post_type:
+        filter_query["post_type"] = post_type
+    
+    posts = await db.member_posts.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add author information
+    for post in posts:
+        author = await db.users.find_one({"id": post["author_id"]})
+        if author:
+            post["author_name"] = author.get("full_name", author["username"])
+            post["author_email"] = author["email"]
+    
+    return [MemberPost(**post) for post in posts]
+
+@api_router.get("/admin/posts", response_model=List[MemberPost])
+async def get_all_posts(
+    current_admin: User = Depends(get_current_admin),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, le=200),
+    status: Optional[PostStatus] = None,
+    post_type: Optional[PostType] = None
+):
+    """Get all member posts - Admin only"""
+    filter_query = {}
+    if status:
+        filter_query["status"] = status
+    if post_type:
+        filter_query["post_type"] = post_type
+    
+    posts = await db.member_posts.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add author information
+    for post in posts:
+        author = await db.users.find_one({"id": post["author_id"]})
+        if author:
+            post["author_name"] = author.get("full_name", author["username"])
+            post["author_email"] = author["email"]
+    
+    return [MemberPost(**post) for post in posts]
+
+@api_router.put("/admin/posts/{post_id}/approve")
+async def approve_post(
+    post_id: str,
+    approval_data: PostApproval,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Approve or reject member post - Admin only"""
+    post = await db.member_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    update_data = {
+        "status": approval_data.status,
+        "admin_notes": approval_data.admin_notes,
+        "approved_by": current_admin.id,
+        "updated_at": datetime.utcnow()
+    }
+    
+    if approval_data.status == "approved":
+        update_data["approved_at"] = datetime.utcnow()
+        update_data["featured"] = approval_data.featured
+        
+        # Copy to main collections based on post type
+        if post["post_type"] == "property":
+            property_dict = {
+                "id": post["id"],
+                "title": post["title"],
+                "description": post["description"],
+                "property_type": post["property_type"],
+                "status": post["property_status"],
+                "price": post["price"],
+                "area": post["area"],
+                "bedrooms": post["bedrooms"],
+                "bathrooms": post["bathrooms"],
+                "address": post["address"],
+                "district": post["district"],
+                "city": post["city"],
+                "images": post["images"],
+                "featured": approval_data.featured,
+                "contact_phone": post["contact_phone"],
+                "contact_email": post["contact_email"],
+                "agent_name": post.get("author_name", ""),
+                "created_at": post["created_at"],
+                "updated_at": datetime.utcnow(),
+                "views": 0
+            }
+            await db.properties.insert_one(property_dict)
+        
+        elif post["post_type"] == "land":
+            land_dict = {
+                "id": post["id"],
+                "title": post["title"],
+                "description": post["description"],
+                "land_type": post["land_type"],
+                "status": post["property_status"] or "for_sale",
+                "price": post["price"],
+                "area": post["area"],
+                "width": post.get("width"),
+                "length": post.get("length"),
+                "address": post["address"],
+                "district": post["district"],
+                "city": post["city"],
+                "legal_status": post.get("legal_status", "Sổ đỏ"),
+                "orientation": post.get("orientation"),
+                "road_width": post.get("road_width"),
+                "images": post["images"],
+                "featured": approval_data.featured,
+                "contact_phone": post["contact_phone"],
+                "contact_email": post["contact_email"],
+                "agent_name": post.get("author_name", ""),
+                "created_at": post["created_at"],
+                "updated_at": datetime.utcnow(),
+                "views": 0
+            }
+            await db.lands.insert_one(land_dict)
+        
+        elif post["post_type"] == "sim":
+            sim_dict = {
+                "id": post["id"],
+                "phone_number": post["phone_number"],
+                "network": post["network"],
+                "sim_type": post["sim_type"],
+                "price": post["price"],
+                "is_vip": post["is_vip"],
+                "features": post["features"],
+                "description": post["description"],
+                "status": "available",
+                "created_at": post["created_at"],
+                "updated_at": datetime.utcnow(),
+                "views": 0
+            }
+            await db.sims.insert_one(sim_dict)
+    
+    elif approval_data.status == "rejected":
+        update_data["rejection_reason"] = approval_data.rejection_reason
+    
+    await db.member_posts.update_one({"id": post_id}, {"$set": update_data})
+    
+    return {"message": f"Post {approval_data.status} successfully"}
+
+# Property Routes
 @api_router.get("/properties", response_model=List[Property])
 async def get_properties(
     skip: int = Query(0, ge=0),
