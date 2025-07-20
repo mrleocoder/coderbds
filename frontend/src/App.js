@@ -6,6 +6,9 @@ import { AuthProvider } from './components/AuthContext';
 import LoginPage from './components/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './components/AdminDashboard';
+import SimCard from './components/SimCard';
+import LandCard from './components/LandCard';
+import SimStorePage from './components/SimStorePage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
