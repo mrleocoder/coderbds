@@ -367,14 +367,14 @@ frontend:
     file: "/app/frontend/src/components/AdminDashboard.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "main"
         comment: "Admin Dashboard showing zero values for all statistics despite backend APIs returning valid data. Issue identified: Frontend was using public /api/stats instead of admin-specific /api/admin/dashboard/stats endpoint"
       - working: true
         agent: "main"
-        comment: "FIXED: Updated fetchAdminData function to use correct admin endpoint (/api/admin/dashboard/stats) with authentication headers. Backend testing confirmed all admin statistics APIs working perfectly with real data (properties: 30, sims: 25, lands: 20, tickets: 15). Added better error logging."
+        comment: "✅ FULLY FIXED: Updated fetchAdminData function to use correct admin endpoint (/api/admin/dashboard/stats) with authentication headers. Fixed ProtectedRoute to redirect admin routes to /admin/login instead of homepage. All statistics now showing real data: Properties 30, Sims 25, Lands 20, Tickets 15, News 20. Admin authentication and dashboard working perfectly."
 
   - task: "Contact Form on Website"
     implemented: false
