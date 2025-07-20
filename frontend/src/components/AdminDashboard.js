@@ -274,22 +274,55 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSubmitTicket = async (e) => {
+  const handleSubmitMember = async (e) => {
     e.preventDefault();
     try {
       if (editingItem) {
         const token = localStorage.getItem('token');
-        await axios.put(`${API}/tickets/${editingItem.id}`, ticketForm, {
+        await axios.put(`${API}/admin/members/${editingItem.id}`, memberForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
       fetchAdminData();
       setShowForm(false);
       setEditingItem(null);
-      resetTicketForm();
+      resetMemberForm();
     } catch (error) {
-      console.error('Error submitting ticket:', error);
-      alert('Có lỗi xảy ra khi cập nhật ticket');
+      console.error('Error submitting member:', error);
+      alert('Có lỗi xảy ra khi cập nhật thành viên');
+    }
+  };
+
+  const handleDeleteMember = async (memberId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa thành viên này?')) {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.delete(`${API}/admin/members/${memberId}`, { headers });
+        fetchAdminData();
+      } catch (error) {
+        console.error('Error deleting member:', error);
+        alert('Có lỗi xảy ra khi xóa thành viên');
+      }
+    }
+  };
+
+  const handleLockUnlockMember = async (memberId, currentStatus) => {
+    const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
+    const action = currentStatus === 'active' ? 'khóa' : 'mở khóa';
+    
+    if (window.confirm(`Bạn có chắc chắn muốn ${action} tài khoản này?`)) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.put(`${API}/admin/users/${memberId}/status`, 
+          { status: newStatus },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        fetchAdminData();
+      } catch (error) {
+        console.error('Error updating member status:', error);
+        alert(`Có lỗi xảy ra khi ${action} tài khoản`);
+      }
     }
   };
 
