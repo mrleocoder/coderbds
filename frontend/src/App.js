@@ -142,6 +142,34 @@ const Header = () => {
               <i className="fas fa-envelope"></i>
               <span>Liên hệ</span>
             </button>
+            
+            {/* User Authentication */}
+            {isAuthenticated() ? (
+              <div className="flex items-center space-x-4">
+                <Link 
+                  to={user?.role === 'admin' ? '/admin' : '/member'}
+                  className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+                >
+                  <i className="fas fa-user-circle"></i>
+                  <span className="hidden md:inline">{user?.full_name || user?.username}</span>
+                </Link>
+                <button 
+                  onClick={logout}
+                  className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+                >
+                  <i className="fas fa-sign-out-alt"></i>
+                  <span className="hidden md:inline">Đăng xuất</span>
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowMemberAuth(true)}
+                className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              >
+                <i className="fas fa-sign-in-alt"></i>
+                <span>Đăng nhập</span>
+              </button>
+            )}
           </nav>
           
           <div className="md:hidden">
