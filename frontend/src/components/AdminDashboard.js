@@ -141,6 +141,42 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSubmitSim = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingItem) {
+        await axios.put(`${API}/sims/${editingItem.id}`, simForm);
+      } else {
+        await axios.post(`${API}/sims`, simForm);
+      }
+      fetchAdminData();
+      setShowForm(false);
+      setEditingItem(null);
+      resetSimForm();
+    } catch (error) {
+      console.error('Error submitting sim:', error);
+      alert('Có lỗi xảy ra khi lưu sim');
+    }
+  };
+
+  const handleSubmitLand = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingItem) {
+        await axios.put(`${API}/lands/${editingItem.id}`, landForm);
+      } else {
+        await axios.post(`${API}/lands`, landForm);
+      }
+      fetchAdminData();
+      setShowForm(false);
+      setEditingItem(null);
+      resetLandForm();
+    } catch (error) {
+      console.error('Error submitting land:', error);
+      alert('Có lỗi xảy ra khi lưu đất');
+    }
+  };
+
   const handleDelete = async (id, type) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
       try {
