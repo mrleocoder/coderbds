@@ -131,8 +131,13 @@ const Header = () => {
               <i className="fas fa-newspaper"></i>
               <span>Tin tức</span>
             </Link>
-            <Link to="/lien-he" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
-              <i className="fas fa-phone"></i>
+            <button 
+              onClick={() => setShowContactForm(true)}
+              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+            >
+              <i className="fas fa-envelope"></i>
+              <span>Liên hệ</span>
+            </button>e="fas fa-phone"></i>
               <span>Liên hệ</span>
             </Link>
           </nav>
