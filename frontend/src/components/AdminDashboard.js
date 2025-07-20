@@ -376,6 +376,15 @@ const AdminDashboard = () => {
         admin_notes: item.admin_notes || '',
         assigned_to: item.assigned_to || ''
       });
+    } else if (type === 'members') {
+      setMemberForm({
+        status: item.status || 'active',
+        admin_notes: item.admin_notes || '',
+        full_name: item.full_name || '',
+        phone: item.phone || '',
+        address: item.address || '',
+        email_verified: item.email_verified || false
+      });
     }
     setShowForm(true);
   };
