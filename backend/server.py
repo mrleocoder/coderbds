@@ -883,6 +883,153 @@ async def search_lands(
     lands = await db.lands.find(search_query).skip(skip).limit(limit).to_list(limit)
     return [Land(**land) for land in lands]
 
+# Ticket Routes
+@api_router.get("/tickets", response_model=List[Ticket])
+async def get_tickets(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    status: Optional[str] = None,
+    priority: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get tickets - Admin only"""
+    filter_query = {}
+    if status:
+        filter_query["status"] = status
+    if priority:
+        filter_query["priority"] = priority
+    
+    tickets = await db.tickets.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [Ticket(**ticket) for ticket in tickets]
+
+@api_router.get("/tickets/{ticket_id}", response_model=Ticket)
+async def get_ticket(ticket_id: str, current_user: User = Depends(get_current_user)):
+    """Get single ticket - Admin only"""
+    ticket_data = await db.tickets.find_one({"id": ticket_id})
+    if not ticket_data:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return Ticket(**ticket_data)
+
+@api_router.post("/tickets", response_model=Ticket)
+async def create_ticket(ticket_data: TicketCreate):
+    """Create new ticket (public endpoint)"""
+    ticket_obj = Ticket(**ticket_data.dict())
+    await db.tickets.insert_one(ticket_obj.dict())
+    return ticket_obj
+
+@api_router.put("/tickets/{ticket_id}", response_model=Ticket)
+async def update_ticket(ticket_id: str, ticket_update: TicketUpdate, current_user: User = Depends(get_current_user)):
+    """Update ticket - Admin only"""
+    update_data = {k: v for k, v in ticket_update.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.tickets.update_one({"id": ticket_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    updated_ticket = await db.tickets.find_one({"id": ticket_id})
+    return Ticket(**updated_ticket)
+
+@api_router.delete("/tickets/{ticket_id}")
+async def delete_ticket(ticket_id: str, current_user: User = Depends(get_current_user)):
+    """Delete ticket - Admin only"""
+    result = await db.tickets.delete_one({"id": ticket_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return {"message": "Ticket deleted successfully"}
+
+# Analytics Routes
+@api_router.post("/analytics/pageview")
+async def track_page_view(analytics_data: AnalyticsCreate):
+    """Track page view (public endpoint)"""
+    pageview_obj = PageView(**analytics_data.dict())
+    await db.pageviews.insert_one(pageview_obj.dict())
+    return {"message": "Page view tracked successfully"}
+
+@api_router.get("/analytics/traffic")
+async def get_traffic_analytics(
+    period: str = Query("week", regex="^(day|week|month|year)$"),
+    limit: int = Query(30, le=365),
+    current_user: User = Depends(get_current_user)
+):
+    """Get traffic analytics - Admin only"""
+    now = datetime.utcnow()
+    
+    # Calculate date range based on period
+    if period == "day":
+        start_date = now - timedelta(days=limit)
+        group_format = "%Y-%m-%d"
+    elif period == "week":
+        start_date = now - timedelta(weeks=limit)
+        group_format = "%Y-%U"  # Year-Week
+    elif period == "month":
+        start_date = now - timedelta(days=limit*30)
+        group_format = "%Y-%m"
+    else:  # year
+        start_date = now - timedelta(days=limit*365)
+        group_format = "%Y"
+    
+    # Aggregate page views by time period
+    pipeline = [
+        {"$match": {"timestamp": {"$gte": start_date}}},
+        {
+            "$group": {
+                "_id": {
+                    "$dateToString": {
+                        "format": group_format,
+                        "date": "$timestamp"
+                    }
+                },
+                "views": {"$sum": 1},
+                "unique_sessions": {"$addToSet": "$session_id"}
+            }
+        },
+        {
+            "$addFields": {
+                "unique_visitors": {"$size": "$unique_sessions"}
+            }
+        },
+        {"$sort": {"_id": 1}},
+        {"$limit": limit}
+    ]
+    
+    traffic_data = await db.pageviews.aggregate(pipeline).to_list(limit)
+    
+    return {
+        "period": period,
+        "data": traffic_data
+    }
+
+@api_router.get("/analytics/popular-pages")
+async def get_popular_pages(
+    limit: int = Query(10, le=50),
+    days: int = Query(7, le=365),
+    current_user: User = Depends(get_current_user)
+):
+    """Get most popular pages - Admin only"""
+    start_date = datetime.utcnow() - timedelta(days=days)
+    
+    pipeline = [
+        {"$match": {"timestamp": {"$gte": start_date}}},
+        {
+            "$group": {
+                "_id": "$page_path",
+                "views": {"$sum": 1},
+                "unique_visitors": {"$addToSet": "$session_id"}
+            }
+        },
+        {
+            "$addFields": {
+                "unique_visitors_count": {"$size": "$unique_visitors"}
+            }
+        },
+        {"$sort": {"views": -1}},
+        {"$limit": limit}
+    ]
+    
+    popular_pages = await db.pageviews.aggregate(pipeline).to_list(limit)
+    return popular_pages
+
 # Include the router in the main app
 app.include_router(api_router)
 
