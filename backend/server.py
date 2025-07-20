@@ -639,6 +639,21 @@ async def get_statistics():
     total_news = await db.news_articles.count_documents({"published": True})
     total_sims = await db.sims.count_documents({})
     total_lands = await db.lands.count_documents({})
+    total_tickets = await db.tickets.count_documents({})
+    total_pageviews = await db.pageviews.count_documents({})
+    
+    # Get today's traffic
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_pageviews = await db.pageviews.count_documents({"timestamp": {"$gte": today}})
+    
+    # Get unique sessions today
+    today_sessions_pipeline = [
+        {"$match": {"timestamp": {"$gte": today}}},
+        {"$group": {"_id": "$session_id"}},
+        {"$count": "unique_sessions"}
+    ]
+    today_sessions_result = await db.pageviews.aggregate(today_sessions_pipeline).to_list(1)
+    today_unique_visitors = today_sessions_result[0]["unique_sessions"] if today_sessions_result else 0
     
     # Get properties by city
     pipeline = [
@@ -648,6 +663,10 @@ async def get_statistics():
     ]
     cities = await db.properties.aggregate(pipeline).to_list(10)
     
+    # Get ticket statistics
+    open_tickets = await db.tickets.count_documents({"status": "open"})
+    resolved_tickets = await db.tickets.count_documents({"status": "resolved"})
+    
     return {
         "total_properties": total_properties,
         "properties_for_sale": total_for_sale,
@@ -655,6 +674,12 @@ async def get_statistics():
         "total_news_articles": total_news,
         "total_sims": total_sims,
         "total_lands": total_lands,
+        "total_tickets": total_tickets,
+        "open_tickets": open_tickets,
+        "resolved_tickets": resolved_tickets,
+        "total_pageviews": total_pageviews,
+        "today_pageviews": today_pageviews,
+        "today_unique_visitors": today_unique_visitors,
         "top_cities": cities
     }
 
