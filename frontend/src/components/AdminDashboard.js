@@ -560,65 +560,142 @@ const AdminDashboard = () => {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-800">Tổng quan hệ thống</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-home text-3xl text-emerald-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-home text-2xl text-emerald-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-emerald-600">Tổng BDS</p>
-                        <p className="text-2xl font-bold text-emerald-900">{stats.total_properties || 0}</p>
+                        <p className="text-xl font-bold text-emerald-900">{stats.total_properties || 0}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-tag text-3xl text-blue-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-tag text-2xl text-blue-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-blue-600">Đang bán</p>
-                        <p className="text-2xl font-bold text-blue-900">{stats.properties_for_sale || 0}</p>
+                        <p className="text-xl font-bold text-blue-900">{stats.properties_for_sale || 0}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-key text-3xl text-purple-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-key text-2xl text-purple-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-purple-600">Cho thuê</p>
-                        <p className="text-2xl font-bold text-purple-900">{stats.properties_for_rent || 0}</p>
+                        <p className="text-xl font-bold text-purple-900">{stats.properties_for_rent || 0}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-newspaper text-3xl text-orange-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-newspaper text-2xl text-orange-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-orange-600">Tin tức</p>
-                        <p className="text-2xl font-bold text-orange-900">{stats.total_news_articles || 0}</p>
+                        <p className="text-xl font-bold text-orange-900">{stats.total_news_articles || 0}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-sim-card text-3xl text-indigo-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-sim-card text-2xl text-indigo-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-indigo-600">Sim</p>
-                        <p className="text-2xl font-bold text-indigo-900">{stats.total_sims || 0}</p>
+                        <p className="text-xl font-bold text-indigo-900">{stats.total_sims || 0}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div className="flex items-center">
-                      <i className="fas fa-map text-3xl text-yellow-600"></i>
-                      <div className="ml-4">
+                      <i className="fas fa-map text-2xl text-yellow-600"></i>
+                      <div className="ml-3">
                         <p className="text-sm font-medium text-yellow-600">Đất</p>
-                        <p className="text-2xl font-bold text-yellow-900">{stats.total_lands || 0}</p>
+                        <p className="text-xl font-bold text-yellow-900">{stats.total_lands || 0}</p>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <i className="fas fa-ticket-alt text-2xl text-red-600"></i>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-red-600">Tickets</p>
+                        <p className="text-xl font-bold text-red-900">{stats.total_tickets || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <i className="fas fa-eye text-2xl text-green-600"></i>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-green-600">Lượt xem hôm nay</p>
+                        <p className="text-xl font-bold text-green-900">{stats.today_pageviews || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <i className="fas fa-chart-line text-emerald-600 mr-2"></i>
+                      Traffic 7 ngày qua
+                    </h3>
+                    {trafficData.length > 0 ? (
+                      <div style={{ height: '300px' }}>
+                        <Line 
+                          data={getTrafficChartData()} 
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'top',
+                              },
+                            },
+                            scales: {
+                              y: {
+                                beginAtZero: true,
+                              },
+                            },
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Chưa có dữ liệu traffic</p>
+                    )}
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <i className="fas fa-star text-emerald-600 mr-2"></i>
+                      Top 5 trang phổ biến
+                    </h3>
+                    {popularPages.length > 0 ? (
+                      <div style={{ height: '300px' }}>
+                        <Doughnut 
+                          data={getPopularPagesChartData()} 
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'bottom',
+                              },
+                            },
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center py-8">Chưa có dữ liệu trang phổ biến</p>
+                    )}
                   </div>
                 </div>
 
