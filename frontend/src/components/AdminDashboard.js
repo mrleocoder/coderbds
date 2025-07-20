@@ -148,6 +148,7 @@ const AdminDashboard = () => {
         sims: simsRes.data?.length,
         lands: landsRes.data?.length,
         tickets: ticketsRes.data?.length,
+        members: membersRes.data?.length,
         stats: statsRes.data
       });
       
