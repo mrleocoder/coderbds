@@ -148,6 +148,9 @@ const Header = () => {
               <Link to="/bds/cho-thue" className="py-2 hover:text-emerald-200">Cho thuê</Link>
               <Link to="/loai-hinh/can-ho" className="py-2 hover:text-emerald-200">Căn hộ</Link>
               <Link to="/loai-hinh/nha-pho" className="py-2 hover:text-emerald-200">Nhà phố</Link>
+              <Link to="/dat/ban" className="py-2 hover:text-emerald-200">Đất bán</Link>
+              <Link to="/dat/thue" className="py-2 hover:text-emerald-200">Đất thuê</Link>
+              <Link to="/kho-sim" className="py-2 hover:text-emerald-200">Kho sim</Link>
               <Link to="/tin-tuc" className="py-2 hover:text-emerald-200">Tin tức</Link>
             </div>
           </div>
