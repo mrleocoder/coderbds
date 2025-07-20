@@ -44,6 +44,37 @@ const AdminDashboard = () => {
     published: true
   });
 
+  const [simForm, setSimForm] = useState({
+    phone_number: '',
+    network: 'viettel',
+    sim_type: 'prepaid',
+    price: '',
+    is_vip: false,
+    features: ['Số đẹp'],
+    description: ''
+  });
+
+  const [landForm, setLandForm] = useState({
+    title: '',
+    description: '',
+    land_type: 'residential',
+    status: 'for_sale',
+    price: '',
+    area: '',
+    width: '',
+    length: '',
+    address: '',
+    district: '',
+    city: '',
+    legal_status: 'Sổ đỏ',
+    orientation: 'Đông',
+    road_width: '',
+    contact_phone: '',
+    contact_email: '',
+    agent_name: '',
+    featured: false
+  });
+
   useEffect(() => {
     fetchAdminData();
   }, []);
