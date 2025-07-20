@@ -132,12 +132,13 @@ const AdminDashboard = () => {
       
       console.log('Fetching admin data with token:', !!token);
       
-      const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, statsRes] = await Promise.all([
+      const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, membersRes, statsRes] = await Promise.all([
         axios.get(`${API}/properties?limit=50`),
         axios.get(`${API}/news?limit=50`),
         axios.get(`${API}/sims?limit=50`),
         axios.get(`${API}/lands?limit=50`),
         axios.get(`${API}/tickets?limit=50`, { headers }),
+        axios.get(`${API}/admin/members?limit=50`, { headers }),
         axios.get(`${API}/admin/dashboard/stats`, { headers }) // Use admin-specific stats API
       ]);
       
