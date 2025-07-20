@@ -1908,8 +1908,13 @@ function App() {
             {/* Admin Routes */}
             <Route path="/admin/login" element={<LoginPage />} />
             <Route path="/admin" element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/member" element={
+              <ProtectedRoute memberOnly={true}>
+                <MemberDashboard />
               </ProtectedRoute>
             } />
           </Routes>
