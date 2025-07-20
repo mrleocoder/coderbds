@@ -598,7 +598,137 @@ class PostApproval(BaseModel):
     rejection_reason: Optional[str] = None
     featured: bool = False
 
-# Property Routes
+# Wallet & Transaction Routes
+@api_router.get("/wallet/balance")
+async def get_wallet_balance(current_user: User = Depends(get_current_user)):
+    """Get user wallet balance"""
+    return {
+        "balance": current_user.wallet_balance,
+        "user_id": current_user.id
+    }
+
+@api_router.post("/wallet/deposit")
+async def deposit_money(deposit_request: DepositRequest, current_user: User = Depends(get_current_user)):
+    """Request money deposit (requires admin approval)"""
+    if deposit_request.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than 0")
+    
+    # Create transaction record
+    transaction_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "amount": deposit_request.amount,
+        "transaction_type": "deposit",
+        "status": "pending",
+        "description": deposit_request.description,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    await db.transactions.insert_one(transaction_dict)
+    
+    return {
+        "message": "Deposit request created successfully. Waiting for admin approval.",
+        "transaction_id": transaction_dict["id"],
+        "amount": deposit_request.amount
+    }
+
+@api_router.get("/wallet/transactions", response_model=List[Transaction])
+async def get_user_transactions(
+    current_user: User = Depends(get_current_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    transaction_type: Optional[TransactionType] = None
+):
+    """Get user transaction history"""
+    filter_query = {"user_id": current_user.id}
+    if transaction_type:
+        filter_query["transaction_type"] = transaction_type
+    
+    transactions = await db.transactions.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [Transaction(**txn) for txn in transactions]
+
+# Admin Transaction Management Routes
+@api_router.get("/admin/transactions", response_model=List[Transaction])
+async def get_all_transactions(
+    current_admin: User = Depends(get_current_admin),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, le=200),
+    status: Optional[TransactionStatus] = None,
+    transaction_type: Optional[TransactionType] = None
+):
+    """Get all transactions - Admin only"""
+    filter_query = {}
+    if status:
+        filter_query["status"] = status
+    if transaction_type:
+        filter_query["transaction_type"] = transaction_type
+    
+    transactions = await db.transactions.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [Transaction(**txn) for txn in transactions]
+
+@api_router.put("/admin/transactions/{transaction_id}/approve")
+async def approve_transaction(
+    transaction_id: str,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Approve transaction and update user balance - Admin only"""
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Transaction is not pending")
+    
+    # Update transaction status
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {
+            "$set": {
+                "status": "completed",
+                "completed_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "admin_notes": f"Approved by admin: {current_admin.username}"
+            }
+        }
+    )
+    
+    # Update user balance for deposits
+    if transaction["transaction_type"] == "deposit":
+        await db.users.update_one(
+            {"id": transaction["user_id"]},
+            {"$inc": {"wallet_balance": transaction["amount"]}}
+        )
+    
+    return {"message": "Transaction approved successfully"}
+
+@api_router.put("/admin/transactions/{transaction_id}/reject")
+async def reject_transaction(
+    transaction_id: str,
+    admin_notes: str,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Reject transaction - Admin only"""
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Transaction is not pending")
+    
+    # Update transaction status
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {
+            "$set": {
+                "status": "failed",
+                "updated_at": datetime.utcnow(),
+                "admin_notes": f"Rejected by admin {current_admin.username}: {admin_notes}"
+            }
+        }
+    )
+    
+    return {"message": "Transaction rejected successfully"}
 @api_router.get("/")
 async def root():
     return {"message": "BDS Vietnam API - Professional Real Estate Platform"}
