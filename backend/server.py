@@ -1413,7 +1413,7 @@ async def create_property(property_data: PropertyCreate, current_user: User = De
     return property_obj
 
 @api_router.put("/properties/{property_id}", response_model=Property)
-async def update_property(property_id: str, property_update: PropertyUpdate, current_user: User = Depends(get_current_user)):
+async def update_property(property_id: str, property_update: PropertyUpdate, current_user: User = Depends(get_current_admin)):
     """Update property - Admin only"""
     """Update property"""
     update_data = {k: v for k, v in property_update.dict().items() if v is not None}
@@ -1435,7 +1435,7 @@ async def update_property(property_id: str, property_update: PropertyUpdate, cur
     return Property(**updated_property)
 
 @api_router.delete("/properties/{property_id}")
-async def delete_property(property_id: str, current_user: User = Depends(get_current_user)):
+async def delete_property(property_id: str, current_user: User = Depends(get_current_admin)):
     """Delete property - Admin only"""
     """Delete property"""
     result = await db.properties.delete_one({"id": property_id})
