@@ -167,6 +167,12 @@ const Header = () => {
         )}
       </div>
     </header>
+    
+    {/* Contact Form Modal */}
+    {showContactForm && (
+      <ContactForm onClose={() => setShowContactForm(false)} />
+    )}
+    </>
   );
 };
 
