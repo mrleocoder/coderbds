@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -24,13 +24,13 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI(title="BDS Vietnam API", description="Professional Real Estate API")
+app = FastAPI(title="BDS Vietnam API", description="Professional Real Estate Platform with Member Management")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
 # JWT Settings
-SECRET_KEY = "your-secret-key-here-change-in-production"
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-here-change-in-production')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -54,7 +54,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -78,6 +78,15 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if user is None:
         raise credentials_exception
     return User(**user)
+
+async def get_current_admin(current_user: "User" = Depends(get_current_user)):
+    """Get current admin user only"""
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+    return current_user
 
 # Enums
 class PropertyType(str, Enum):
