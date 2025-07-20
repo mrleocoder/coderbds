@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   // Redirect if already logged in
   if (isAuthenticated()) {
