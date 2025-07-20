@@ -324,6 +324,52 @@ class LandUpdate(BaseModel):
     contact_email: Optional[str] = None
     agent_name: Optional[str] = None
 
+# Ticket/Contact Models
+class Ticket(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    email: str
+    phone: Optional[str] = None
+    subject: str
+    message: str
+    status: str = "open"  # open, in_progress, resolved, closed
+    priority: str = "medium"  # low, medium, high, urgent
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    admin_notes: Optional[str] = None
+    assigned_to: Optional[str] = None
+
+class TicketCreate(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    subject: str
+    message: str
+
+class TicketUpdate(BaseModel):
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    admin_notes: Optional[str] = None
+    assigned_to: Optional[str] = None
+
+# Traffic Analytics Models
+class PageView(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    page_path: str
+    user_agent: str
+    ip_address: str
+    referrer: Optional[str] = None
+    session_id: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    duration: Optional[int] = None  # seconds spent on page
+
+class AnalyticsCreate(BaseModel):
+    page_path: str
+    user_agent: str
+    ip_address: str
+    referrer: Optional[str] = None
+    session_id: str
+
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
