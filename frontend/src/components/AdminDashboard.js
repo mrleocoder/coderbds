@@ -82,13 +82,17 @@ const AdminDashboard = () => {
   const fetchAdminData = async () => {
     try {
       setLoading(true);
-      const [propertiesRes, newsRes, statsRes] = await Promise.all([
+      const [propertiesRes, newsRes, simsRes, landsRes, statsRes] = await Promise.all([
         axios.get(`${API}/properties?limit=100`),
         axios.get(`${API}/news?limit=100`),
+        axios.get(`${API}/sims?limit=100`),
+        axios.get(`${API}/lands?limit=100`),
         axios.get(`${API}/stats`)
       ]);
       setProperties(propertiesRes.data);
       setNews(newsRes.data);
+      setSims(simsRes.data);
+      setLands(landsRes.data);
       setStats(statsRes.data);
     } catch (error) {
       console.error('Error fetching admin data:', error);
