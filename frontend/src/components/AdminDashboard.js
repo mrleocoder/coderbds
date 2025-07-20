@@ -193,8 +193,12 @@ const AdminDashboard = () => {
     setEditingItem(item);
     if (type === 'properties') {
       setPropertyForm(item);
-    } else {
+    } else if (type === 'news') {
       setNewsForm(item);
+    } else if (type === 'sims') {
+      setSimForm(item);
+    } else if (type === 'lands') {
+      setLandForm(item);
     }
     setShowForm(true);
   };
@@ -227,6 +231,41 @@ const AdminDashboard = () => {
       category: '',
       author: '',
       published: true
+    });
+  };
+
+  const resetSimForm = () => {
+    setSimForm({
+      phone_number: '',
+      network: 'viettel',
+      sim_type: 'prepaid',
+      price: '',
+      is_vip: false,
+      features: ['Số đẹp'],
+      description: ''
+    });
+  };
+
+  const resetLandForm = () => {
+    setLandForm({
+      title: '',
+      description: '',
+      land_type: 'residential',
+      status: 'for_sale',
+      price: '',
+      area: '',
+      width: '',
+      length: '',
+      address: '',
+      district: '',
+      city: '',
+      legal_status: 'Sổ đỏ',
+      orientation: 'Đông',
+      road_width: '',
+      contact_phone: '',
+      contact_email: '',
+      agent_name: '',
+      featured: false
     });
   };
 
