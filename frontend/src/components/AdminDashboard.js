@@ -222,10 +222,13 @@ const AdminDashboard = () => {
   const handleSubmitSim = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
       if (editingItem) {
-        await axios.put(`${API}/sims/${editingItem.id}`, simForm);
+        await axios.put(`${API}/sims/${editingItem.id}`, simForm, { headers });
       } else {
-        await axios.post(`${API}/sims`, simForm);
+        await axios.post(`${API}/sims`, simForm, { headers });
       }
       fetchAdminData();
       setShowForm(false);
