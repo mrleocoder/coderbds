@@ -243,10 +243,13 @@ const AdminDashboard = () => {
   const handleSubmitLand = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
       if (editingItem) {
-        await axios.put(`${API}/lands/${editingItem.id}`, landForm);
+        await axios.put(`${API}/lands/${editingItem.id}`, landForm, { headers });
       } else {
-        await axios.post(`${API}/lands`, landForm);
+        await axios.post(`${API}/lands`, landForm, { headers });
       }
       fetchAdminData();
       setShowForm(false);
