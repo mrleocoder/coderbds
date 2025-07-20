@@ -205,6 +205,32 @@ async def get_properties(
     properties = await db.properties.find(filter_query).sort(sort_by, sort_order).skip(skip).limit(limit).to_list(limit)
     return [Property(**prop) for prop in properties]
 
+@api_router.get("/properties/featured", response_model=List[Property])
+async def get_featured_properties(limit: int = Query(6, le=20)):
+    """Get featured properties"""
+    properties = await db.properties.find({"featured": True}).sort("created_at", -1).limit(limit).to_list(limit)
+    return [Property(**prop) for prop in properties]
+
+@api_router.get("/properties/search", response_model=List[Property])
+async def search_properties(
+    q: str = Query(..., description="Search query"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100)
+):
+    """Search properties by title, description, address"""
+    search_query = {
+        "$or": [
+            {"title": {"$regex": q, "$options": "i"}},
+            {"description": {"$regex": q, "$options": "i"}},
+            {"address": {"$regex": q, "$options": "i"}},
+            {"district": {"$regex": q, "$options": "i"}},
+            {"city": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    
+    properties = await db.properties.find(search_query).skip(skip).limit(limit).to_list(limit)
+    return [Property(**prop) for prop in properties]
+
 @api_router.get("/properties/{property_id}", response_model=Property)
 async def get_property(property_id: str):
     """Get single property by ID"""
@@ -257,32 +283,6 @@ async def delete_property(property_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Property not found")
     return {"message": "Property deleted successfully"}
-
-@api_router.get("/properties/featured", response_model=List[Property])
-async def get_featured_properties(limit: int = Query(6, le=20)):
-    """Get featured properties"""
-    properties = await db.properties.find({"featured": True}).sort("created_at", -1).limit(limit).to_list(limit)
-    return [Property(**prop) for prop in properties]
-
-@api_router.get("/properties/search", response_model=List[Property])
-async def search_properties(
-    q: str = Query(..., description="Search query"),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, le=100)
-):
-    """Search properties by title, description, address"""
-    search_query = {
-        "$or": [
-            {"title": {"$regex": q, "$options": "i"}},
-            {"description": {"$regex": q, "$options": "i"}},
-            {"address": {"$regex": q, "$options": "i"}},
-            {"district": {"$regex": q, "$options": "i"}},
-            {"city": {"$regex": q, "$options": "i"}}
-        ]
-    }
-    
-    properties = await db.properties.find(search_query).skip(skip).limit(limit).to_list(limit)
-    return [Property(**prop) for prop in properties]
 
 # News Routes
 @api_router.get("/news", response_model=List[NewsArticle])
