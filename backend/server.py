@@ -1491,9 +1491,15 @@ async def get_statistics():
     total_sims = await db.sims.count_documents({})
     total_lands = await db.lands.count_documents({})
     
+    # Ticket statistics
+    total_tickets = await db.tickets.count_documents({})
+    open_tickets = await db.tickets.count_documents({"status": "open"})
+    resolved_tickets = await db.tickets.count_documents({"status": "resolved"})
+    
     # Get today's traffic
     today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_pageviews = await db.pageviews.count_documents({"timestamp": {"$gte": today}})
+    total_pageviews = await db.pageviews.count_documents({})
     
     # Get unique sessions today
     today_sessions_pipeline = [
@@ -1519,6 +1525,10 @@ async def get_statistics():
         "total_news_articles": total_news,
         "total_sims": total_sims,
         "total_lands": total_lands,
+        "total_tickets": total_tickets,
+        "open_tickets": open_tickets,
+        "resolved_tickets": resolved_tickets,
+        "total_pageviews": total_pageviews,
         "today_pageviews": today_pageviews,
         "today_unique_visitors": today_unique_visitors,
         "top_cities": cities
