@@ -98,10 +98,6 @@ const Header = () => {
               <i className="fas fa-phone"></i>
               <span>Liên hệ</span>
             </Link>
-            <Link to="/admin" className="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-lg transition-colors flex items-center space-x-1">
-              <i className="fas fa-user-shield"></i>
-              <span>Admin</span>
-            </Link>
           </nav>
           
           <div className="md:hidden">
