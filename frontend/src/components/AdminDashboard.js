@@ -322,7 +322,7 @@ const AdminDashboard = () => {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-800">Tổng quan hệ thống</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
                     <div className="flex items-center">
                       <i className="fas fa-home text-3xl text-emerald-600"></i>
