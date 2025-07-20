@@ -82,15 +82,9 @@ const SimCard = ({ sim, onClick }) => {
         </div>
         
         <div className="flex space-x-2">
-          <Link 
-            to={`/sim/${sim.id}`}
-            className="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors text-center text-sm"
-          >
-            <i className="fas fa-eye mr-1"></i>
-            <span>Xem chi tiết</span>
-          </Link>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-            <i className="fas fa-phone"></i>
+          <button className="flex-1 bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm">
+            <i className="fas fa-shopping-cart mr-2"></i>
+            <span>Liên hệ mua</span>
           </button>
         </div>
       </div>
