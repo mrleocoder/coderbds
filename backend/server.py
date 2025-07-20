@@ -148,6 +148,23 @@ class SearchFilters(BaseModel):
     bedrooms: Optional[int] = None
     bathrooms: Optional[int] = None
 
+class User(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    username: str
+    email: str
+    hashed_password: str
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
 # Property Routes
 @api_router.get("/")
 async def root():
