@@ -9,6 +9,7 @@ import AdminDashboard from './components/AdminDashboard';
 import SimCard from './components/SimCard';
 import LandCard from './components/LandCard';
 import SimStorePage from './components/SimStorePage';
+import LandDetailPage from './components/LandDetailPage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
