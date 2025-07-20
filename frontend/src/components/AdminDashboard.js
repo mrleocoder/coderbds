@@ -1780,6 +1780,174 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Members Tab */}
+            {activeTab === 'members' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Quản lý Thành viên</h2>
+                </div>
+
+                {showForm && editingItem && (
+                  <form onSubmit={handleSubmitMember} className="mb-8 p-6 bg-gray-50 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-4">Chỉnh sửa thông tin thành viên</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <input
+                        type="text"
+                        placeholder="Tên đầy đủ"
+                        value={memberForm.full_name}
+                        onChange={(e) => setMemberForm({...memberForm, full_name: e.target.value})}
+                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                      <input
+                        type="tel"
+                        placeholder="Số điện thoại"
+                        value={memberForm.phone}
+                        onChange={(e) => setMemberForm({...memberForm, phone: e.target.value})}
+                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                      <select
+                        value={memberForm.status}
+                        onChange={(e) => setMemberForm({...memberForm, status: e.target.value})}
+                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      >
+                        <option value="active">Hoạt động</option>
+                        <option value="suspended">Bị khóa</option>
+                        <option value="pending">Chờ xử lý</option>
+                      </select>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="email_verified"
+                          checked={memberForm.email_verified}
+                          onChange={(e) => setMemberForm({...memberForm, email_verified: e.target.checked})}
+                          className="rounded text-emerald-600"
+                        />
+                        <label htmlFor="email_verified">Email đã xác thực</label>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Địa chỉ"
+                      value={memberForm.address}
+                      onChange={(e) => setMemberForm({...memberForm, address: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                    <textarea
+                      placeholder="Ghi chú của admin"
+                      value={memberForm.admin_notes}
+                      onChange={(e) => setMemberForm({...memberForm, admin_notes: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
+                      rows="3"
+                    />
+                    <div className="flex space-x-4">
+                      <button
+                        type="submit"
+                        className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                      >
+                        <i className="fas fa-save mr-2"></i>
+                        Cập nhật thành viên
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForm(false);
+                          setEditingItem(null);
+                        }}
+                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                      >
+                        <i className="fas fa-times mr-2"></i>
+                        Hủy
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                <div className="space-y-4">
+                  {members.length > 0 ? members.map((member) => (
+                    <div key={member.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="font-semibold text-lg">{member.username}</h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              member.status === 'active' ? 'bg-green-100 text-green-800' :
+                              member.status === 'suspended' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {member.status === 'active' ? 'Hoạt động' : 
+                               member.status === 'suspended' ? 'Bị khóa' : 'Chờ xử lý'}
+                            </span>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              member.role === 'admin' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {member.role === 'admin' ? 'Admin' : 'Thành viên'}
+                            </span>
+                            {member.email_verified && (
+                              <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-sm font-medium">
+                                <i className="fas fa-check-circle mr-1"></i>
+                                Email xác thực
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-gray-600 mb-2">
+                            <p><strong>Email:</strong> {member.email}</p>
+                            {member.full_name && <p><strong>Tên:</strong> {member.full_name}</p>}
+                            {member.phone && <p><strong>SĐT:</strong> {member.phone}</p>}
+                            {member.address && <p><strong>Địa chỉ:</strong> {member.address}</p>}
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>
+                              Tạo: {new Date(member.created_at).toLocaleDateString('vi-VN')}
+                            </span>
+                            {member.last_login && (
+                              <span><i className="fas fa-sign-in-alt text-emerald-600 mr-1"></i>
+                                Đăng nhập cuối: {new Date(member.last_login).toLocaleDateString('vi-VN')}
+                              </span>
+                            )}
+                            <span><i className="fas fa-wallet text-emerald-600 mr-1"></i>
+                              Số dư: {member.balance?.toLocaleString() || '0'} VNĐ
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2 ml-4">
+                          <button
+                            onClick={() => handleEdit(member, 'members')}
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+                            title="Chỉnh sửa"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            onClick={() => handleLockUnlockMember(member.id, member.status)}
+                            className={`px-3 py-2 rounded transition-colors text-white ${
+                              member.status === 'active' 
+                                ? 'bg-orange-600 hover:bg-orange-700' 
+                                : 'bg-green-600 hover:bg-green-700'
+                            }`}
+                            title={member.status === 'active' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
+                          >
+                            <i className={`fas ${member.status === 'active' ? 'fa-lock' : 'fa-unlock'}`}></i>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMember(member.id)}
+                            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors"
+                            title="Xóa thành viên"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có thành viên nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
               <div className="space-y-6">
