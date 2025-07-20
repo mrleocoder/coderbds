@@ -450,7 +450,8 @@ async def get_news_article(article_id: str):
     return NewsArticle(**article)
 
 @api_router.post("/news", response_model=NewsArticle)
-async def create_news_article(article_data: NewsArticleCreate):
+async def create_news_article(article_data: NewsArticleCreate, current_user: User = Depends(get_current_user)):
+    """Create news article - Admin only"""
     """Create news article"""
     article_obj = NewsArticle(**article_data.dict())
     await db.news_articles.insert_one(article_obj.dict())
