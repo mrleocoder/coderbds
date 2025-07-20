@@ -234,10 +234,31 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSubmitTicket = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingItem) {
+        const token = localStorage.getItem('token');
+        await axios.put(`${API}/tickets/${editingItem.id}`, ticketForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      fetchAdminData();
+      setShowForm(false);
+      setEditingItem(null);
+      resetTicketForm();
+    } catch (error) {
+      console.error('Error submitting ticket:', error);
+      alert('Có lỗi xảy ra khi cập nhật ticket');
+    }
+  };
+
   const handleDelete = async (id, type) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
       try {
-        await axios.delete(`${API}/${type}/${id}`);
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        await axios.delete(`${API}/${type}/${id}`, { headers });
         fetchAdminData();
       } catch (error) {
         console.error('Error deleting:', error);
@@ -256,6 +277,13 @@ const AdminDashboard = () => {
       setSimForm(item);
     } else if (type === 'lands') {
       setLandForm(item);
+    } else if (type === 'tickets') {
+      setTicketForm({
+        status: item.status || 'open',
+        priority: item.priority || 'medium',
+        admin_notes: item.admin_notes || '',
+        assigned_to: item.assigned_to || ''
+      });
     }
     setShowForm(true);
   };
