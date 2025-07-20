@@ -1,75 +1,136 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
+import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate, useLocation } from "react-router-dom";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Header Component
-const Header = ({ setActiveSection }) => {
+// Header Component with Dropdown Menus
+const Header = () => {
+  const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
+  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   return (
     <header className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <i className="fas fa-home text-2xl"></i>
             <div>
               <h1 className="text-xl font-bold">BDS Việt Nam</h1>
               <p className="text-sm text-emerald-100">Premium Real Estate</p>
             </div>
-          </div>
+          </Link>
           
           <nav className="hidden md:flex items-center space-x-6">
-            <button 
-              onClick={() => setActiveSection('home')}
-              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
-            >
+            <Link to="/" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-home"></i>
               <span>Trang chủ</span>
-            </button>
-            <button 
-              onClick={() => setActiveSection('properties')}
-              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+            </Link>
+            
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowPropertyDropdown(true)}
+              onMouseLeave={() => setShowPropertyDropdown(false)}
             >
-              <i className="fas fa-building"></i>
-              <span>Bất động sản</span>
-            </button>
-            <button 
-              onClick={() => setActiveSection('news')}
-              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+                <i className="fas fa-building"></i>
+                <span>Bất động sản</span>
+                <i className="fas fa-chevron-down text-sm"></i>
+              </button>
+              {showPropertyDropdown && (
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
+                  <Link to="/bds/dang-ban" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-home text-emerald-600 mr-2"></i>
+                    Đang bán
+                  </Link>
+                  <Link to="/bds/cho-thue" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-key text-emerald-600 mr-2"></i>
+                    Cho thuê
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowTypeDropdown(true)}
+              onMouseLeave={() => setShowTypeDropdown(false)}
             >
+              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+                <i className="fas fa-th-large"></i>
+                <span>Loại hình</span>
+                <i className="fas fa-chevron-down text-sm"></i>
+              </button>
+              {showTypeDropdown && (
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
+                  <Link to="/loai-hinh/can-ho" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-building text-emerald-600 mr-2"></i>
+                    Căn hộ
+                  </Link>
+                  <Link to="/loai-hinh/nha-pho" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-home text-emerald-600 mr-2"></i>
+                    Nhà phố
+                  </Link>
+                  <Link to="/loai-hinh/biet-thu" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-star text-emerald-600 mr-2"></i>
+                    Biệt thự
+                  </Link>
+                  <Link to="/loai-hinh/shophouse" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-store text-emerald-600 mr-2"></i>
+                    Shophouse
+                  </Link>
+                </div>
+              )}
+            </div>
+            
+            <Link to="/tin-tuc" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-newspaper"></i>
               <span>Tin tức</span>
-            </button>
-            <button 
-              onClick={() => setActiveSection('contact')}
-              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
-            >
+            </Link>
+            <Link to="/lien-he" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-phone"></i>
               <span>Liên hệ</span>
-            </button>
-            <button 
-              onClick={() => setActiveSection('admin')}
-              className="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-lg transition-colors flex items-center space-x-1"
-            >
+            </Link>
+            <Link to="/admin" className="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-lg transition-colors flex items-center space-x-1">
               <i className="fas fa-user-shield"></i>
               <span>Admin</span>
-            </button>
+            </Link>
           </nav>
           
           <div className="md:hidden">
-            <button className="text-white hover:text-emerald-200">
-              <i className="fas fa-bars text-xl"></i>
+            <button 
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="text-white hover:text-emerald-200"
+            >
+              <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'} text-xl`}></i>
             </button>
           </div>
         </div>
+        
+        {showMobileMenu && (
+          <div className="md:hidden pb-4">
+            <div className="flex flex-col space-y-2">
+              <Link to="/" className="py-2 hover:text-emerald-200">Trang chủ</Link>
+              <Link to="/bds/dang-ban" className="py-2 hover:text-emerald-200">Đang bán</Link>
+              <Link to="/bds/cho-thue" className="py-2 hover:text-emerald-200">Cho thuê</Link>
+              <Link to="/loai-hinh/can-ho" className="py-2 hover:text-emerald-200">Căn hộ</Link>
+              <Link to="/loai-hinh/nha-pho" className="py-2 hover:text-emerald-200">Nhà phố</Link>
+              <Link to="/tin-tuc" className="py-2 hover:text-emerald-200">Tin tức</Link>
+              <Link to="/admin" className="py-2 hover:text-emerald-200">Admin</Link>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
 };
 
 // Hero Section
-const HeroSection = ({ onSearch }) => {
+const HeroSection = () => {
+  const navigate = useNavigate();
   const [searchForm, setSearchForm] = useState({
     city: '',
     propertyType: '',
@@ -87,7 +148,14 @@ const HeroSection = ({ onSearch }) => {
   ];
 
   const handleSearch = () => {
-    onSearch(searchForm);
+    const params = new URLSearchParams();
+    if (searchForm.city) params.append('city', searchForm.city);
+    if (searchForm.propertyType) params.append('property_type', searchForm.propertyType);
+    if (searchForm.minPrice) params.append('min_price', searchForm.minPrice);
+    if (searchForm.maxPrice) params.append('max_price', searchForm.maxPrice);
+    if (searchForm.bedrooms) params.append('bedrooms', searchForm.bedrooms);
+    
+    navigate(`/tim-kiem?${params.toString()}`);
   };
 
   return (
@@ -307,63 +375,106 @@ const PropertyCard = ({ property, onClick }) => {
           </div>
         </div>
         
-        <button className="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2">
-          <i className="fas fa-eye"></i>
+        <Link 
+          to={`/page/${property.id}`}
+          className="block w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors text-center"
+        >
+          <i className="fas fa-eye mr-2"></i>
           <span>Xem chi tiết</span>
-        </button>
+        </Link>
       </div>
     </div>
   );
 };
 
-// Properties Section
-const PropertiesSection = ({ searchFilters }) => {
+// Properties Section with Load More
+const PropertiesSection = ({ searchFilters, hideTitle = false }) => {
   const [properties, setProperties] = useState([]);
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMoreFeatured, setHasMoreFeatured] = useState(true);
+  const [hasMoreLatest, setHasMoreLatest] = useState(true);
+  const [featuredSkip, setFeaturedSkip] = useState(0);
+  const [latestSkip, setLatestSkip] = useState(0);
 
   useEffect(() => {
     fetchProperties();
-    fetchFeaturedProperties();
+    if (!searchFilters) {
+      fetchFeaturedProperties();
+    }
   }, [searchFilters]);
 
-  const fetchProperties = async () => {
+  const fetchProperties = async (skip = 0, append = false) => {
     try {
-      setLoading(true);
+      if (!append) setLoading(true);
       const params = new URLSearchParams();
       if (searchFilters?.city) params.append('city', searchFilters.city);
       if (searchFilters?.propertyType) params.append('property_type', searchFilters.propertyType);
       if (searchFilters?.minPrice) params.append('min_price', searchFilters.minPrice);
       if (searchFilters?.maxPrice) params.append('max_price', searchFilters.maxPrice);
       if (searchFilters?.bedrooms) params.append('bedrooms', searchFilters.bedrooms);
+      params.append('skip', skip.toString());
+      params.append('limit', '6');
       
       const response = await axios.get(`${API}/properties?${params.toString()}`);
-      setProperties(response.data);
+      const newProperties = response.data;
+      
+      if (append) {
+        setProperties(prev => [...prev, ...newProperties]);
+      } else {
+        setProperties(newProperties);
+      }
+      
+      if (newProperties.length < 6) {
+        setHasMoreLatest(false);
+      }
+      
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  const fetchFeaturedProperties = async () => {
+  const fetchFeaturedProperties = async (skip = 0, append = false) => {
     try {
-      const response = await axios.get(`${API}/properties?featured=true&limit=6`);
-      setFeaturedProperties(response.data);
+      const response = await axios.get(`${API}/properties?featured=true&limit=6&skip=${skip}`);
+      const newFeatured = response.data;
+      
+      if (append) {
+        setFeaturedProperties(prev => [...prev, ...newFeatured]);
+      } else {
+        setFeaturedProperties(newFeatured);
+      }
+      
+      if (newFeatured.length < 6) {
+        setHasMoreFeatured(false);
+      }
     } catch (error) {
       console.error('Error fetching featured properties:', error);
     }
   };
 
-  if (selectedProperty) {
-    return (
-      <PropertyDetail 
-        property={selectedProperty} 
-        onBack={() => setSelectedProperty(null)} 
-      />
-    );
-  }
+  const loadMoreFeatured = async () => {
+    setLoadingMore(true);
+    const newSkip = featuredSkip + 6;
+    setFeaturedSkip(newSkip);
+    await fetchFeaturedProperties(newSkip, true);
+    setLoadingMore(false);
+  };
+
+  const loadMoreLatest = async () => {
+    setLoadingMore(true);
+    const newSkip = latestSkip + 6;
+    setLatestSkip(newSkip);
+    await fetchProperties(newSkip, true);
+  };
+
+  const handlePropertyClick = (property) => {
+    // Navigation is handled by the PropertyCard component
+  };
 
   if (loading) {
     return (
@@ -379,7 +490,7 @@ const PropertiesSection = ({ searchFilters }) => {
   return (
     <div className="py-16 bg-gray-50">
       {/* Featured Properties */}
-      {featuredProperties.length > 0 && (
+      {!searchFilters && featuredProperties.length > 0 && (
         <section className="mb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -395,39 +506,75 @@ const PropertiesSection = ({ searchFilters }) => {
                 <PropertyCard 
                   key={property.id} 
                   property={property} 
-                  onClick={setSelectedProperty}
+                  onClick={handlePropertyClick}
                 />
               ))}
             </div>
+            
+            {hasMoreFeatured && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={loadMoreFeatured}
+                  disabled={loadingMore}
+                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? (
+                    <><i className="fas fa-spinner fa-spin mr-2"></i>Đang tải...</>
+                  ) : (
+                    <><i className="fas fa-plus mr-2"></i>Xem thêm</>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}
 
-      {/* All Properties */}
+      {/* All Properties / Search Results */}
       <section>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <i className="fas fa-building text-emerald-600 text-2xl"></i>
-              <h2 className="text-3xl font-bold text-gray-800">
-                {searchFilters ? 'Kết quả tìm kiếm' : 'Bất động sản mới nhất'}
-              </h2>
+          {!hideTitle && (
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <i className="fas fa-building text-emerald-600 text-2xl"></i>
+                <h2 className="text-3xl font-bold text-gray-800">
+                  {searchFilters ? 'Kết quả tìm kiếm' : 'Bất động sản mới nhất'}
+                </h2>
+              </div>
+              <p className="text-gray-600">
+                {searchFilters ? `Tìm thấy ${properties.length}+ bất động sản phù hợp` : 'Cập nhật những bất động sản mới được đăng gần đây'}
+              </p>
             </div>
-            <p className="text-gray-600">
-              {searchFilters ? `Tìm thấy ${properties.length} bất động sản phù hợp` : 'Cập nhật những bất động sản mới được đăng gần đây'}
-            </p>
-          </div>
+          )}
           
           {properties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {properties.map((property) => (
-                <PropertyCard 
-                  key={property.id} 
-                  property={property} 
-                  onClick={setSelectedProperty}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {properties.map((property) => (
+                  <PropertyCard 
+                    key={property.id} 
+                    property={property} 
+                    onClick={handlePropertyClick}
+                  />
+                ))}
+              </div>
+              
+              {hasMoreLatest && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={loadMoreLatest}
+                    disabled={loadingMore}
+                    className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <><i className="fas fa-spinner fa-spin mr-2"></i>Đang tải...</>
+                    ) : (
+                      <><i className="fas fa-plus mr-2"></i>Xem thêm</>
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16">
               <i className="fas fa-search text-6xl text-gray-300 mb-4"></i>
@@ -441,23 +588,84 @@ const PropertiesSection = ({ searchFilters }) => {
   );
 };
 
-// Property Detail Component
-const PropertyDetail = ({ property, onBack }) => {
+// Property Detail Page
+const PropertyDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProperty();
+  }, [id]);
+
+  const fetchProperty = async () => {
+    try {
+      const response = await axios.get(`${API}/properties/${id}`);
+      setProperty(response.data);
+    } catch (error) {
+      console.error('Error fetching property:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatPrice = (price) => {
     if (price >= 1000000000) return `${(price / 1000000000).toFixed(1)} tỷ VNĐ`;
     if (price >= 1000000) return `${(price / 1000000).toFixed(1)} triệu VNĐ`;
     return `${price.toLocaleString()} VNĐ`;
   };
 
+  const getPropertyTypeLabel = (type) => {
+    const types = {
+      apartment: 'Căn hộ',
+      house: 'Nhà phố',
+      villa: 'Biệt thự',
+      shophouse: 'Shophouse',
+      office: 'Văn phòng',
+      land: 'Đất nền'
+    };
+    return types[type] || type;
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-exclamation-circle text-6xl text-gray-300 mb-4"></i>
+          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Không tìm thấy bất động sản</h2>
+          <p className="text-gray-500 mb-4">Bất động sản này có thể đã bị xóa hoặc không tồn tại</p>
+          <button 
+            onClick={() => navigate('/')}
+            className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Về trang chủ
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-8 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <button 
-          onClick={onBack}
+          onClick={() => navigate(-1)}
           className="mb-6 flex items-center space-x-2 text-emerald-600 hover:text-emerald-700"
         >
           <i className="fas fa-arrow-left"></i>
-          <span>Quay lại danh sách</span>
+          <span>Quay lại</span>
         </button>
         
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -468,9 +676,24 @@ const PropertyDetail = ({ property, onBack }) => {
                 alt={property.title}
                 className="w-full h-96 object-cover rounded-lg"
               />
+              
+              {property.featured && (
+                <div className="mt-4">
+                  <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <i className="fas fa-star mr-1"></i>
+                    Bất động sản nổi bật
+                  </span>
+                </div>
+              )}
             </div>
             
             <div>
+              <div className="mb-4">
+                <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {getPropertyTypeLabel(property.property_type)}
+                </span>
+              </div>
+              
               <h1 className="text-3xl font-bold mb-4">{property.title}</h1>
               <div className="text-3xl font-bold text-emerald-600 mb-4">
                 {formatPrice(property.price)}
@@ -490,8 +713,8 @@ const PropertyDetail = ({ property, onBack }) => {
                   <span>{property.area}m²</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <i className="fas fa-building text-emerald-600"></i>
-                  <span>{property.property_type}</span>
+                  <i className="fas fa-eye text-emerald-600"></i>
+                  <span>{property.views} lượt xem</span>
                 </div>
               </div>
               
@@ -526,14 +749,20 @@ const PropertyDetail = ({ property, onBack }) => {
               </div>
               
               <div className="flex space-x-4">
-                <button className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2">
+                <a 
+                  href={`tel:${property.contact_phone}`}
+                  className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2"
+                >
                   <i className="fas fa-phone"></i>
                   <span>Gọi ngay</span>
-                </button>
-                <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                </a>
+                <a 
+                  href={`sms:${property.contact_phone}`}
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                >
                   <i className="fas fa-envelope"></i>
                   <span>Nhắn tin</span>
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -548,9 +777,10 @@ const PropertyDetail = ({ property, onBack }) => {
   );
 };
 
-// News Section
-const NewsSection = () => {
+// News Slider Component
+const NewsSlider = () => {
   const [articles, setArticles] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -559,8 +789,7 @@ const NewsSection = () => {
 
   const fetchNews = async () => {
     try {
-      setLoading(true);
-      const response = await axios.get(`${API}/news?limit=6`);
+      const response = await axios.get(`${API}/news?limit=10`);
       setArticles(response.data);
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -569,14 +798,24 @@ const NewsSection = () => {
     }
   };
 
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % Math.ceil(articles.length / 3));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + Math.ceil(articles.length / 3)) % Math.ceil(articles.length / 3));
+  };
+
+  const visibleArticles = articles.slice(currentIndex * 3, currentIndex * 3 + 3);
+
   if (loading) {
     return (
-      <div className="py-16">
-        <div className="text-center">
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
           <p className="text-gray-600">Đang tải tin tức...</p>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -592,37 +831,63 @@ const NewsSection = () => {
         </div>
         
         {articles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
-              <article key={article.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <img 
-                  src={article.featured_image || 'https://images.unsplash.com/photo-1626487129383-e0a379fa957b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NTMwMTkwNTh8MA&ixlib=rb-4.1.0&q=85'}
-                  alt={article.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-sm">
-                      {article.category}
-                    </span>
-                    <span className="text-gray-500 text-sm">
-                      {new Date(article.created_at).toLocaleDateString('vi-VN')}
-                    </span>
+          <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {visibleArticles.map((article) => (
+                <Link 
+                  key={article.id}
+                  to={`/post/${article.id}`}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow block"
+                >
+                  <img 
+                    src={article.featured_image || 'https://images.unsplash.com/photo-1626487129383-e0a379fa957b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NTMwMTkwNTh8MA&ixlib=rb-4.1.0&q=85'}
+                    alt={article.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-sm">
+                        {article.category}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        {new Date(article.created_at).toLocaleDateString('vi-VN')}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2">{article.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        <i className="fas fa-user mr-1"></i>
+                        {article.author}
+                      </span>
+                      <span className="text-emerald-600 hover:text-emerald-700 font-medium">
+                        Đọc thêm →
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mb-2 line-clamp-2">{article.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      <i className="fas fa-user mr-1"></i>
-                      {article.author}
-                    </span>
-                    <button className="text-emerald-600 hover:text-emerald-700 font-medium">
-                      Đọc thêm →
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </Link>
+              ))}
+            </div>
+            
+            {articles.length > 3 && (
+              <div className="flex items-center justify-center space-x-4 mt-8">
+                <button
+                  onClick={prevSlide}
+                  className="bg-emerald-600 text-white p-2 rounded-full hover:bg-emerald-700 transition-colors"
+                >
+                  <i className="fas fa-chevron-left"></i>
+                </button>
+                <span className="text-gray-600">
+                  {currentIndex + 1} / {Math.ceil(articles.length / 3)}
+                </span>
+                <button
+                  onClick={nextSlide}
+                  className="bg-emerald-600 text-white p-2 rounded-full hover:bg-emerald-700 transition-colors"
+                >
+                  <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-center py-16">
@@ -633,17 +898,528 @@ const NewsSection = () => {
         )}
         
         <div className="text-center mt-12">
-          <button className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2 mx-auto">
+          <Link 
+            to="/tin-tuc"
+            className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors inline-flex items-center space-x-2"
+          >
             <i className="fas fa-newspaper"></i>
             <span>Xem tất cả tin tức</span>
-          </button>
+          </Link>
         </div>
       </div>
     </section>
   );
 };
 
-// Admin Section
+// News Detail Page
+const NewsDetailPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchArticle();
+  }, [id]);
+
+  const fetchArticle = async () => {
+    try {
+      const response = await axios.get(`${API}/news/${id}`);
+      setArticle(response.data);
+    } catch (error) {
+      console.error('Error fetching article:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-exclamation-circle text-6xl text-gray-300 mb-4"></i>
+          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Không tìm thấy bài viết</h2>
+          <p className="text-gray-500 mb-4">Bài viết này có thể đã bị xóa hoặc không tồn tại</p>
+          <button 
+            onClick={() => navigate('/tin-tuc')}
+            className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Về trang tin tức
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-8 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button 
+          onClick={() => navigate(-1)}
+          className="mb-6 flex items-center space-x-2 text-emerald-600 hover:text-emerald-700"
+        >
+          <i className="fas fa-arrow-left"></i>
+          <span>Quay lại</span>
+        </button>
+        
+        <article className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img 
+            src={article.featured_image || 'https://images.unsplash.com/photo-1626487129383-e0a379fa957b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NTMwMTkwNTh8MA&ixlib=rb-4.1.0&q=85'}
+            alt={article.title}
+            className="w-full h-64 md:h-96 object-cover"
+          />
+          
+          <div className="p-6 md:p-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
+                {article.category}
+              </span>
+              <span className="text-gray-500 text-sm">
+                {new Date(article.created_at).toLocaleDateString('vi-VN')}
+              </span>
+            </div>
+            
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">{article.title}</h1>
+            
+            <div className="flex items-center space-x-4 mb-6 text-gray-600">
+              <div className="flex items-center space-x-1">
+                <i className="fas fa-user text-emerald-600"></i>
+                <span>{article.author}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <i className="fas fa-eye text-emerald-600"></i>
+                <span>{article.views} lượt xem</span>
+              </div>
+            </div>
+            
+            <div className="prose max-w-none">
+              <p className="text-lg text-gray-600 mb-6 font-medium">{article.excerpt}</p>
+              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {article.content}
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  );
+};
+
+// News List Page
+const NewsListPage = () => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [skip, setSkip] = useState(0);
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async (skipCount = 0, append = false) => {
+    try {
+      if (!append) setLoading(true);
+      const response = await axios.get(`${API}/news?limit=15&skip=${skipCount}`);
+      const newArticles = response.data;
+      
+      if (append) {
+        setArticles(prev => [...prev, ...newArticles]);
+      } else {
+        setArticles(newArticles);
+      }
+      
+      if (newArticles.length < 15) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error fetching news:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    const newSkip = skip + 15;
+    setSkip(newSkip);
+    await fetchNews(newSkip, true);
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải tin tức...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Tin tức bất động sản</h1>
+          <p className="text-gray-600">Cập nhật những thông tin mới nhất về thị trường bất động sản</p>
+        </div>
+        
+        {articles.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {articles.map((article) => (
+                <Link 
+                  key={article.id}
+                  to={`/post/${article.id}`}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow block"
+                >
+                  <img 
+                    src={article.featured_image || 'https://images.unsplash.com/photo-1626487129383-e0a379fa957b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjaXR5JTIwc2t5bGluZXxlbnwwfHx8fDE3NTMwMTkwNTh8MA&ixlib=rb-4.1.0&q=85'}
+                    alt={article.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-sm">
+                        {article.category}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        {new Date(article.created_at).toLocaleDateString('vi-VN')}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2">{article.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        <i className="fas fa-user mr-1"></i>
+                        {article.author}
+                      </span>
+                      <span className="text-emerald-600 hover:text-emerald-700 font-medium">
+                        Đọc thêm →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            
+            {hasMore && (
+              <div className="text-center mt-12">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? (
+                    <><i className="fas fa-spinner fa-spin mr-2"></i>Đang tải...</>
+                  ) : (
+                    <><i className="fas fa-plus mr-2"></i>Xem thêm</>
+                  )}
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <i className="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Chưa có tin tức</h3>
+            <p className="text-gray-500">Tin tức sẽ được cập nhật sớm</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Property Filter Page
+const PropertyFilterPage = () => {
+  const location = useLocation();
+  const { filterType, filterValue } = useParams();
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    fetchFilteredProperties();
+  }, [filterType, filterValue]);
+
+  const fetchFilteredProperties = async () => {
+    try {
+      setLoading(true);
+      let params = new URLSearchParams();
+      let titleText = '';
+      
+      if (filterType === 'dang-ban') {
+        params.append('status', 'for_sale');
+        titleText = 'Bất động sản đang bán';
+      } else if (filterType === 'cho-thue') {
+        params.append('status', 'for_rent');
+        titleText = 'Bất động sản cho thuê';
+      } else if (filterType === 'can-ho') {
+        params.append('property_type', 'apartment');
+        titleText = 'Căn hộ';
+      } else if (filterType === 'nha-pho') {
+        params.append('property_type', 'house');
+        titleText = 'Nhà phố';
+      } else if (filterType === 'biet-thu') {
+        params.append('property_type', 'villa');
+        titleText = 'Biệt thự';
+      } else if (filterType === 'shophouse') {
+        params.append('property_type', 'shophouse');
+        titleText = 'Shophouse';
+      }
+      
+      setTitle(titleText);
+      
+      const response = await axios.get(`${API}/properties?${params.toString()}`);
+      setProperties(response.data);
+    } catch (error) {
+      console.error('Error fetching filtered properties:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">{title}</h1>
+          <p className="text-gray-600">
+            {properties.length > 0 
+              ? `Tìm thấy ${properties.length} bất động sản` 
+              : 'Không tìm thấy bất động sản phù hợp'
+            }
+          </p>
+        </div>
+        
+        {properties.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {properties.map((property) => (
+              <PropertyCard 
+                key={property.id} 
+                property={property} 
+                onClick={() => {}}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <i className="fas fa-search text-6xl text-gray-300 mb-4"></i>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Đang trống</h3>
+            <p className="text-gray-500 mb-4">Hiện tại chưa có {title.toLowerCase()} nào</p>
+            <Link 
+              to="/"
+              className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors inline-block"
+            >
+              Về trang chủ
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Search Results Page
+const SearchResultsPage = () => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  
+  const searchFilters = {
+    city: params.get('city') || '',
+    propertyType: params.get('property_type') || '',
+    minPrice: params.get('min_price') || '',
+    maxPrice: params.get('max_price') || '',
+    bedrooms: params.get('bedrooms') || ''
+  };
+
+  return <PropertiesSection searchFilters={searchFilters} hideTitle={false} />;
+};
+
+// FAQ Section
+const FAQSection = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = [
+    {
+      question: "Làm thế nào để đăng tin bất động sản?",
+      answer: "Bạn có thể đăng tin bất động sản bằng cách liên hệ với chúng tôi qua hotline hoặc email. Đội ngũ tư vấn viên sẽ hỗ trợ bạn đăng tin một cách nhanh chóng và hiệu quả nhất."
+    },
+    {
+      question: "Chi phí đăng tin như thế nào?",
+      answer: "Chúng tôi có nhiều gói đăng tin khác nhau phù hợp với nhu cầu của bạn. Vui lòng liên hệ để được tư vấn chi tiết về bảng giá và các ưu đãi hiện có."
+    },
+    {
+      question: "Thời gian tin đăng được duyệt bao lâu?",
+      answer: "Tin đăng sẽ được kiểm duyệt và đăng lên website trong vòng 2-4 giờ làm việc sau khi nhận được thông tin đầy đủ từ khách hàng."
+    },
+    {
+      question: "Có hỗ trợ tư vấn pháp lý không?",
+      answer: "Chúng tôi có đội ngũ luật sư chuyên về bất động sản sẵn sàng hỗ trợ khách hàng trong các thủ tục pháp lý liên quan đến mua bán, cho thuê bất động sản."
+    },
+    {
+      question: "Làm thế nào để được hỗ trợ xem nhà?",
+      answer: "Bạn có thể liên hệ trực tiếp với số điện thoại trên tin đăng hoặc gọi hotline của chúng tôi. Chúng tôi sẽ sắp xếp lịch xem nhà phù hợp với thời gian của bạn."
+    }
+  ];
+
+  return (
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <i className="fas fa-question-circle text-emerald-600 text-2xl"></i>
+            <h2 className="text-3xl font-bold text-gray-800">Câu hỏi thường gặp</h2>
+          </div>
+          <p className="text-gray-600">Những câu hỏi thường gặp về dịch vụ của chúng tôi</p>
+        </div>
+
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <span className="font-semibold text-gray-800">{faq.question}</span>
+                <i className={`fas fa-chevron-${openIndex === index ? 'up' : 'down'} text-emerald-600`}></i>
+              </button>
+              {openIndex === index && (
+                <div className="px-6 pb-4">
+                  <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Contact Page
+const ContactPage = () => {
+  return (
+    <div className="py-16 bg-gray-50 min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Liên hệ với chúng tôi</h1>
+          <p className="text-gray-600">Chúng tôi sẵn sàng hỗ trợ bạn 24/7</p>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-6">Thông tin liên hệ</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-map-marker-alt text-emerald-600 text-xl"></i>
+                  <div>
+                    <p className="font-semibold">Địa chỉ</p>
+                    <p className="text-gray-600">123 Nguyễn Huệ, Quận 1, TP.HCM</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-phone text-emerald-600 text-xl"></i>
+                  <div>
+                    <p className="font-semibold">Số điện thoại</p>
+                    <p className="text-gray-600">0123 456 789</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-envelope text-emerald-600 text-xl"></i>
+                  <div>
+                    <p className="font-semibold">Email</p>
+                    <p className="text-gray-600">info@bdsvietnam.com</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <i className="fas fa-clock text-emerald-600 text-xl"></i>
+                  <div>
+                    <p className="font-semibold">Giờ làm việc</p>
+                    <p className="text-gray-600">T2-T6: 8:00-18:00 | T7: 8:00-12:00</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-6">Gửi tin nhắn</h3>
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Họ tên</label>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Nhập họ tên của bạn"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Nhập email của bạn"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                  <input
+                    type="tel"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Nhập số điện thoại"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tin nhắn</label>
+                  <textarea
+                    rows="4"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="Nhập tin nhắn của bạn"
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-semibold"
+                >
+                  <i className="fas fa-paper-plane mr-2"></i>
+                  Gửi tin nhắn
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Admin Section (keep existing)
 const AdminSection = () => {
   const [activeTab, setActiveTab] = useState('properties');
   const [properties, setProperties] = useState([]);
@@ -1091,64 +1867,15 @@ const AdminSection = () => {
   );
 };
 
-// FAQ Section
-const FAQSection = () => {
-  const [openIndex, setOpenIndex] = useState(null);
-
-  const faqs = [
-    {
-      question: "Làm thế nào để đăng tin bất động sản?",
-      answer: "Bạn có thể đăng tin bất động sản bằng cách liên hệ với chúng tôi qua hotline hoặc email. Đội ngũ tư vấn viên sẽ hỗ trợ bạn đăng tin một cách nhanh chóng và hiệu quả nhất."
-    },
-    {
-      question: "Chi phí đăng tin như thế nào?",
-      answer: "Chúng tôi có nhiều gói đăng tin khác nhau phù hợp với nhu cầu của bạn. Vui lòng liên hệ để được tư vấn chi tiết về bảng giá và các ưu đãi hiện có."
-    },
-    {
-      question: "Thời gian tin đăng được duyệt bao lâu?",
-      answer: "Tin đăng sẽ được kiểm duyệt và đăng lên website trong vòng 2-4 giờ làm việc sau khi nhận được thông tin đầy đủ từ khách hàng."
-    },
-    {
-      question: "Có hỗ trợ tư vấn pháp lý không?",
-      answer: "Chúng tôi có đội ngũ luật sư chuyên về bất động sản sẵn sàng hỗ trợ khách hàng trong các thủ tục pháp lý liên quan đến mua bán, cho thuê bất động sản."
-    },
-    {
-      question: "Làm thế nào để được hỗ trợ xem nhà?",
-      answer: "Bạn có thể liên hệ trực tiếp với số điện thoại trên tin đăng hoặc gọi hotline của chúng tôi. Chúng tôi sẽ sắp xếp lịch xem nhà phù hợp với thời gian của bạn."
-    }
-  ];
-
+// Home Page Component
+const HomePage = () => {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <i className="fas fa-question-circle text-emerald-600 text-2xl"></i>
-            <h2 className="text-3xl font-bold text-gray-800">Câu hỏi thường gặp</h2>
-          </div>
-          <p className="text-gray-600">Những câu hỏi thường gặp về dịch vụ của chúng tôi</p>
-        </div>
-
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-semibold text-gray-800">{faq.question}</span>
-                <i className={`fas fa-chevron-${openIndex === index ? 'up' : 'down'} text-emerald-600`}></i>
-              </button>
-              {openIndex === index && (
-                <div className="px-6 pb-4">
-                  <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <>
+      <HeroSection />
+      <PropertiesSection searchFilters={null} />
+      <NewsSlider />
+      <FAQSection />
+    </>
   );
 };
 
@@ -1189,9 +1916,9 @@ const Footer = () => {
               <h4 className="font-semibold">Liên kết nhanh</h4>
             </div>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Về chúng tôi</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Tin tức</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Liên hệ</a></li>
+              <li><Link to="/" className="text-gray-300 hover:text-emerald-400 transition-colors">Trang chủ</Link></li>
+              <li><Link to="/tin-tuc" className="text-gray-300 hover:text-emerald-400 transition-colors">Tin tức</Link></li>
+              <li><Link to="/lien-he" className="text-gray-300 hover:text-emerald-400 transition-colors">Liên hệ</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Điều khoản sử dung</a></li>
               <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách bảo mật</a></li>
             </ul>
@@ -1203,10 +1930,10 @@ const Footer = () => {
               <h4 className="font-semibold">Loại hình BDS</h4>
             </div>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Căn hộ chung cư</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Biệt thự</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Nhà phố</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Shophouse</a></li>
+              <li><Link to="/loai-hinh/can-ho" className="text-gray-300 hover:text-emerald-400 transition-colors">Căn hộ chung cư</Link></li>
+              <li><Link to="/loai-hinh/biet-thu" className="text-gray-300 hover:text-emerald-400 transition-colors">Biệt thự</Link></li>
+              <li><Link to="/loai-hinh/nha-pho" className="text-gray-300 hover:text-emerald-400 transition-colors">Nhà phố</Link></li>
+              <li><Link to="/loai-hinh/shophouse" className="text-gray-300 hover:text-emerald-400 transition-colors">Shophouse</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Đất nền</a></li>
             </ul>
           </div>
@@ -1245,18 +1972,30 @@ const Footer = () => {
             Made with <i className="fas fa-heart text-emerald-400"></i> in Vietnam
           </p>
         </div>
-
-        <div className="fixed bottom-6 right-6 space-y-2">
-          <button className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
-            <i className="fas fa-comment-alt text-xl"></i>
-          </button>
-          <button className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
-            <i className="fas fa-phone text-xl"></i>
-          </button>
-          <button className="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors">
-            <i className="fas fa-headset text-xl"></i>
-          </button>
-        </div>
+      </div>
+      
+      {/* Fixed Action Buttons */}
+      <div className="fixed bottom-6 right-6 space-y-2 z-40">
+        <a 
+          href="https://zalo.me/0123456789" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors block"
+        >
+          <i className="fas fa-comment-alt text-xl"></i>
+        </a>
+        <a 
+          href="tel:0123456789"
+          className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition-colors block"
+        >
+          <i className="fas fa-phone text-xl"></i>
+        </a>
+        <a 
+          href="#"
+          className="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors block"
+        >
+          <i className="fas fa-headset text-xl"></i>
+        </a>
       </div>
     </footer>
   );
@@ -1264,97 +2003,29 @@ const Footer = () => {
 
 // Main App Component
 function App() {
-  const [activeSection, setActiveSection] = useState('home');
-  const [searchFilters, setSearchFilters] = useState(null);
-
-  const handleSearch = (filters) => {
-    setSearchFilters(filters);
-    setActiveSection('properties');
-  };
-
-  const renderContent = () => {
-    switch(activeSection) {
-      case 'home':
-        return (
-          <>
-            <HeroSection onSearch={handleSearch} />
-            <PropertiesSection searchFilters={null} />
-            <NewsSection />
-            <FAQSection />
-          </>
-        );
-      case 'properties':
-        return <PropertiesSection searchFilters={searchFilters} />;
-      case 'news':
-        return <NewsSection />;
-      case 'admin':
-        return <AdminSection />;
-      case 'contact':
-        return (
-          <div className="py-16 bg-gray-50 min-h-screen">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8">Liên hệ với chúng tôi</h2>
-              <div className="bg-white p-8 rounded-lg shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="text-left">
-                    <h3 className="text-xl font-semibold mb-4">Thông tin liên hệ</h3>
-                    <div className="space-y-4">
-                      <p className="flex items-center space-x-2">
-                        <i className="fas fa-map-marker-alt text-emerald-600"></i>
-                        <span>123 Nguyễn Huệ, Quận 1, TP.HCM</span>
-                      </p>
-                      <p className="flex items-center space-x-2">
-                        <i className="fas fa-phone text-emerald-600"></i>
-                        <span>0123 456 789</span>
-                      </p>
-                      <p className="flex items-center space-x-2">
-                        <i className="fas fa-envelope text-emerald-600"></i>
-                        <span>info@bdsvietnam.com</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-xl font-semibold mb-4">Gửi tin nhắn</h3>
-                    <form className="space-y-4">
-                      <input
-                        type="text"
-                        placeholder="Họ tên"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      />
-                      <textarea
-                        placeholder="Tin nhắn"
-                        rows="4"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                      ></textarea>
-                      <button className="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors">
-                        Gửi tin nhắn
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      default:
-        return <div>Section not found</div>;
-    }
-  };
-
   return (
-    <div className="App">
-      <Header setActiveSection={setActiveSection} />
-      {renderContent()}
-      <Footer />
-      
-      {/* FontAwesome CDN */}
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/page/:id" element={<PropertyDetailPage />} />
+            <Route path="/post/:id" element={<NewsDetailPage />} />
+            <Route path="/tin-tuc" element={<NewsListPage />} />
+            <Route path="/tim-kiem" element={<SearchResultsPage />} />
+            <Route path="/bds/:filterType" element={<PropertyFilterPage />} />
+            <Route path="/loai-hinh/:filterType" element={<PropertyFilterPage />} />
+            <Route path="/lien-he" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminSection />} />
+          </Routes>
+        </main>
+        <Footer />
+        
+        {/* FontAwesome CDN */}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      </div>
+    </Router>
   );
 }
 
