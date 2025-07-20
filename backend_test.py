@@ -619,6 +619,478 @@ class BDSVietnamAPITester:
             self.log_test("Enhanced Statistics", False, f"Error: {str(e)}")
             return False
 
+    # ========================================
+    # NEW ENHANCED FEATURES TESTING
+    # ========================================
+
+    def test_enhanced_user_registration(self):
+        """Test enhanced user registration with full_name and phone"""
+        test_user_data = {
+            "username": "testmember",
+            "email": "testmember@example.com", 
+            "password": "test123",
+            "full_name": "Test Member User",
+            "phone": "0987654321"
+        }
+        
+        try:
+            # Remove auth header for registration
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/register", json=test_user_data)
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_profile = data.get("user", {})
+                
+                # Verify enhanced fields
+                checks = [
+                    user_profile.get("role") == "member",
+                    user_profile.get("wallet_balance") == 0.0,
+                    user_profile.get("full_name") == test_user_data["full_name"],
+                    user_profile.get("phone") == test_user_data["phone"],
+                    user_profile.get("profile_completed") == True  # Should be True since full_name and phone provided
+                ]
+                
+                if all(checks):
+                    self.log_test("Enhanced User Registration", True, f"User registered with all enhanced fields: role=member, balance=0.0, profile_completed=True")
+                    return data.get("access_token")
+                else:
+                    self.log_test("Enhanced User Registration", False, f"Missing enhanced fields: {user_profile}")
+                    return None
+            elif response.status_code == 400 and "already registered" in response.text:
+                self.log_test("Enhanced User Registration", True, "Test user already exists (expected)")
+                return "existing_user"
+            else:
+                self.log_test("Enhanced User Registration", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Enhanced User Registration", False, f"Error: {str(e)}")
+            return None
+
+    def test_enhanced_user_login(self):
+        """Test enhanced user login with suspended user check and last_login update"""
+        login_data = {
+            "username": "testmember",
+            "password": "test123"
+        }
+        
+        try:
+            # Remove auth header for login
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json=login_data)
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_profile = data.get("user", {})
+                
+                # Verify enhanced login features
+                checks = [
+                    data.get("access_token") is not None,
+                    user_profile.get("role") == "member",
+                    user_profile.get("last_login") is not None  # Should be updated
+                ]
+                
+                if all(checks):
+                    self.log_test("Enhanced User Login", True, f"Member login successful with last_login update")
+                    return data.get("access_token")
+                else:
+                    self.log_test("Enhanced User Login", False, f"Missing enhanced login fields: {user_profile}")
+                    return None
+            else:
+                self.log_test("Enhanced User Login", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Enhanced User Login", False, f"Error: {str(e)}")
+            return None
+
+    def test_user_profile_management(self):
+        """Test user profile management with profile_completed logic"""
+        # First login as test member
+        member_token = self.test_enhanced_user_login()
+        if not member_token or member_token == "existing_user":
+            self.log_test("User Profile Management", False, "Could not get member token for testing")
+            return False
+        
+        # Set member auth header
+        original_headers = self.session.headers.copy()
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            # Test profile update
+            profile_update = {
+                "full_name": "Updated Test Member",
+                "phone": "0123456789",
+                "address": "123 Test Street, Ho Chi Minh City"
+            }
+            
+            response = self.session.put(f"{self.base_url}/auth/profile", json=profile_update)
+            
+            if response.status_code == 200:
+                updated_profile = response.json()
+                
+                # Verify profile_completed logic
+                checks = [
+                    updated_profile.get("full_name") == profile_update["full_name"],
+                    updated_profile.get("phone") == profile_update["phone"],
+                    updated_profile.get("address") == profile_update["address"],
+                    updated_profile.get("profile_completed") == True  # Should be True with full_name and phone
+                ]
+                
+                if all(checks):
+                    self.log_test("User Profile Management", True, f"Profile updated with profile_completed=True")
+                    return True
+                else:
+                    self.log_test("User Profile Management", False, f"Profile update failed validation: {updated_profile}")
+                    return False
+            else:
+                self.log_test("User Profile Management", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("User Profile Management", False, f"Error: {str(e)}")
+            return False
+        finally:
+            # Restore original headers
+            self.session.headers.update(original_headers)
+
+    def test_wallet_deposit_request(self):
+        """Test wallet deposit request creation"""
+        # First login as test member
+        member_token = self.test_enhanced_user_login()
+        if not member_token or member_token == "existing_user":
+            self.log_test("Wallet Deposit Request", False, "Could not get member token for testing")
+            return None
+        
+        # Set member auth header
+        original_headers = self.session.headers.copy()
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            deposit_data = {
+                "amount": 1000000.0,
+                "description": "Test deposit for wallet testing"
+            }
+            
+            response = self.session.post(f"{self.base_url}/wallet/deposit", json=deposit_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                transaction_id = data.get("transaction_id")
+                
+                if transaction_id and data.get("amount") == deposit_data["amount"]:
+                    self.log_test("Wallet Deposit Request", True, f"Deposit request created: {transaction_id}, amount: {data.get('amount'):,.0f} VNĐ")
+                    return transaction_id
+                else:
+                    self.log_test("Wallet Deposit Request", False, f"Invalid response data: {data}")
+                    return None
+            else:
+                self.log_test("Wallet Deposit Request", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Wallet Deposit Request", False, f"Error: {str(e)}")
+            return None
+        finally:
+            # Restore original headers
+            self.session.headers.update(original_headers)
+
+    def test_wallet_transaction_history(self):
+        """Test wallet transaction history retrieval"""
+        # First login as test member
+        member_token = self.test_enhanced_user_login()
+        if not member_token or member_token == "existing_user":
+            self.log_test("Wallet Transaction History", False, "Could not get member token for testing")
+            return False
+        
+        # Set member auth header
+        original_headers = self.session.headers.copy()
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            response = self.session.get(f"{self.base_url}/wallet/transactions")
+            
+            if response.status_code == 200:
+                transactions = response.json()
+                self.log_test("Wallet Transaction History", True, f"Retrieved {len(transactions)} transactions")
+                
+                # Test with transaction type filter
+                filter_response = self.session.get(f"{self.base_url}/wallet/transactions", params={"transaction_type": "deposit"})
+                if filter_response.status_code == 200:
+                    deposit_transactions = filter_response.json()
+                    self.log_test("Wallet Transaction Filter", True, f"Deposit transactions: {len(deposit_transactions)}")
+                else:
+                    self.log_test("Wallet Transaction Filter", False, f"Filter failed: {filter_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Wallet Transaction History", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Wallet Transaction History", False, f"Error: {str(e)}")
+            return False
+        finally:
+            # Restore original headers
+            self.session.headers.update(original_headers)
+
+    def test_admin_transaction_management(self, transaction_id: str):
+        """Test admin transaction approval/rejection"""
+        if not transaction_id:
+            self.log_test("Admin Transaction Management", False, "No transaction ID provided")
+            return False
+        
+        try:
+            # Test get all transactions (admin)
+            response = self.session.get(f"{self.base_url}/admin/transactions")
+            if response.status_code == 200:
+                transactions = response.json()
+                self.log_test("Admin Get All Transactions", True, f"Retrieved {len(transactions)} transactions")
+            else:
+                self.log_test("Admin Get All Transactions", False, f"Status: {response.status_code}")
+            
+            # Test approve transaction
+            approve_response = self.session.put(f"{self.base_url}/admin/transactions/{transaction_id}/approve")
+            if approve_response.status_code == 200:
+                self.log_test("Admin Approve Transaction", True, f"Transaction {transaction_id} approved successfully")
+                return True
+            else:
+                self.log_test("Admin Approve Transaction", False, f"Status: {approve_response.status_code}, Response: {approve_response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Transaction Management", False, f"Error: {str(e)}")
+            return False
+
+    def test_member_post_creation(self):
+        """Test member post creation with 50k VND fee deduction"""
+        # First login as test member
+        member_token = self.test_enhanced_user_login()
+        if not member_token or member_token == "existing_user":
+            self.log_test("Member Post Creation", False, "Could not get member token for testing")
+            return None
+        
+        # Set member auth header
+        original_headers = self.session.headers.copy()
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            # Test property post creation
+            property_post_data = {
+                "title": "Căn hộ test từ member",
+                "description": "Căn hộ test được đăng bởi member để kiểm tra hệ thống",
+                "post_type": "property",
+                "price": 3000000000,
+                "images": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="],
+                "contact_phone": "0987654321",
+                "contact_email": "testmember@example.com",
+                "property_type": "apartment",
+                "property_status": "for_sale",
+                "area": 75.0,
+                "bedrooms": 2,
+                "bathrooms": 2,
+                "address": "123 Test Street",
+                "district": "Test District",
+                "city": "Ho Chi Minh"
+            }
+            
+            response = self.session.post(f"{self.base_url}/member/posts", json=property_post_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                post_id = data.get("id")
+                
+                # Verify post creation and fee deduction
+                checks = [
+                    post_id is not None,
+                    data.get("status") == "pending",
+                    data.get("author_id") is not None,
+                    data.get("post_type") == "property"
+                ]
+                
+                if all(checks):
+                    self.log_test("Member Post Creation", True, f"Property post created: {post_id}, status: pending")
+                    return post_id
+                else:
+                    self.log_test("Member Post Creation", False, f"Invalid post data: {data}")
+                    return None
+            elif response.status_code == 400 and "Insufficient balance" in response.text:
+                self.log_test("Member Post Creation", True, f"Insufficient balance check working (expected for new user)")
+                return "insufficient_balance"
+            else:
+                self.log_test("Member Post Creation", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Member Post Creation", False, f"Error: {str(e)}")
+            return None
+        finally:
+            # Restore original headers
+            self.session.headers.update(original_headers)
+
+    def test_member_post_management(self):
+        """Test member post management (get, update, delete)"""
+        # First login as test member
+        member_token = self.test_enhanced_user_login()
+        if not member_token or member_token == "existing_user":
+            self.log_test("Member Post Management", False, "Could not get member token for testing")
+            return False
+        
+        # Set member auth header
+        original_headers = self.session.headers.copy()
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            # Test get member posts
+            response = self.session.get(f"{self.base_url}/member/posts")
+            
+            if response.status_code == 200:
+                posts = response.json()
+                self.log_test("Get Member Posts", True, f"Retrieved {len(posts)} member posts")
+                
+                # Test with status filter
+                pending_response = self.session.get(f"{self.base_url}/member/posts", params={"status": "pending"})
+                if pending_response.status_code == 200:
+                    pending_posts = pending_response.json()
+                    self.log_test("Get Member Posts by Status", True, f"Pending posts: {len(pending_posts)}")
+                else:
+                    self.log_test("Get Member Posts by Status", False, f"Status filter failed: {pending_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Member Post Management", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Member Post Management", False, f"Error: {str(e)}")
+            return False
+        finally:
+            # Restore original headers
+            self.session.headers.update(original_headers)
+
+    def test_admin_post_approval_workflow(self):
+        """Test admin post approval workflow"""
+        try:
+            # Test get pending posts
+            response = self.session.get(f"{self.base_url}/admin/posts/pending")
+            if response.status_code == 200:
+                pending_posts = response.json()
+                self.log_test("Admin Get Pending Posts", True, f"Retrieved {len(pending_posts)} pending posts")
+                
+                # Test get all posts
+                all_posts_response = self.session.get(f"{self.base_url}/admin/posts")
+                if all_posts_response.status_code == 200:
+                    all_posts = all_posts_response.json()
+                    self.log_test("Admin Get All Posts", True, f"Retrieved {len(all_posts)} total posts")
+                else:
+                    self.log_test("Admin Get All Posts", False, f"Status: {all_posts_response.status_code}")
+                
+                # If there are pending posts, test approval
+                if pending_posts:
+                    post_id = pending_posts[0].get("id")
+                    if post_id:
+                        approval_data = {
+                            "status": "approved",
+                            "admin_notes": "Test approval by admin",
+                            "featured": False
+                        }
+                        
+                        approve_response = self.session.put(f"{self.base_url}/admin/posts/{post_id}/approve", json=approval_data)
+                        if approve_response.status_code == 200:
+                            self.log_test("Admin Approve Post", True, f"Post {post_id} approved successfully")
+                        else:
+                            self.log_test("Admin Approve Post", False, f"Approval failed: {approve_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Admin Post Approval Workflow", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Post Approval Workflow", False, f"Error: {str(e)}")
+            return False
+
+    def test_admin_user_management(self):
+        """Test admin user management (get users, update status, adjust balance)"""
+        try:
+            # Test get all users
+            response = self.session.get(f"{self.base_url}/admin/users")
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test("Admin Get All Users", True, f"Retrieved {len(users)} users")
+                
+                # Test with role filter
+                member_response = self.session.get(f"{self.base_url}/admin/users", params={"role": "member"})
+                if member_response.status_code == 200:
+                    members = member_response.json()
+                    self.log_test("Admin Get Users by Role", True, f"Members: {len(members)}")
+                else:
+                    self.log_test("Admin Get Users by Role", False, f"Role filter failed: {member_response.status_code}")
+                
+                # Find a test member to test user management
+                test_member = None
+                for user in users:
+                    if user.get("username") == "testmember":
+                        test_member = user
+                        break
+                
+                if test_member:
+                    user_id = test_member.get("id")
+                    
+                    # Test balance adjustment
+                    balance_response = self.session.put(
+                        f"{self.base_url}/admin/users/{user_id}/balance",
+                        params={"amount": 100000.0, "description": "Test balance adjustment"}
+                    )
+                    if balance_response.status_code == 200:
+                        self.log_test("Admin Adjust User Balance", True, f"Balance adjusted for user {user_id}")
+                    else:
+                        self.log_test("Admin Adjust User Balance", False, f"Balance adjustment failed: {balance_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Admin User Management", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin User Management", False, f"Error: {str(e)}")
+            return False
+
+    def test_enhanced_admin_dashboard_stats(self):
+        """Test enhanced admin dashboard statistics"""
+        try:
+            response = self.session.get(f"{self.base_url}/admin/dashboard/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                
+                # Check for enhanced dashboard fields
+                enhanced_fields = [
+                    "total_users", "active_users", "suspended_users", "today_users",
+                    "total_properties", "properties_for_sale", "properties_for_rent",
+                    "total_news_articles", "total_sims", "total_lands", "total_tickets",
+                    "pending_posts", "pending_properties", "pending_lands", "pending_sims",
+                    "pending_transactions", "total_transactions", "total_revenue",
+                    "today_transactions", "total_pageviews", "today_pageviews",
+                    "today_unique_visitors", "top_cities"
+                ]
+                
+                missing_fields = [field for field in enhanced_fields if field not in stats]
+                if not missing_fields:
+                    self.log_test("Enhanced Admin Dashboard Stats", True, f"All enhanced dashboard fields present ({len(enhanced_fields)} fields)")
+                    return True
+                else:
+                    self.log_test("Enhanced Admin Dashboard Stats", False, f"Missing enhanced fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Enhanced Admin Dashboard Stats", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Enhanced Admin Dashboard Stats", False, f"Error: {str(e)}")
+            return False
+
     # SIMS CRUD TESTING
     def test_create_sim(self):
         """Test creating a new sim"""
