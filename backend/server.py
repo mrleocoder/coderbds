@@ -591,6 +591,8 @@ async def get_statistics():
     total_for_sale = await db.properties.count_documents({"status": "for_sale"})
     total_for_rent = await db.properties.count_documents({"status": "for_rent"})
     total_news = await db.news_articles.count_documents({"published": True})
+    total_sims = await db.sims.count_documents({})
+    total_lands = await db.lands.count_documents({})
     
     # Get properties by city
     pipeline = [
@@ -605,8 +607,235 @@ async def get_statistics():
         "properties_for_sale": total_for_sale,
         "properties_for_rent": total_for_rent,
         "total_news_articles": total_news,
+        "total_sims": total_sims,
+        "total_lands": total_lands,
         "top_cities": cities
     }
+
+# Sim Routes
+@api_router.get("/sims", response_model=List[Sim])
+async def get_sims(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    network: Optional[SimNetwork] = None,
+    sim_type: Optional[SimType] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    is_vip: Optional[bool] = None,
+    status: str = "available",
+    sort_by: str = "created_at",
+    order: str = "desc"
+):
+    """Get sims with filtering and pagination"""
+    filter_query = {"status": status}
+    
+    if network:
+        filter_query["network"] = network
+    if sim_type:
+        filter_query["sim_type"] = sim_type
+    if min_price is not None:
+        filter_query["price"] = {"$gte": min_price}
+    if max_price is not None:
+        if "price" in filter_query:
+            filter_query["price"]["$lte"] = max_price
+        else:
+            filter_query["price"] = {"$lte": max_price}
+    if is_vip is not None:
+        filter_query["is_vip"] = is_vip
+    
+    sort_order = -1 if order == "desc" else 1
+    
+    sims = await db.sims.find(filter_query).sort(sort_by, sort_order).skip(skip).limit(limit).to_list(limit)
+    return [Sim(**sim) for sim in sims]
+
+@api_router.get("/sims/{sim_id}", response_model=Sim)
+async def get_sim(sim_id: str):
+    """Get single sim by ID"""
+    sim_data = await db.sims.find_one({"id": sim_id})
+    if not sim_data:
+        raise HTTPException(status_code=404, detail="Sim not found")
+    
+    # Increment views
+    await db.sims.update_one({"id": sim_id}, {"$inc": {"views": 1}})
+    sim_data["views"] += 1
+    
+    return Sim(**sim_data)
+
+@api_router.post("/sims", response_model=Sim)
+async def create_sim(sim_data: SimCreate, current_user: User = Depends(get_current_user)):
+    """Create new sim - Admin only"""
+    sim_obj = Sim(**sim_data.dict())
+    await db.sims.insert_one(sim_obj.dict())
+    return sim_obj
+
+@api_router.put("/sims/{sim_id}", response_model=Sim)
+async def update_sim(sim_id: str, sim_update: SimUpdate, current_user: User = Depends(get_current_user)):
+    """Update sim - Admin only"""
+    update_data = {k: v for k, v in sim_update.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    result = await db.sims.update_one({"id": sim_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Sim not found")
+    
+    updated_sim = await db.sims.find_one({"id": sim_id})
+    return Sim(**updated_sim)
+
+@api_router.delete("/sims/{sim_id}")
+async def delete_sim(sim_id: str, current_user: User = Depends(get_current_user)):
+    """Delete sim - Admin only"""
+    result = await db.sims.delete_one({"id": sim_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Sim not found")
+    return {"message": "Sim deleted successfully"}
+
+@api_router.get("/sims/search", response_model=List[Sim])
+async def search_sims(
+    q: str = Query(..., description="Search query"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100)
+):
+    """Search sims by phone number, features"""
+    search_query = {
+        "$or": [
+            {"phone_number": {"$regex": q, "$options": "i"}},
+            {"features": {"$regex": q, "$options": "i"}},
+            {"description": {"$regex": q, "$options": "i"}}
+        ],
+        "status": "available"
+    }
+    
+    sims = await db.sims.find(search_query).skip(skip).limit(limit).to_list(limit)
+    return [Sim(**sim) for sim in sims]
+
+# Land Routes
+@api_router.get("/lands", response_model=List[Land])
+async def get_lands(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    land_type: Optional[LandType] = None,
+    status: Optional[PropertyStatus] = None,
+    city: Optional[str] = None,
+    district: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    min_area: Optional[float] = None,
+    max_area: Optional[float] = None,
+    featured: Optional[bool] = None,
+    sort_by: str = "created_at",
+    order: str = "desc"
+):
+    """Get lands with filtering and pagination"""
+    filter_query = {}
+    
+    if land_type:
+        filter_query["land_type"] = land_type
+    if status:
+        filter_query["status"] = status
+    if city:
+        filter_query["city"] = {"$regex": city, "$options": "i"}
+    if district:
+        filter_query["district"] = {"$regex": district, "$options": "i"}
+    if min_price is not None:
+        filter_query["price"] = {"$gte": min_price}
+    if max_price is not None:
+        if "price" in filter_query:
+            filter_query["price"]["$lte"] = max_price
+        else:
+            filter_query["price"] = {"$lte": max_price}
+    if min_area is not None:
+        filter_query["area"] = {"$gte": min_area}
+    if max_area is not None:
+        if "area" in filter_query:
+            filter_query["area"]["$lte"] = max_area
+        else:
+            filter_query["area"] = {"$lte": max_area}
+    if featured is not None:
+        filter_query["featured"] = featured
+    
+    sort_order = -1 if order == "desc" else 1
+    
+    lands = await db.lands.find(filter_query).sort(sort_by, sort_order).skip(skip).limit(limit).to_list(limit)
+    return [Land(**land) for land in lands]
+
+@api_router.get("/lands/{land_id}", response_model=Land)
+async def get_land(land_id: str):
+    """Get single land by ID"""
+    land_data = await db.lands.find_one({"id": land_id})
+    if not land_data:
+        raise HTTPException(status_code=404, detail="Land not found")
+    
+    # Increment views
+    await db.lands.update_one({"id": land_id}, {"$inc": {"views": 1}})
+    land_data["views"] += 1
+    
+    return Land(**land_data)
+
+@api_router.post("/lands", response_model=Land)
+async def create_land(land_data: LandCreate, current_user: User = Depends(get_current_user)):
+    """Create new land - Admin only"""
+    land_dict = land_data.dict()
+    if land_dict.get("area") and land_dict.get("price"):
+        land_dict["price_per_sqm"] = land_dict["price"] / land_dict["area"]
+    
+    land_obj = Land(**land_dict)
+    await db.lands.insert_one(land_obj.dict())
+    return land_obj
+
+@api_router.put("/lands/{land_id}", response_model=Land)
+async def update_land(land_id: str, land_update: LandUpdate, current_user: User = Depends(get_current_user)):
+    """Update land - Admin only"""
+    update_data = {k: v for k, v in land_update.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    if "area" in update_data or "price" in update_data:
+        land_data = await db.lands.find_one({"id": land_id})
+        if land_data:
+            area = update_data.get("area", land_data.get("area"))
+            price = update_data.get("price", land_data.get("price"))
+            if area and price:
+                update_data["price_per_sqm"] = price / area
+    
+    result = await db.lands.update_one({"id": land_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Land not found")
+    
+    updated_land = await db.lands.find_one({"id": land_id})
+    return Land(**updated_land)
+
+@api_router.delete("/lands/{land_id}")
+async def delete_land(land_id: str, current_user: User = Depends(get_current_user)):
+    """Delete land - Admin only"""
+    result = await db.lands.delete_one({"id": land_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Land not found")
+    return {"message": "Land deleted successfully"}
+
+@api_router.get("/lands/featured", response_model=List[Land])
+async def get_featured_lands(limit: int = Query(6, le=20)):
+    """Get featured lands"""
+    lands = await db.lands.find({"featured": True}).sort("created_at", -1).limit(limit).to_list(limit)
+    return [Land(**land) for land in lands]
+
+@api_router.get("/lands/search", response_model=List[Land])
+async def search_lands(
+    q: str = Query(..., description="Search query"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100)
+):
+    """Search lands by title, description, address"""
+    search_query = {
+        "$or": [
+            {"title": {"$regex": q, "$options": "i"}},
+            {"description": {"$regex": q, "$options": "i"}},
+            {"address": {"$regex": q, "$options": "i"}},
+            {"district": {"$regex": q, "$options": "i"}},
+            {"city": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    
+    lands = await db.lands.find(search_query).skip(skip).limit(limit).to_list(limit)
+    return [Land(**land) for land in lands]
 
 # Include the router in the main app
 app.include_router(api_router)
