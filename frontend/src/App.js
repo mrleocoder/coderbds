@@ -1280,20 +1280,88 @@ const PropertyFilterPage = () => {
   );
 };
 
-// Search Results Page
-const SearchResultsPage = () => {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  
-  const searchFilters = {
-    city: params.get('city') || '',
-    propertyType: params.get('property_type') || '',
-    minPrice: params.get('min_price') || '',
-    maxPrice: params.get('max_price') || '',
-    bedrooms: params.get('bedrooms') || ''
+// Land Filter Page
+const LandFilterPage = () => {
+  const { filterType } = useParams();
+  const [lands, setLands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    fetchFilteredLands();
+  }, [filterType]);
+
+  const fetchFilteredLands = async () => {
+    try {
+      setLoading(true);
+      let params = new URLSearchParams();
+      let titleText = '';
+      
+      if (filterType === 'ban') {
+        params.append('status', 'for_sale');
+        titleText = 'Đất bán';
+      } else if (filterType === 'thue') {
+        params.append('status', 'for_rent');
+        titleText = 'Đất cho thuê';
+      }
+      
+      setTitle(titleText);
+      
+      const response = await axios.get(`${API}/lands?${params.toString()}`);
+      setLands(response.data);
+    } catch (error) {
+      console.error('Error fetching filtered lands:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return <PropertiesSection searchFilters={searchFilters} hideTitle={false} />;
+  if (loading) {
+    return (
+      <div className="py-16 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-8 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">{title}</h1>
+          <p className="text-gray-600">
+            {lands.length > 0 
+              ? `Tìm thấy ${lands.length} dự án đất` 
+              : 'Không tìm thấy dự án đất phù hợp'
+            }
+          </p>
+        </div>
+        
+        {lands.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {lands.map((land) => (
+              <LandCard key={land.id} land={land} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <i className="fas fa-search text-6xl text-gray-300 mb-4"></i>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Đang trống</h3>
+            <p className="text-gray-500 mb-4">Hiện tại chưa có {title.toLowerCase()} nào</p>
+            <Link 
+              to="/"
+              className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors inline-block"
+            >
+              Về trang chủ
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 // FAQ Section
