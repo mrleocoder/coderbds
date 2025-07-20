@@ -89,6 +89,35 @@ const Header = () => {
                 </div>
               )}
             </div>
+
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowLandDropdown(true)}
+              onMouseLeave={() => setShowLandDropdown(false)}
+            >
+              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+                <i className="fas fa-map"></i>
+                <span>Dự án đất</span>
+                <i className="fas fa-chevron-down text-sm"></i>
+              </button>
+              {showLandDropdown && (
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
+                  <Link to="/dat/ban" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-tag text-emerald-600 mr-2"></i>
+                    Đất bán
+                  </Link>
+                  <Link to="/dat/thue" className="block px-4 py-2 hover:bg-gray-100">
+                    <i className="fas fa-key text-emerald-600 mr-2"></i>
+                    Đất cho thuê
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link to="/kho-sim" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+              <i className="fas fa-sim-card"></i>
+              <span>Kho sim</span>
+            </Link>
             
             <Link to="/tin-tuc" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-newspaper"></i>
