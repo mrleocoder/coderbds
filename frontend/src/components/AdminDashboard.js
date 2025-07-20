@@ -285,6 +285,34 @@ const AdminDashboard = () => {
                 <i className="fas fa-newspaper mr-2"></i>
                 Quản lý Tin tức ({news.length})
               </button>
+              <button
+                onClick={() => {
+                  setActiveTab('sims');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'sims'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-sim-card mr-2"></i>
+                Quản lý Sim ({sims.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('lands');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'lands'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-map mr-2"></i>
+                Quản lý Đất ({lands.length})
+              </button>
             </nav>
           </div>
 
