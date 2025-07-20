@@ -25,6 +25,12 @@ const Header = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showMemberAuth, setShowMemberAuth] = useState(false);
+  
+  // Mobile accordion states
+  const [showMobilePropertyDropdown, setShowMobilePropertyDropdown] = useState(false);
+  const [showMobileTypeDropdown, setShowMobileTypeDropdown] = useState(false);
+  const [showMobileLandDropdown, setShowMobileLandDropdown] = useState(false);
+  
   const { user, isAuthenticated, logout } = useAuth();
 
   return (
