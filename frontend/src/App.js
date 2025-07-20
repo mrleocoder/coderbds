@@ -1364,6 +1364,22 @@ const LandFilterPage = () => {
   );
 };
 
+// Search Results Page
+const SearchResultsPage = () => {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  
+  const searchFilters = {
+    city: params.get('city') || '',
+    propertyType: params.get('property_type') || '',
+    minPrice: params.get('min_price') || '',
+    maxPrice: params.get('max_price') || '',
+    bedrooms: params.get('bedrooms') || ''
+  };
+
+  return <PropertiesSection searchFilters={searchFilters} hideTitle={false} />;
+};
+
 // FAQ Section
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
