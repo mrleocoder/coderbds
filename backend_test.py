@@ -1327,12 +1327,23 @@ class BDSVietnamAPITester:
             print("❌ API not accessible, stopping tests")
             return
         
-        # PHASE 1: PUBLIC ENDPOINTS (no auth needed)
-        print("\n🌐 PHASE 1: Testing PUBLIC Endpoints (No Authentication Required)")
+        # PRIORITY TEST: Admin Statistics Issue Investigation
+        print("\n🎯 PRIORITY: Admin Statistics Issue Investigation")
         print("-" * 80)
         
         # Create demo admin user first
         self.test_create_demo_admin_user()
+        
+        # Test admin authentication
+        if self.test_authentication():
+            # Run focused admin statistics test
+            self.test_admin_statistics_issue()
+        else:
+            print("❌ Admin authentication failed, running limited statistics tests")
+            # Still test public endpoints
+            self.test_admin_statistics_issue()
+        
+        # Continue with other tests if needed...
         
         # Test public ticket creation
         ticket_id = self.test_create_ticket_public()
