@@ -1215,9 +1215,9 @@ class BDSVietnamAPITester:
     
     def run_all_tests(self):
         """Run all backend API tests"""
-        print("🚀 Starting BDS Vietnam Backend API Tests - ENHANCED VERSION")
+        print("🚀 Starting BDS Vietnam Backend API Tests - COMPREHENSIVE ENHANCED VERSION")
         print(f"Backend URL: {self.base_url}")
-        print("=" * 60)
+        print("=" * 80)
         
         # Test API connectivity
         if not self.test_api_root():
@@ -1226,7 +1226,7 @@ class BDSVietnamAPITester:
         
         # PHASE 1: PUBLIC ENDPOINTS (no auth needed)
         print("\n🌐 PHASE 1: Testing PUBLIC Endpoints (No Authentication Required)")
-        print("-" * 60)
+        print("-" * 80)
         
         # Create demo admin user first
         self.test_create_demo_admin_user()
@@ -1240,17 +1240,72 @@ class BDSVietnamAPITester:
         # Test public statistics (enhanced)
         self.test_enhanced_statistics()
         
-        # PHASE 2: AUTHENTICATION
-        print("\n🔐 PHASE 2: Testing AUTHENTICATION")
-        print("-" * 60)
+        # PHASE 2: ENHANCED AUTHENTICATION & USER MANAGEMENT
+        print("\n🔐 PHASE 2: Testing ENHANCED AUTHENTICATION & USER MANAGEMENT")
+        print("-" * 80)
         
+        # Test enhanced user registration
+        self.test_enhanced_user_registration()
+        
+        # Test enhanced user login
+        member_token = self.test_enhanced_user_login()
+        
+        # Test user profile management
+        self.test_user_profile_management()
+        
+        # Test admin authentication
         if not self.test_authentication():
-            print("❌ Authentication failed, skipping admin-only tests")
+            print("❌ Admin authentication failed, skipping admin-only tests")
             return
         
-        # PHASE 3: ADMIN-ONLY ENDPOINTS (auth required)
-        print("\n🔒 PHASE 3: Testing ADMIN-ONLY Endpoints (Authentication Required)")
-        print("-" * 60)
+        # PHASE 3: WALLET & TRANSACTION SYSTEM
+        print("\n💰 PHASE 3: Testing WALLET & TRANSACTION SYSTEM")
+        print("-" * 80)
+        
+        # Test wallet deposit request
+        transaction_id = self.test_wallet_deposit_request()
+        
+        # Test wallet transaction history
+        self.test_wallet_transaction_history()
+        
+        # Test admin transaction management
+        if transaction_id and transaction_id != "insufficient_balance":
+            self.test_admin_transaction_management(transaction_id)
+        
+        # PHASE 4: MEMBER POST SYSTEM
+        print("\n📝 PHASE 4: Testing MEMBER POST SYSTEM")
+        print("-" * 80)
+        
+        # Test member post creation (with fee deduction)
+        post_id = self.test_member_post_creation()
+        
+        # Test member post management
+        self.test_member_post_management()
+        
+        # PHASE 5: ADMIN APPROVAL WORKFLOW
+        print("\n✅ PHASE 5: Testing ADMIN APPROVAL WORKFLOW")
+        print("-" * 80)
+        
+        # Test admin post approval workflow
+        self.test_admin_post_approval_workflow()
+        
+        # PHASE 6: ADMIN USER MANAGEMENT
+        print("\n👥 PHASE 6: Testing ADMIN USER MANAGEMENT")
+        print("-" * 80)
+        
+        # Test admin user management
+        self.test_admin_user_management()
+        
+        # PHASE 7: ENHANCED DASHBOARD
+        print("\n📊 PHASE 7: Testing ENHANCED DASHBOARD")
+        print("-" * 80)
+        
+        # Test enhanced admin dashboard stats
+        self.test_enhanced_admin_dashboard_stats()
+        
+        # PHASE 8: ADMIN-ONLY ENDPOINTS (existing features verification)
+        print("\n🔒 PHASE 8: Testing EXISTING ADMIN-ONLY Endpoints (Quick Verification)")
+        print("-" * 80)
         
         # Test ticket management (admin)
         if ticket_id:
@@ -1262,9 +1317,9 @@ class BDSVietnamAPITester:
         self.test_get_traffic_analytics_admin()
         self.test_get_popular_pages_admin()
         
-        # PHASE 4: EXISTING FEATURES VERIFICATION
-        print("\n✅ PHASE 4: Verifying EXISTING Features (Quick Check)")
-        print("-" * 60)
+        # PHASE 9: EXISTING FEATURES VERIFICATION (Quick Check)
+        print("\n✅ PHASE 9: Verifying EXISTING Features (Quick Check)")
+        print("-" * 80)
         
         # Property CRUD Tests (existing)
         print("\n📋 Testing Property CRUD Operations...")
@@ -1287,9 +1342,9 @@ class BDSVietnamAPITester:
         if article_id:
             self.test_get_news_article_by_id(article_id)
         
-        # PHASE 5: NEW CRUD FEATURES
-        print("\n🆕 PHASE 5: Testing NEW CRUD Features")
-        print("-" * 60)
+        # PHASE 10: NEW CRUD FEATURES (Quick Check)
+        print("\n🆕 PHASE 10: Testing NEW CRUD Features (Quick Check)")
+        print("-" * 80)
         
         # Sims CRUD Tests
         print("\n📱 Testing Sims CRUD Operations...")
@@ -1305,9 +1360,9 @@ class BDSVietnamAPITester:
         print("\n📊 Testing Enhanced Statistics...")
         self.test_statistics()
         
-        # PHASE 6: CLEANUP
-        print("\n🧹 PHASE 6: Cleaning up test data...")
-        print("-" * 60)
+        # PHASE 11: CLEANUP
+        print("\n🧹 PHASE 11: Cleaning up test data...")
+        print("-" * 80)
         
         if property_id:
             self.test_delete_property(property_id)
