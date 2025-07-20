@@ -128,7 +128,7 @@ const AdminDashboard = () => {
         axios.get(`${API}/sims?limit=50`),
         axios.get(`${API}/lands?limit=50`),
         axios.get(`${API}/tickets?limit=50`, { headers }),
-        axios.get(`${API}/stats`) // Use public stats API for now
+        axios.get(`${API}/admin/dashboard/stats`, { headers }) // Use admin-specific stats API
       ]);
       
       console.log('API responses:', {
@@ -153,6 +153,7 @@ const AdminDashboard = () => {
       console.error('Error fetching admin data:', error);
       if (error.response) {
         console.error('Response error:', error.response.data);
+        console.error('Response status:', error.response.status);
       }
     } finally {
       setLoading(false);
