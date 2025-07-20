@@ -107,51 +107,63 @@ user_problem_statement: "Thiết kế trang website đăng tin bất động s�
 backend:
   - task: "Property CRUD API endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented full Property model with CRUD operations, search, filtering, featured properties endpoint. Includes property types, status, pricing, area, location info"
+      - working: true
+        agent: "testing"
+        comment: "✅ ALL PROPERTY CRUD OPERATIONS WORKING: Fixed critical route ordering issue where /properties/{id} was intercepting /properties/featured and /properties/search. All endpoints now working: GET /properties (with all filters), GET /properties/{id} (with view increment), POST /properties, PUT /properties/{id}, DELETE /properties/{id}, GET /properties/featured, GET /properties/search. Complex filtering with multiple parameters working. Data validation working correctly (422 for missing fields, 404 for non-existent resources)."
 
   - task: "News/Articles CRUD API endpoints" 
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented NewsArticle model with CRUD operations, categories, published status, author info, featured images"
+      - working: true
+        agent: "testing"
+        comment: "✅ ALL NEWS CRUD OPERATIONS WORKING: GET /api/news (with pagination and category filtering), GET /api/news/{id} (with view increment), POST /api/news (create article). All endpoints responding correctly with proper data structure and view counting functionality."
 
   - task: "Statistics API endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Created stats endpoint to return total properties, for sale/rent counts, news count, top cities"
+      - working: true
+        agent: "testing"
+        comment: "✅ STATISTICS API WORKING: GET /api/stats returns all required fields: total_properties, properties_for_sale, properties_for_rent, total_news_articles, top_cities with proper aggregation data."
 
   - task: "Search and filtering functionality"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented complex search with filters for property type, status, price range, area, bedrooms, bathrooms, location"
+      - working: true
+        agent: "testing"
+        comment: "✅ SEARCH AND FILTERING WORKING: Fixed route ordering issue. GET /api/properties/search?q=query working with text search across title, description, address, district, city. All property filters working: property_type, status, city, district, price ranges, bedrooms, bathrooms, featured flag. Complex multi-parameter filtering tested and working."
 
 frontend:
   - task: "Professional header with navigation"
