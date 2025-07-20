@@ -1782,7 +1782,7 @@ async def create_land(land_data: LandCreate, current_user: User = Depends(get_cu
     return land_obj
 
 @api_router.put("/lands/{land_id}", response_model=Land)
-async def update_land(land_id: str, land_update: LandUpdate, current_user: User = Depends(get_current_user)):
+async def update_land(land_id: str, land_update: LandUpdate, current_user: User = Depends(get_current_admin)):
     """Update land - Admin only"""
     update_data = {k: v for k, v in land_update.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
