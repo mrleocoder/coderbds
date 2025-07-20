@@ -1130,6 +1130,205 @@ async def approve_post(
     
     return {"message": f"Post {approval_data.status} successfully"}
 
+# Admin User Management Routes
+@api_router.get("/admin/users", response_model=List[UserProfile])
+async def get_all_users(
+    current_admin: User = Depends(get_current_admin),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, le=200),
+    role: Optional[UserRole] = None,
+    status: Optional[UserStatus] = None,
+    search: Optional[str] = None
+):
+    """Get all users - Admin only"""
+    filter_query = {}
+    if role:
+        filter_query["role"] = role
+    if status:
+        filter_query["status"] = status
+    if search:
+        filter_query["$or"] = [
+            {"username": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}},
+            {"full_name": {"$regex": search, "$options": "i"}}
+        ]
+    
+    users = await db.users.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [UserProfile(**user) for user in users]
+
+@api_router.get("/admin/users/{user_id}", response_model=UserProfile)
+async def get_user_by_id(
+    user_id: str,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Get user by ID - Admin only"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserProfile(**user)
+
+@api_router.put("/admin/users/{user_id}/status")
+async def update_user_status(
+    user_id: str,
+    status: UserStatus,
+    admin_notes: Optional[str] = None,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Update user status - Admin only"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user["role"] == "admin" and current_admin.id != user_id:
+        raise HTTPException(status_code=403, detail="Cannot modify other admin users")
+    
+    await db.users.update_one(
+        {"id": user_id},
+        {
+            "$set": {
+                "status": status,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": f"User status updated to {status}"}
+
+@api_router.put("/admin/users/{user_id}/balance")
+async def adjust_user_balance(
+    user_id: str,
+    amount: float,
+    description: str,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Adjust user wallet balance - Admin only"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update user balance
+    await db.users.update_one(
+        {"id": user_id},
+        {"$inc": {"wallet_balance": amount}}
+    )
+    
+    # Create transaction record
+    transaction_dict = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "amount": abs(amount),
+        "transaction_type": "deposit" if amount > 0 else "withdraw",
+        "status": "completed",
+        "description": description,
+        "admin_notes": f"Manual adjustment by admin: {current_admin.username}",
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "completed_at": datetime.utcnow()
+    }
+    
+    await db.transactions.insert_one(transaction_dict)
+    
+    return {"message": f"User balance adjusted by {amount:,.0f} VNĐ"}
+
+@api_router.get("/admin/dashboard/stats")
+async def get_admin_dashboard_stats(current_admin: User = Depends(get_current_admin)):
+    """Get admin dashboard statistics"""
+    # User statistics
+    total_users = await db.users.count_documents({"role": "member"})
+    active_users = await db.users.count_documents({"role": "member", "status": "active"})
+    suspended_users = await db.users.count_documents({"role": "member", "status": "suspended"})
+    
+    # Content statistics
+    total_properties = await db.properties.count_documents({})
+    total_for_sale = await db.properties.count_documents({"status": "for_sale"})
+    total_for_rent = await db.properties.count_documents({"status": "for_rent"})
+    total_news = await db.news_articles.count_documents({"published": True})
+    total_sims = await db.sims.count_documents({})
+    total_lands = await db.lands.count_documents({})
+    total_tickets = await db.tickets.count_documents({})
+    
+    # Pending approvals
+    pending_posts = await db.member_posts.count_documents({"status": "pending"})
+    pending_properties = await db.member_posts.count_documents({"status": "pending", "post_type": "property"})
+    pending_lands = await db.member_posts.count_documents({"status": "pending", "post_type": "land"})
+    pending_sims = await db.member_posts.count_documents({"status": "pending", "post_type": "sim"})
+    
+    # Transaction statistics
+    pending_transactions = await db.transactions.count_documents({"status": "pending"})
+    total_transactions = await db.transactions.count_documents({})
+    
+    # Revenue statistics (completed post fees)
+    revenue_pipeline = [
+        {"$match": {"transaction_type": "post_fee", "status": "completed"}},
+        {"$group": {"_id": None, "total_revenue": {"$sum": "$amount"}}}
+    ]
+    revenue_result = await db.transactions.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total_revenue"] if revenue_result else 0
+    
+    # Today's statistics
+    today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_users = await db.users.count_documents({"created_at": {"$gte": today}})
+    today_posts = await db.member_posts.count_documents({"created_at": {"$gte": today}})
+    today_transactions = await db.transactions.count_documents({"created_at": {"$gte": today}})
+    
+    # Traffic analytics
+    total_pageviews = await db.pageviews.count_documents({})
+    today_pageviews = await db.pageviews.count_documents({"timestamp": {"$gte": today}})
+    
+    # Get unique sessions today
+    today_sessions_pipeline = [
+        {"$match": {"timestamp": {"$gte": today}}},
+        {"$group": {"_id": "$session_id"}},
+        {"$count": "unique_sessions"}
+    ]
+    today_sessions_result = await db.pageviews.aggregate(today_sessions_pipeline).to_list(1)
+    today_unique_visitors = today_sessions_result[0]["unique_sessions"] if today_sessions_result else 0
+    
+    # Get properties by city
+    cities_pipeline = [
+        {"$group": {"_id": "$city", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]
+    top_cities = await db.properties.aggregate(cities_pipeline).to_list(10)
+    
+    return {
+        # User statistics
+        "total_users": total_users,
+        "active_users": active_users,
+        "suspended_users": suspended_users,
+        "today_users": today_users,
+        
+        # Content statistics
+        "total_properties": total_properties,
+        "properties_for_sale": total_for_sale,
+        "properties_for_rent": total_for_rent,
+        "total_news_articles": total_news,
+        "total_sims": total_sims,
+        "total_lands": total_lands,
+        "total_tickets": total_tickets,
+        
+        # Pending approvals
+        "pending_posts": pending_posts,
+        "pending_properties": pending_properties,
+        "pending_lands": pending_lands,
+        "pending_sims": pending_sims,
+        
+        # Transaction statistics
+        "pending_transactions": pending_transactions,
+        "total_transactions": total_transactions,
+        "total_revenue": total_revenue,
+        "today_transactions": today_transactions,
+        
+        # Traffic analytics
+        "total_pageviews": total_pageviews,
+        "today_pageviews": today_pageviews,
+        "today_unique_visitors": today_unique_visitors,
+        
+        # Other
+        "top_cities": top_cities
+    }
+
 # Property Routes
 @api_router.get("/properties", response_model=List[Property])
 async def get_properties(
