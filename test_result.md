@@ -415,6 +415,18 @@ frontend:
         agent: "main"
         comment: "Add ticket management tab in admin panel to handle customer contact form submissions"
 
+  - task: "Admin Member Management Tab"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/AdminDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added member management functionality to admin dashboard. Includes listing all members, editing member details, lock/unlock accounts, and delete members. Integrated with existing backend APIs /api/admin/members and /api/admin/users/{id}/status"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
