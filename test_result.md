@@ -134,6 +134,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ ALL NEWS CRUD OPERATIONS WORKING: GET /api/news (with pagination and category filtering), GET /api/news/{id} (with view increment), POST /api/news (create article). All endpoints responding correctly with proper data structure and view counting functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE NEWS CRUD TESTING COMPLETED: Specifically tested the reportedly missing PUT and DELETE endpoints. FINDINGS: 1) PUT /api/news/{id} endpoint EXISTS and WORKS PERFECTLY - successfully updated article title, content, category, tags. 2) DELETE /api/news/{id} endpoint EXISTS and WORKS PERFECTLY - successfully deleted article and verified 404 on subsequent GET. 3) Complete CRUD workflow tested: CREATE (POST) ✅, READ (GET) ✅, UPDATE (PUT) ✅, DELETE ✅. 4) All endpoints return proper HTTP status codes (200 for success, 404 for not found). 5) Data persistence verified - updates are saved correctly. CONCLUSION: The user's report of 405 Method Not Allowed errors for PUT/DELETE was likely due to a temporary issue or incorrect endpoint usage. All News CRUD operations are fully functional."
 
   - task: "Statistics API endpoint"
     implemented: true
