@@ -310,17 +310,53 @@ frontend:
         agent: "main"
         comment: "FAQ accordion with real estate related questions and answers"
 
-  - task: "Professional footer"
-    implemented: true
-    working: true
+  - task: "Admin Sim and Land Management Forms"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/components/AdminDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Admin panel currently only shows forms for Properties and News. Need to add Sim and Land management forms that are already defined but not rendered"
+
+  - task: "Analytics Dashboard with Charts"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/components/AdminDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement dashboard with Chart.js for traffic analytics, user statistics, and various chart visualizations by day/week/month/year"
+
+  - task: "Contact Form on Website"
+    implemented: false
+    working: "NA"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
-      - working: true
+      - working: "NA"
         agent: "main"
-        comment: "Complete footer with links, contact info, social media, property types, company info"
+        comment: "Replace current contact link with actual contact form that creates support tickets"
+
+  - task: "Ticket Management in Admin"
+    implemented: false
+    working: "NA"
+    file: "/app/frontend/src/components/AdminDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Add ticket management tab in admin panel to handle customer contact form submissions"
 
 metadata:
   created_by: "main_agent"
