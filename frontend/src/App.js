@@ -40,8 +40,9 @@ const Header = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex">
+          <nav className="flex items-center space-x-6">
             <Link to="/" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-home"></i>
               <span>Trang chủ</span>
@@ -166,14 +167,14 @@ const Header = () => {
                   className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
                 >
                   <i className="fas fa-user-circle"></i>
-                  <span className="hidden md:inline">{user?.full_name || user?.username}</span>
+                  <span>{user?.full_name || user?.username}</span>
                 </Link>
                 <button 
                   onClick={logout}
                   className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
                 >
                   <i className="fas fa-sign-out-alt"></i>
-                  <span className="hidden md:inline">Đăng xuất</span>
+                  <span>Đăng xuất</span>
                 </button>
               </div>
             ) : (
@@ -186,55 +187,186 @@ const Header = () => {
               </button>
             )}
           </nav>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="text-white hover:text-emerald-200 transition-colors"
-            >
-              <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'} text-xl`}></i>
-            </button>
-          </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {showMobileMenu && (
-          <div className="md:hidden mt-4 pb-4">
-            <nav className="flex flex-col space-y-2">
-              <Link to="/" className="text-white hover:text-emerald-200 transition-colors py-2">
-                <i className="fas fa-home mr-2"></i>
-                Trang chủ
-              </Link>
-              <Link to="/bat-dong-san/for_sale" className="text-white hover:text-emerald-200 transition-colors py-2">
-                <i className="fas fa-tag mr-2"></i>
-                Nhà đất bán
-              </Link>
-              <Link to="/bat-dong-san/for_rent" className="text-white hover:text-emerald-200 transition-colors py-2">
-                <i className="fas fa-key mr-2"></i>
-                Nhà đất cho thuê
-              </Link>
-              <Link to="/kho-sim" className="text-white hover:text-emerald-200 transition-colors py-2">
-                <i className="fas fa-sim-card mr-2"></i>
-                Kho Sim
-              </Link>
-              <Link to="/tin-tuc" className="text-white hover:text-emerald-200 transition-colors py-2">
-                <i className="fas fa-newspaper mr-2"></i>
-                Tin tức
-              </Link>
-              <button 
-                onClick={() => {
-                  setShowContactForm(true);
-                  setShowMobileMenu(false);
-                }}
-                className="text-white hover:text-emerald-200 transition-colors py-2 text-left"
-              >
-                <i className="fas fa-envelope mr-2"></i>
-                Liên hệ
-              </button>
-            </nav>
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="text-white hover:text-emerald-200 transition-colors"
+          >
+            <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'} text-xl`}></i>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden bg-emerald-700 border-t border-emerald-500">
+          <div className="px-4 py-2 space-y-1">
+            <Link 
+              to="/" 
+              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <i className="fas fa-home"></i>
+              <span>Trang chủ</span>
+            </Link>
+            
+            {/* Property Links Mobile */}
+            <div className="py-1">
+              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
+                <i className="fas fa-building mr-2"></i>
+                Bất động sản
+              </p>
+              <div className="pl-4 space-y-1">
+                <Link 
+                  to="/bat-dong-san/for_sale" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Nhà đất bán
+                </Link>
+                <Link 
+                  to="/bat-dong-san/for_rent" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Nhà đất cho thuê
+                </Link>
+              </div>
+            </div>
+
+            {/* Property Types Mobile */}
+            <div className="py-1">
+              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
+                <i className="fas fa-th-large mr-2"></i>
+                Loại hình BDS
+              </p>
+              <div className="pl-4 space-y-1">
+                <Link 
+                  to="/loai-hinh-bat-dong-san/apartment" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Căn hộ chung cư
+                </Link>
+                <Link 
+                  to="/loai-hinh-bat-dong-san/house" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Nhà riêng
+                </Link>
+                <Link 
+                  to="/loai-hinh-bat-dong-san/villa" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Biệt thự, liền kề
+                </Link>
+                <Link 
+                  to="/loai-hinh-bat-dong-san/shophouse" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Nhà mặt phố
+                </Link>
+              </div>
+            </div>
+
+            {/* Land Projects Mobile */}
+            <div className="py-1">
+              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
+                <i className="fas fa-map mr-2"></i>
+                Dự án đất
+              </p>
+              <div className="pl-4 space-y-1">
+                <Link 
+                  to="/dat/for_sale" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Đất bán
+                </Link>
+                <Link 
+                  to="/dat/for_rent" 
+                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  • Đất thuê
+                </Link>
+              </div>
+            </div>
+            
+            <Link 
+              to="/kho-sim" 
+              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <i className="fas fa-sim-card"></i>
+              <span>Kho Sim</span>
+            </Link>
+            
+            <Link 
+              to="/tin-tuc" 
+              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              <i className="fas fa-newspaper"></i>
+              <span>Tin tức</span>
+            </Link>
+            
+            <button 
+              onClick={() => {
+                setShowContactForm(true);
+                setShowMobileMenu(false);
+              }}
+              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2 w-full text-left"
+            >
+              <i className="fas fa-envelope"></i>
+              <span>Liên hệ</span>
+            </button>
+
+            {/* User Authentication Mobile */}
+            <div className="border-t border-emerald-600 pt-2 mt-2">
+              {isAuthenticated() ? (
+                <div className="space-y-1">
+                  <Link 
+                    to={user?.role === 'admin' ? '/admin' : '/member'}
+                    className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <i className="fas fa-user-circle"></i>
+                    <span>{user?.full_name || user?.username}</span>
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      logout();
+                      setShowMobileMenu(false);
+                    }}
+                    className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2 w-full text-left"
+                  >
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setShowMemberAuth(true);
+                    setShowMobileMenu(false);
+                  }}
+                  className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2 w-full text-left"
+                >
+                  <i className="fas fa-sign-in-alt"></i>
+                  <span>Đăng nhập</span>
+                </button>
+              )}
+            </div>
           </div>
-        )}
+        </div>
+      )}
       </div>
     </header>
     
