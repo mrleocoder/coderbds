@@ -2332,6 +2332,13 @@ class BDSVietnamAPITester:
         # Test admin user management
         self.test_admin_user_management()
         
+        # PHASE 6.1: ADMIN MEMBER MANAGEMENT (NEW FEATURE)
+        print("\n👥 PHASE 6.1: Testing ADMIN MEMBER MANAGEMENT (NEW FEATURE)")
+        print("-" * 80)
+        
+        # Test complete admin member management functionality
+        self.test_admin_member_management_complete()
+        
         # PHASE 7: ENHANCED DASHBOARD
         print("\n📊 PHASE 7: Testing ENHANCED DASHBOARD")
         print("-" * 80)
