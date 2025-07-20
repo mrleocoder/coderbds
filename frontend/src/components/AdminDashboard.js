@@ -157,6 +157,7 @@ const AdminDashboard = () => {
       setSims(simsRes.data || []);
       setLands(landsRes.data || []);
       setTickets(ticketsRes.data || []);
+      setMembers(membersRes.data || []);
       setStats(statsRes.data || {});
       
       // Fetch analytics data
