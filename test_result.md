@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ ALL PROPERTY CRUD OPERATIONS WORKING: Fixed critical route ordering issue where /properties/{id} was intercepting /properties/featured and /properties/search. All endpoints now working: GET /properties (with all filters), GET /properties/{id} (with view increment), POST /properties, PUT /properties/{id}, DELETE /properties/{id}, GET /properties/featured, GET /properties/search. Complex filtering with multiple parameters working. Data validation working correctly (422 for missing fields, 404 for non-existent resources)."
+      - working: true
+        agent: "testing"
+        comment: "✅ ADMIN PROPERTY CRUD AUTHORIZATION FIX VERIFIED: Tested admin property CRUD operations after authorization fix. All operations working perfectly with admin authentication (get_current_admin): CREATE (POST) ✅, UPDATE (PUT) ✅, DELETE ✅. No 403 Forbidden errors found. Authorization fix successful."
 
   - task: "News/Articles CRUD API endpoints" 
     implemented: true
