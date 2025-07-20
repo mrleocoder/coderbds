@@ -17,11 +17,18 @@ const ProtectedRoute = ({ children, adminOnly = false, memberOnly = false }) => 
   }
 
   if (!user) {
+    // Redirect to appropriate login page based on route type
+    if (adminOnly) {
+      return <Navigate to="/admin/login" replace />;
+    }
+    if (memberOnly) {
+      return <Navigate to="/" replace />; // Members login via modal on homepage
+    }
     return <Navigate to="/" replace />;
   }
 
   if (adminOnly && user.role !== 'admin') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   if (memberOnly && user.role !== 'member') {
