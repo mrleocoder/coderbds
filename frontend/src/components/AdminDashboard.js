@@ -523,6 +523,34 @@ const AdminDashboard = () => {
                 <i className="fas fa-map mr-2"></i>
                 Quản lý Đất ({lands.length})
               </button>
+              <button
+                onClick={() => {
+                  setActiveTab('tickets');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'tickets'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-ticket-alt mr-2"></i>
+                Support Tickets ({tickets.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('analytics');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'analytics'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-chart-line mr-2"></i>
+                Phân tích
+              </button>
             </nav>
           </div>
 
