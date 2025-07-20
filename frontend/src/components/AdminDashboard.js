@@ -82,6 +82,27 @@ const AdminDashboard = () => {
     description: ''
   });
 
+  const [landForm, setLandForm] = useState({
+    title: '',
+    description: '',
+    land_type: 'residential',
+    status: 'for_sale',
+    price: '',
+    area: '',
+    width: '',
+    length: '',
+    address: '',
+    district: '',
+    city: '',
+    legal_status: 'Sổ đỏ',
+    orientation: 'Đông',
+    road_width: '',
+    contact_phone: '',
+    contact_email: '',
+    agent_name: '',
+    featured: false
+  });
+
   const [ticketForm, setTicketForm] = useState({
     status: 'open',
     priority: 'medium',
