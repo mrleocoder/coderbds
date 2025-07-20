@@ -204,6 +204,11 @@ const Header = () => {
     {showContactForm && (
       <ContactForm onClose={() => setShowContactForm(false)} />
     )}
+    
+    {/* Member Auth Modal */}
+    {showMemberAuth && (
+      <MemberAuth onClose={() => setShowMemberAuth(false)} />
+    )}
     </>
   );
 };
