@@ -111,6 +111,15 @@ const AdminDashboard = () => {
     assigned_to: ''
   });
 
+  const [memberForm, setMemberForm] = useState({
+    status: 'active',
+    admin_notes: '',
+    full_name: '',
+    phone: '',
+    address: '',
+    email_verified: false
+  });
+
   useEffect(() => {
     fetchAdminData();
   }, []);
