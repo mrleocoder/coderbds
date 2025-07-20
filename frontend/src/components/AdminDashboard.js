@@ -9,6 +9,8 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [properties, setProperties] = useState([]);
   const [news, setNews] = useState([]);
+  const [sims, setSims] = useState([]);
+  const [lands, setLands] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [stats, setStats] = useState({});
