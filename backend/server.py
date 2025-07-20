@@ -1401,7 +1401,7 @@ async def get_property(property_id: str):
     return Property(**property_data)
 
 @api_router.post("/properties", response_model=Property)
-async def create_property(property_data: PropertyCreate, current_user: User = Depends(get_current_user)):
+async def create_property(property_data: PropertyCreate, current_user: User = Depends(get_current_admin)):
     """Create new property - Admin only"""
     """Create new property"""
     property_dict = property_data.dict()
