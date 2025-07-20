@@ -1661,14 +1661,14 @@ async def get_sim(sim_id: str):
     return Sim(**sim_data)
 
 @api_router.post("/sims", response_model=Sim)
-async def create_sim(sim_data: SimCreate, current_user: User = Depends(get_current_user)):
+async def create_sim(sim_data: SimCreate, current_user: User = Depends(get_current_admin)):
     """Create new sim - Admin only"""
     sim_obj = Sim(**sim_data.dict())
     await db.sims.insert_one(sim_obj.dict())
     return sim_obj
 
 @api_router.put("/sims/{sim_id}", response_model=Sim)
-async def update_sim(sim_id: str, sim_update: SimUpdate, current_user: User = Depends(get_current_user)):
+async def update_sim(sim_id: str, sim_update: SimUpdate, current_user: User = Depends(get_current_admin)):
     """Update sim - Admin only"""
     update_data = {k: v for k, v in sim_update.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
@@ -1681,7 +1681,7 @@ async def update_sim(sim_id: str, sim_update: SimUpdate, current_user: User = De
     return Sim(**updated_sim)
 
 @api_router.delete("/sims/{sim_id}")
-async def delete_sim(sim_id: str, current_user: User = Depends(get_current_user)):
+async def delete_sim(sim_id: str, current_user: User = Depends(get_current_admin)):
     """Delete sim - Admin only"""
     result = await db.sims.delete_one({"id": sim_id})
     if result.deleted_count == 0:
