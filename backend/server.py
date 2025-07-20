@@ -1550,7 +1550,7 @@ async def update_news_article(article_id: str, article_data: dict, current_user:
     return NewsArticle(**updated_article)
 
 @api_router.delete("/news/{article_id}")
-async def delete_news_article(article_id: str, current_user: User = Depends(get_current_user)):
+async def delete_news_article(article_id: str, current_user: User = Depends(get_current_admin)):
     """Delete news article - Admin only"""
     result = await db.news_articles.delete_one({"id": article_id})
     if result.deleted_count == 0:
