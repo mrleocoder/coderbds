@@ -1513,7 +1513,7 @@ async def create_news_article(article_data: NewsArticleCreate, current_user: Use
     return article_obj
 
 @api_router.put("/news/{article_id}", response_model=NewsArticle)
-async def update_news_article(article_id: str, article_data: dict, current_user: User = Depends(get_current_user)):
+async def update_news_article(article_id: str, article_data: dict, current_user: User = Depends(get_current_admin)):
     """Update news article - Admin only"""
     # Remove None values from update data
     update_data = {k: v for k, v in article_data.items() if v is not None}
