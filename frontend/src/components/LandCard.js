@@ -115,7 +115,7 @@ const LandCard = ({ land, onClick }) => {
         </div>
         
         <Link 
-          to={`/dat/${land.id}`}
+          to={`/land/${land.id}`}
           className="block w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors text-center"
         >
           <i className="fas fa-eye mr-2"></i>
