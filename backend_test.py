@@ -2138,6 +2138,12 @@ class BDSVietnamAPITester:
         
         if article_id:
             self.test_get_news_article_by_id(article_id)
+            self.test_update_news_article(article_id)
+            self.test_delete_news_article(article_id)
+        
+        # Test complete News CRUD workflow (including PUT/DELETE that were missing)
+        print("\n🔍 Testing Complete News CRUD Workflow (Focus on PUT/DELETE)...")
+        self.test_news_crud_complete_workflow()
         
         # PHASE 10: NEW CRUD FEATURES (Quick Check)
         print("\n🆕 PHASE 10: Testing NEW CRUD Features (Quick Check)")
