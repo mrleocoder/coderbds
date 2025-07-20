@@ -39,6 +39,57 @@ class BDSVietnamAPITester:
         self.test_results.append(result)
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"{status} - {test_name}: {details}")
+
+    def test_authentication(self):
+        """Test authentication - login with demo admin account"""
+        login_data = {
+            "username": "admin",
+            "password": "admin123"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/login", json=login_data)
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get("access_token")
+                if self.auth_token:
+                    # Set authorization header for future requests
+                    self.session.headers.update({"Authorization": f"Bearer {self.auth_token}"})
+                    user_info = data.get("user", {})
+                    self.log_test("Authentication Login", True, f"Login successful, user: {user_info.get('username')}")
+                    return True
+                else:
+                    self.log_test("Authentication Login", False, "No access token in response")
+                    return False
+            else:
+                self.log_test("Authentication Login", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Authentication Login", False, f"Error: {str(e)}")
+            return False
+
+    def test_create_demo_admin_user(self):
+        """Create demo admin user if it doesn't exist"""
+        register_data = {
+            "username": "admin",
+            "email": "admin@bdsvietnam.com",
+            "password": "admin123"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/register", json=register_data)
+            if response.status_code == 200:
+                self.log_test("Create Demo Admin User", True, "Demo admin user created successfully")
+                return True
+            elif response.status_code == 400 and "already registered" in response.text:
+                self.log_test("Create Demo Admin User", True, "Demo admin user already exists")
+                return True
+            else:
+                self.log_test("Create Demo Admin User", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Create Demo Admin User", False, f"Error: {str(e)}")
+            return False
         
     def test_api_root(self):
         """Test API root endpoint"""
