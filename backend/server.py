@@ -412,22 +412,191 @@ class AnalyticsCreate(BaseModel):
     referrer: Optional[str] = None
     session_id: str
 
+# Enhanced User Models
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
     email: str
     hashed_password: str
+    role: UserRole = UserRole.member
+    status: UserStatus = UserStatus.active
+    wallet_balance: float = 0.0
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar: Optional[str] = None  # base64
+    address: Optional[str] = None
     is_active: bool = True
+    email_verified: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_login: Optional[datetime] = None
+    profile_completed: bool = False
 
 class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    avatar: Optional[str] = None
 
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class UserProfile(BaseModel):
+    id: str
+    username: str
+    email: str
+    role: UserRole
+    status: UserStatus
+    wallet_balance: float
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
+    address: Optional[str] = None
+    created_at: datetime
+    last_login: Optional[datetime] = None
+    profile_completed: bool
+
+# Wallet & Transaction Models
+class Transaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    amount: float
+    transaction_type: TransactionType
+    status: TransactionStatus = TransactionStatus.pending
+    description: str
+    reference_id: Optional[str] = None  # For post fees, etc.
+    admin_notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: Optional[datetime] = None
+
+class TransactionCreate(BaseModel):
+    amount: float
+    transaction_type: TransactionType
+    description: str
+    reference_id: Optional[str] = None
+
+class DepositRequest(BaseModel):
+    amount: float
+    description: Optional[str] = "Nạp tiền vào tài khoản"
+
+# Enhanced Post Models (for approval workflow)
+class PostBase(BaseModel):
+    title: str
+    description: str
+    post_type: PostType
+    status: PostStatus = PostStatus.pending
+    author_id: str
+    price: float
+    images: List[str] = []
+    contact_phone: str
+    contact_email: Optional[str] = None
+    featured: bool = False
+    admin_notes: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    approved_at: Optional[datetime] = None
+    approved_by: Optional[str] = None  # Admin user_id
+    expires_at: Optional[datetime] = None
+    views: int = 0
+
+class MemberPost(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    post_type: PostType
+    status: PostStatus = PostStatus.pending
+    author_id: str
+    price: float
+    images: List[str] = []
+    contact_phone: str
+    contact_email: Optional[str] = None
+    
+    # Property specific fields
+    property_type: Optional[PropertyType] = None
+    property_status: Optional[PropertyStatus] = None
+    area: Optional[float] = None
+    bedrooms: Optional[int] = None
+    bathrooms: Optional[int] = None
+    address: Optional[str] = None
+    district: Optional[str] = None
+    city: Optional[str] = None
+    
+    # Land specific fields
+    land_type: Optional[LandType] = None
+    width: Optional[float] = None
+    length: Optional[float] = None
+    legal_status: Optional[str] = None
+    orientation: Optional[str] = None
+    road_width: Optional[float] = None
+    
+    # Sim specific fields
+    phone_number: Optional[str] = None
+    network: Optional[SimNetwork] = None
+    sim_type: Optional[SimType] = None
+    is_vip: bool = False
+    features: List[str] = []
+    
+    # Admin fields
+    featured: bool = False
+    admin_notes: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    approved_by: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    expires_at: Optional[datetime] = None
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    views: int = 0
+
+class MemberPostCreate(BaseModel):
+    title: str
+    description: str
+    post_type: PostType
+    price: float
+    images: List[str] = []
+    contact_phone: str
+    contact_email: Optional[str] = None
+    
+    # Property specific fields
+    property_type: Optional[PropertyType] = None
+    property_status: Optional[PropertyStatus] = None
+    area: Optional[float] = None
+    bedrooms: Optional[int] = None
+    bathrooms: Optional[int] = None
+    address: Optional[str] = None
+    district: Optional[str] = None
+    city: Optional[str] = None
+    
+    # Land specific fields
+    land_type: Optional[LandType] = None
+    width: Optional[float] = None
+    length: Optional[float] = None
+    legal_status: Optional[str] = None
+    orientation: Optional[str] = None
+    road_width: Optional[float] = None
+    
+    # Sim specific fields
+    phone_number: Optional[str] = None
+    network: Optional[SimNetwork] = None
+    sim_type: Optional[SimType] = None
+    is_vip: bool = False
+    features: List[str] = []
+
+class PostApproval(BaseModel):
+    status: PostStatus
+    admin_notes: Optional[str] = None
+    rejection_reason: Optional[str] = None
+    featured: bool = False
 
 # Property Routes
 @api_router.get("/")
