@@ -31,96 +31,112 @@ const Header = () => {
     <>
     <header className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <i className="fas fa-home text-2xl"></i>
             <div>
               <h1 className="text-xl font-bold">BDS Việt Nam</h1>
-              <p className="text-sm text-emerald-100">Premium Real Estate</p>
+              <p className="text-xs opacity-90">Premium Real Estate</p>
             </div>
           </Link>
-          
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-home"></i>
               <span>Trang chủ</span>
             </Link>
             
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowPropertyDropdown(true)}
-              onMouseLeave={() => setShowPropertyDropdown(false)}
-            >
-              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+            {/* Property Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowPropertyDropdown(!showPropertyDropdown);
+                  setShowTypeDropdown(false);
+                  setShowLandDropdown(false);
+                }}
+                className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              >
                 <i className="fas fa-building"></i>
                 <span>Bất động sản</span>
-                <i className="fas fa-chevron-down text-sm"></i>
+                <i className="fas fa-chevron-down text-xs"></i>
               </button>
+              
               {showPropertyDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
-                  <Link to="/bds/dang-ban" className="block px-4 py-2 hover:bg-gray-100">
-                    <i className="fas fa-home text-emerald-600 mr-2"></i>
-                    Đang bán
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <Link to="/bat-dong-san/for_sale" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-tag text-emerald-600 mr-2"></i>
+                    Nhà đất bán
                   </Link>
-                  <Link to="/bds/cho-thue" className="block px-4 py-2 hover:bg-gray-100">
+                  <Link to="/bat-dong-san/for_rent" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
                     <i className="fas fa-key text-emerald-600 mr-2"></i>
-                    Cho thuê
+                    Nhà đất cho thuê
                   </Link>
                 </div>
               )}
             </div>
 
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowTypeDropdown(true)}
-              onMouseLeave={() => setShowTypeDropdown(false)}
-            >
-              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+            {/* Property Type Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowTypeDropdown(!showTypeDropdown);
+                  setShowPropertyDropdown(false);
+                  setShowLandDropdown(false);
+                }}
+                className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              >
                 <i className="fas fa-th-large"></i>
-                <span>Loại hình</span>
-                <i className="fas fa-chevron-down text-sm"></i>
+                <span>Loại hình bất động sản</span>
+                <i className="fas fa-chevron-down text-xs"></i>
               </button>
+              
               {showTypeDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
-                  <Link to="/loai-hinh/can-ho" className="block px-4 py-2 hover:bg-gray-100">
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <Link to="/loai-hinh-bat-dong-san/apartment" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
                     <i className="fas fa-building text-emerald-600 mr-2"></i>
-                    Căn hộ
+                    Căn hộ chung cư
                   </Link>
-                  <Link to="/loai-hinh/nha-pho" className="block px-4 py-2 hover:bg-gray-100">
+                  <Link to="/loai-hinh-bat-dong-san/house" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
                     <i className="fas fa-home text-emerald-600 mr-2"></i>
-                    Nhà phố
+                    Nhà riêng
                   </Link>
-                  <Link to="/loai-hinh/biet-thu" className="block px-4 py-2 hover:bg-gray-100">
-                    <i className="fas fa-star text-emerald-600 mr-2"></i>
-                    Biệt thự
+                  <Link to="/loai-hinh-bat-dong-san/villa" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-crown text-emerald-600 mr-2"></i>
+                    Biệt thự, liền kề
                   </Link>
-                  <Link to="/loai-hinh/shophouse" className="block px-4 py-2 hover:bg-gray-100">
+                  <Link to="/loai-hinh-bat-dong-san/shophouse" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
                     <i className="fas fa-store text-emerald-600 mr-2"></i>
-                    Shophouse
+                    Nhà mặt phố
                   </Link>
                 </div>
               )}
             </div>
 
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowLandDropdown(true)}
-              onMouseLeave={() => setShowLandDropdown(false)}
-            >
-              <button className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
+            {/* Land Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowLandDropdown(!showLandDropdown);
+                  setShowPropertyDropdown(false);
+                  setShowTypeDropdown(false);
+                }}
+                className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              >
                 <i className="fas fa-map"></i>
                 <span>Dự án đất</span>
-                <i className="fas fa-chevron-down text-sm"></i>
+                <i className="fas fa-chevron-down text-xs"></i>
               </button>
+              
               {showLandDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg py-2 text-gray-800">
-                  <Link to="/dat/ban" className="block px-4 py-2 hover:bg-gray-100">
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <Link to="/dat/for_sale" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
                     <i className="fas fa-tag text-emerald-600 mr-2"></i>
                     Đất bán
                   </Link>
-                  <Link to="/dat/thue" className="block px-4 py-2 hover:bg-gray-100">
-                    <i className="fas fa-key text-emerald-600 mr-2"></i>
-                    Đất cho thuê
+                  <Link to="/dat/for_rent" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-handshake text-emerald-600 mr-2"></i>
+                    Đất thuê
                   </Link>
                 </div>
               )}
@@ -128,9 +144,8 @@ const Header = () => {
 
             <Link to="/kho-sim" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-sim-card"></i>
-              <span>Kho sim</span>
+              <span>Kho Sim</span>
             </Link>
-            
             <Link to="/tin-tuc" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
               <i className="fas fa-newspaper"></i>
               <span>Tin tức</span>
@@ -171,30 +186,53 @@ const Header = () => {
               </button>
             )}
           </nav>
-          
+
+          {/* Mobile menu button */}
           <div className="md:hidden">
-            <button 
+            <button
               onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="text-white hover:text-emerald-200"
+              className="text-white hover:text-emerald-200 transition-colors"
             >
               <i className={`fas ${showMobileMenu ? 'fa-times' : 'fa-bars'} text-xl`}></i>
             </button>
           </div>
         </div>
-        
+
+        {/* Mobile Navigation */}
         {showMobileMenu && (
-          <div className="md:hidden pb-4">
-            <div className="flex flex-col space-y-2">
-              <Link to="/" className="py-2 hover:text-emerald-200">Trang chủ</Link>
-              <Link to="/bds/dang-ban" className="py-2 hover:text-emerald-200">Đang bán</Link>
-              <Link to="/bds/cho-thue" className="py-2 hover:text-emerald-200">Cho thuê</Link>
-              <Link to="/loai-hinh/can-ho" className="py-2 hover:text-emerald-200">Căn hộ</Link>
-              <Link to="/loai-hinh/nha-pho" className="py-2 hover:text-emerald-200">Nhà phố</Link>
-              <Link to="/dat/ban" className="py-2 hover:text-emerald-200">Đất bán</Link>
-              <Link to="/dat/thue" className="py-2 hover:text-emerald-200">Đất thuê</Link>
-              <Link to="/kho-sim" className="py-2 hover:text-emerald-200">Kho sim</Link>
-              <Link to="/tin-tuc" className="py-2 hover:text-emerald-200">Tin tức</Link>
-            </div>
+          <div className="md:hidden mt-4 pb-4">
+            <nav className="flex flex-col space-y-2">
+              <Link to="/" className="text-white hover:text-emerald-200 transition-colors py-2">
+                <i className="fas fa-home mr-2"></i>
+                Trang chủ
+              </Link>
+              <Link to="/bat-dong-san/for_sale" className="text-white hover:text-emerald-200 transition-colors py-2">
+                <i className="fas fa-tag mr-2"></i>
+                Nhà đất bán
+              </Link>
+              <Link to="/bat-dong-san/for_rent" className="text-white hover:text-emerald-200 transition-colors py-2">
+                <i className="fas fa-key mr-2"></i>
+                Nhà đất cho thuê
+              </Link>
+              <Link to="/kho-sim" className="text-white hover:text-emerald-200 transition-colors py-2">
+                <i className="fas fa-sim-card mr-2"></i>
+                Kho Sim
+              </Link>
+              <Link to="/tin-tuc" className="text-white hover:text-emerald-200 transition-colors py-2">
+                <i className="fas fa-newspaper mr-2"></i>
+                Tin tức
+              </Link>
+              <button 
+                onClick={() => {
+                  setShowContactForm(true);
+                  setShowMobileMenu(false);
+                }}
+                className="text-white hover:text-emerald-200 transition-colors py-2 text-left"
+              >
+                <i className="fas fa-envelope mr-2"></i>
+                Liên hệ
+              </button>
+            </nav>
           </div>
         )}
       </div>
