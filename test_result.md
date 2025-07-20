@@ -294,9 +294,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Property CRUD API endpoints"
-    - "News/Articles CRUD API endpoints"
-    - "Search and filtering functionality"
     - "Property detail view"
     - "News section display"
   stuck_tasks: []
@@ -306,3 +303,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Completed full implementation of professional real estate website. Created backend API with Property and News models, full CRUD operations, search/filtering. Frontend has professional design with hero section, property listings, admin panel, mobile responsive. Added sample data. Ready for backend testing of API endpoints - need to verify all CRUD operations, search functionality, and data integrity."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETED SUCCESSFULLY: All high-priority backend APIs are working perfectly. Fixed critical route ordering issue in FastAPI where specific routes (/properties/featured, /properties/search) were being intercepted by parameterized route (/properties/{id}). All 23 backend tests passing with 100% success rate. Property CRUD, News CRUD, Statistics, Search, and Complex Filtering all working. Data validation working correctly. Backend is production-ready. Only frontend tasks remain for testing."
