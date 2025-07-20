@@ -120,26 +120,40 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
+      console.log('Fetching admin data with token:', !!token);
+      
       const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, statsRes] = await Promise.all([
         axios.get(`${API}/properties?limit=100`),
         axios.get(`${API}/news?limit=100`),
         axios.get(`${API}/sims?limit=100`),
         axios.get(`${API}/lands?limit=100`),
         axios.get(`${API}/tickets?limit=100`, { headers }),
-        axios.get(`${API}/admin/dashboard/stats`, { headers })
+        axios.get(`${API}/stats`) // Use public stats API for now
       ]);
       
-      setProperties(propertiesRes.data);
-      setNews(newsRes.data);
-      setSims(simsRes.data);
-      setLands(landsRes.data);
-      setTickets(ticketsRes.data);
-      setStats(statsRes.data);
+      console.log('API responses:', {
+        properties: propertiesRes.data?.length,
+        news: newsRes.data?.length,
+        sims: simsRes.data?.length,
+        lands: landsRes.data?.length,
+        tickets: ticketsRes.data?.length,
+        stats: statsRes.data
+      });
+      
+      setProperties(propertiesRes.data || []);
+      setNews(newsRes.data || []);
+      setSims(simsRes.data || []);
+      setLands(landsRes.data || []);
+      setTickets(ticketsRes.data || []);
+      setStats(statsRes.data || {});
       
       // Fetch analytics data
       await fetchAnalyticsData(headers);
     } catch (error) {
       console.error('Error fetching admin data:', error);
+      if (error.response) {
+        console.error('Response error:', error.response.data);
+      }
     } finally {
       setLoading(false);
     }
