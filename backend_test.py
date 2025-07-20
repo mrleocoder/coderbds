@@ -1816,8 +1816,8 @@ class BDSVietnamAPITester:
                 self.log_test(f"{name} Authentication Test", False, f"Error: {str(e)}")
 
     def run_all_tests(self):
-        """Run all backend API tests"""
-        print("🚀 Starting BDS Vietnam Backend API Tests - COMPREHENSIVE ENHANCED VERSION")
+        """Run all backend API tests with CRITICAL SYNCHRONIZATION INVESTIGATION FIRST"""
+        print("🚀 Starting BDS Vietnam Backend API Tests - SYNCHRONIZATION INVESTIGATION")
         print(f"Backend URL: {self.base_url}")
         print("=" * 80)
         
@@ -1826,21 +1826,27 @@ class BDSVietnamAPITester:
             print("❌ API not accessible, stopping tests")
             return
         
+        # Create demo admin user and authenticate
+        self.test_create_demo_admin_user()
+        if not self.test_authentication():
+            print("❌ Authentication failed. Some tests may not work.")
+        
+        # CRITICAL SYNCHRONIZATION TESTS FIRST - HIGHEST PRIORITY
+        print("\n🔍 CRITICAL SYNCHRONIZATION INVESTIGATION - HIGHEST PRIORITY")
+        print("=" * 80)
+        print("Investigating admin vs customer page synchronization issues...")
+        
+        self.test_admin_vs_public_data_synchronization()
+        self.test_crud_operations_synchronization()
+        self.test_database_collection_verification()
+        self.test_authentication_impact_on_data()
+        
         # PRIORITY TEST: Admin Statistics Issue Investigation
         print("\n🎯 PRIORITY: Admin Statistics Issue Investigation")
         print("-" * 80)
         
-        # Create demo admin user first
-        self.test_create_demo_admin_user()
-        
-        # Test admin authentication
-        if self.test_authentication():
-            # Run focused admin statistics test
-            self.test_admin_statistics_issue()
-        else:
-            print("❌ Admin authentication failed, running limited statistics tests")
-            # Still test public endpoints
-            self.test_admin_statistics_issue()
+        # Run focused admin statistics test
+        self.test_admin_statistics_issue()
         
         # Continue with other tests if needed...
         
