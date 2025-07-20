@@ -120,6 +120,39 @@ class LandType(str, Enum):
     industrial = "industrial"    # Đất công nghiệp
     agricultural = "agricultural" # Đất nông nghiệp
 
+class UserRole(str, Enum):
+    member = "member"
+    admin = "admin"
+
+class UserStatus(str, Enum):
+    active = "active"
+    suspended = "suspended"
+    pending = "pending"
+
+class PostStatus(str, Enum):
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+    expired = "expired"
+
+class PostType(str, Enum):
+    property = "property"
+    land = "land"
+    sim = "sim"
+    news = "news"
+
+class TransactionType(str, Enum):
+    deposit = "deposit"
+    withdraw = "withdraw"
+    post_fee = "post_fee"
+    refund = "refund"
+
+class TransactionStatus(str, Enum):
+    pending = "pending"
+    completed = "completed"
+    failed = "failed"
+    cancelled = "cancelled"
+
 # Pydantic Models
 class Property(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
