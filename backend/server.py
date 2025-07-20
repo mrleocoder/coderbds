@@ -390,7 +390,8 @@ async def create_property(property_data: PropertyCreate, current_user: User = De
     return property_obj
 
 @api_router.put("/properties/{property_id}", response_model=Property)
-async def update_property(property_id: str, property_update: PropertyUpdate):
+async def update_property(property_id: str, property_update: PropertyUpdate, current_user: User = Depends(get_current_user)):
+    """Update property - Admin only"""
     """Update property"""
     update_data = {k: v for k, v in property_update.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
