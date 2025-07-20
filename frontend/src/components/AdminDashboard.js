@@ -362,6 +362,26 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   </div>
+
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                    <div className="flex items-center">
+                      <i className="fas fa-sim-card text-3xl text-indigo-600"></i>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-indigo-600">Sim</p>
+                        <p className="text-2xl font-bold text-indigo-900">{stats.total_sims || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <div className="flex items-center">
+                      <i className="fas fa-map text-3xl text-yellow-600"></i>
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-yellow-600">Đất</p>
+                        <p className="text-2xl font-bold text-yellow-900">{stats.total_lands || 0}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
