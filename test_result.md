@@ -165,6 +165,42 @@ backend:
         agent: "testing"
         comment: "✅ SEARCH AND FILTERING WORKING: Fixed route ordering issue. GET /api/properties/search?q=query working with text search across title, description, address, district, city. All property filters working: property_type, status, city, district, price ranges, bedrooms, bathrooms, featured flag. Complex multi-parameter filtering tested and working."
 
+  - task: "Traffic Analytics API endpoints"
+    implemented: false
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement traffic tracking models and API endpoints for analytics dashboard. Track page views, user sessions by day/week/month/year"
+
+  - task: "Ticket/Contact system API endpoints"
+    implemented: false
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement ticket/contact system with CRUD operations. Contact form submissions, ticket management, message threads"
+
+  - task: "Enhanced Statistics with Chart Data"
+    implemented: false
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enhance existing stats endpoint to provide chart-ready data for dashboard visualization"
+
 frontend:
   - task: "Professional header with navigation"
     implemented: true
