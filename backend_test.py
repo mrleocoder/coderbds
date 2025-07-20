@@ -423,6 +423,323 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Delete Property", False, f"Error: {str(e)}")
             return False
+
+    # NEW FEATURES TESTING - TICKETS SYSTEM
+    def test_create_ticket_public(self):
+        """Test creating a ticket (public endpoint - no auth needed)"""
+        ticket_data = {
+            "name": "Nguyễn Văn Minh",
+            "email": "nguyenvanminh@gmail.com",
+            "phone": "0987654321",
+            "subject": "Tư vấn mua căn hộ Vinhomes",
+            "message": "Tôi muốn được tư vấn về các căn hộ 2 phòng ngủ tại dự án Vinhomes Central Park. Xin vui lòng liên hệ lại với tôi."
+        }
+        
+        try:
+            # Remove auth header for public endpoint
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/tickets", json=ticket_data)
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                ticket_id = data.get("id")
+                if ticket_id:
+                    self.created_ticket_ids.append(ticket_id)
+                    self.log_test("Create Ticket (Public)", True, f"Ticket created with ID: {ticket_id}")
+                    return ticket_id
+                else:
+                    self.log_test("Create Ticket (Public)", False, "No ID returned in response")
+                    return None
+            else:
+                self.log_test("Create Ticket (Public)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Create Ticket (Public)", False, f"Error: {str(e)}")
+            return None
+
+    def test_get_tickets_admin(self):
+        """Test getting all tickets (admin only)"""
+        try:
+            response = self.session.get(f"{self.base_url}/tickets")
+            if response.status_code == 200:
+                tickets = response.json()
+                self.log_test("Get All Tickets (Admin)", True, f"Retrieved {len(tickets)} tickets")
+                
+                # Test with status filter
+                status_response = self.session.get(f"{self.base_url}/tickets", params={"status": "open"})
+                if status_response.status_code == 200:
+                    open_tickets = status_response.json()
+                    self.log_test("Get Tickets by Status", True, f"Open tickets: {len(open_tickets)}")
+                else:
+                    self.log_test("Get Tickets by Status", False, f"Status filter failed: {status_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Get All Tickets (Admin)", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Get All Tickets (Admin)", False, f"Error: {str(e)}")
+            return False
+
+    def test_get_ticket_by_id_admin(self, ticket_id: str):
+        """Test getting a specific ticket by ID (admin only)"""
+        try:
+            response = self.session.get(f"{self.base_url}/tickets/{ticket_id}")
+            if response.status_code == 200:
+                ticket_data = response.json()
+                self.log_test("Get Ticket by ID (Admin)", True, f"Ticket retrieved: {ticket_data.get('subject', 'N/A')}")
+                return True
+            elif response.status_code == 404:
+                self.log_test("Get Ticket by ID (Admin)", False, f"Ticket not found: {ticket_id}")
+                return False
+            else:
+                self.log_test("Get Ticket by ID (Admin)", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Get Ticket by ID (Admin)", False, f"Error: {str(e)}")
+            return False
+
+    def test_update_ticket_admin(self, ticket_id: str):
+        """Test updating a ticket (admin only)"""
+        update_data = {
+            "status": "in_progress",
+            "priority": "high",
+            "admin_notes": "Đã liên hệ khách hàng, đang chuẩn bị danh sách căn hộ phù hợp"
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/tickets/{ticket_id}", json=update_data)
+            if response.status_code == 200:
+                updated_ticket = response.json()
+                if updated_ticket.get("status") == update_data["status"]:
+                    self.log_test("Update Ticket (Admin)", True, f"Ticket updated successfully")
+                    return True
+                else:
+                    self.log_test("Update Ticket (Admin)", False, "Ticket data not updated correctly")
+                    return False
+            else:
+                self.log_test("Update Ticket (Admin)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Update Ticket (Admin)", False, f"Error: {str(e)}")
+            return False
+
+    # NEW FEATURES TESTING - ANALYTICS SYSTEM
+    def test_track_pageview_public(self):
+        """Test tracking page views (public endpoint - no auth needed)"""
+        pageview_data = {
+            "page_path": "/properties/search",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "ip_address": "192.168.1.100",
+            "referrer": "https://google.com",
+            "session_id": self.session_id
+        }
+        
+        try:
+            # Remove auth header for public endpoint
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/analytics/pageview", json=pageview_data)
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            if response.status_code == 200:
+                self.log_test("Track Page View (Public)", True, "Page view tracked successfully")
+                return True
+            else:
+                self.log_test("Track Page View (Public)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Track Page View (Public)", False, f"Error: {str(e)}")
+            return False
+
+    def test_get_traffic_analytics_admin(self):
+        """Test getting traffic analytics (admin only)"""
+        periods = ["day", "week", "month", "year"]
+        
+        for period in periods:
+            try:
+                response = self.session.get(f"{self.base_url}/analytics/traffic", params={"period": period})
+                if response.status_code == 200:
+                    analytics_data = response.json()
+                    data_points = len(analytics_data.get("data", []))
+                    self.log_test(f"Get Traffic Analytics ({period})", True, f"Retrieved {data_points} data points for {period}")
+                else:
+                    self.log_test(f"Get Traffic Analytics ({period})", False, f"Status: {response.status_code}")
+            except Exception as e:
+                self.log_test(f"Get Traffic Analytics ({period})", False, f"Error: {str(e)}")
+
+    def test_get_popular_pages_admin(self):
+        """Test getting popular pages analytics (admin only)"""
+        try:
+            response = self.session.get(f"{self.base_url}/analytics/popular-pages")
+            if response.status_code == 200:
+                popular_pages = response.json()
+                self.log_test("Get Popular Pages (Admin)", True, f"Retrieved {len(popular_pages)} popular pages")
+                return True
+            else:
+                self.log_test("Get Popular Pages (Admin)", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Get Popular Pages (Admin)", False, f"Error: {str(e)}")
+            return False
+
+    # ENHANCED STATISTICS TESTING
+    def test_enhanced_statistics(self):
+        """Test enhanced statistics endpoint with new fields"""
+        try:
+            response = self.session.get(f"{self.base_url}/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                new_required_fields = [
+                    "total_tickets", "open_tickets", "resolved_tickets", 
+                    "total_pageviews", "today_pageviews", "today_unique_visitors"
+                ]
+                
+                missing_fields = [field for field in new_required_fields if field not in stats]
+                if not missing_fields:
+                    self.log_test("Enhanced Statistics", True, f"All new fields present: {new_required_fields}")
+                    return True
+                else:
+                    self.log_test("Enhanced Statistics", False, f"Missing new fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Enhanced Statistics", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Enhanced Statistics", False, f"Error: {str(e)}")
+            return False
+
+    # SIMS CRUD TESTING
+    def test_create_sim(self):
+        """Test creating a new sim"""
+        sim_data = {
+            "phone_number": "0987654321",
+            "network": "viettel",
+            "sim_type": "prepaid",
+            "price": 500000,
+            "is_vip": True,
+            "features": ["Số đẹp", "Phong thủy", "Dễ nhớ"],
+            "description": "Sim số đẹp Viettel, phong thủy tốt, dễ nhớ"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/sims", json=sim_data)
+            if response.status_code == 200:
+                data = response.json()
+                sim_id = data.get("id")
+                if sim_id:
+                    self.created_sim_ids.append(sim_id)
+                    self.log_test("Create Sim", True, f"Sim created with ID: {sim_id}")
+                    return sim_id
+                else:
+                    self.log_test("Create Sim", False, "No ID returned in response")
+                    return None
+            else:
+                self.log_test("Create Sim", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Create Sim", False, f"Error: {str(e)}")
+            return None
+
+    def test_get_sims(self):
+        """Test getting all sims with filters"""
+        try:
+            response = self.session.get(f"{self.base_url}/sims")
+            if response.status_code == 200:
+                sims = response.json()
+                self.log_test("Get All Sims", True, f"Retrieved {len(sims)} sims")
+                
+                # Test with network filter
+                network_response = self.session.get(f"{self.base_url}/sims", params={"network": "viettel"})
+                if network_response.status_code == 200:
+                    viettel_sims = network_response.json()
+                    self.log_test("Get Sims by Network", True, f"Viettel sims: {len(viettel_sims)}")
+                else:
+                    self.log_test("Get Sims by Network", False, f"Network filter failed: {network_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Get All Sims", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Get All Sims", False, f"Error: {str(e)}")
+            return False
+
+    # LANDS CRUD TESTING
+    def test_create_land(self):
+        """Test creating a new land"""
+        land_data = {
+            "title": "Đất nền dự án Vinhomes Grand Park",
+            "description": "Lô đất nền vị trí đẹp, mặt tiền đường lớn, pháp lý rõ ràng",
+            "land_type": "residential",
+            "status": "for_sale",
+            "price": 2500000000,
+            "area": 120.0,
+            "width": 8.0,
+            "length": 15.0,
+            "address": "Đường Nguyễn Xiển, Long Thạnh Mỹ",
+            "district": "Quận 9",
+            "city": "Hồ Chí Minh",
+            "legal_status": "Sổ đỏ",
+            "orientation": "Đông Nam",
+            "road_width": 12.0,
+            "contact_phone": "0901234567",
+            "contact_email": "agent@vinhomes.vn",
+            "agent_name": "Trần Văn Bình"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/lands", json=land_data)
+            if response.status_code == 200:
+                data = response.json()
+                land_id = data.get("id")
+                if land_id:
+                    self.created_land_ids.append(land_id)
+                    self.log_test("Create Land", True, f"Land created with ID: {land_id}")
+                    return land_id
+                else:
+                    self.log_test("Create Land", False, "No ID returned in response")
+                    return None
+            else:
+                self.log_test("Create Land", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Create Land", False, f"Error: {str(e)}")
+            return None
+
+    def test_get_lands(self):
+        """Test getting all lands with filters"""
+        try:
+            response = self.session.get(f"{self.base_url}/lands")
+            if response.status_code == 200:
+                lands = response.json()
+                self.log_test("Get All Lands", True, f"Retrieved {len(lands)} lands")
+                
+                # Test with land_type filter
+                type_response = self.session.get(f"{self.base_url}/lands", params={"land_type": "residential"})
+                if type_response.status_code == 200:
+                    residential_lands = type_response.json()
+                    self.log_test("Get Lands by Type", True, f"Residential lands: {len(residential_lands)}")
+                else:
+                    self.log_test("Get Lands by Type", False, f"Type filter failed: {type_response.status_code}")
+                
+                return True
+            else:
+                self.log_test("Get All Lands", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Get All Lands", False, f"Error: {str(e)}")
+            return False
     
     def run_all_tests(self):
         """Run all backend API tests"""
