@@ -743,7 +743,7 @@ class BDSVietnamAPITester:
     
     def run_all_tests(self):
         """Run all backend API tests"""
-        print("🚀 Starting BDS Vietnam Backend API Tests")
+        print("🚀 Starting BDS Vietnam Backend API Tests - ENHANCED VERSION")
         print(f"Backend URL: {self.base_url}")
         print("=" * 60)
         
@@ -752,7 +752,49 @@ class BDSVietnamAPITester:
             print("❌ API not accessible, stopping tests")
             return
         
-        # Property CRUD Tests
+        # PHASE 1: PUBLIC ENDPOINTS (no auth needed)
+        print("\n🌐 PHASE 1: Testing PUBLIC Endpoints (No Authentication Required)")
+        print("-" * 60)
+        
+        # Create demo admin user first
+        self.test_create_demo_admin_user()
+        
+        # Test public ticket creation
+        ticket_id = self.test_create_ticket_public()
+        
+        # Test public analytics tracking
+        self.test_track_pageview_public()
+        
+        # Test public statistics (enhanced)
+        self.test_enhanced_statistics()
+        
+        # PHASE 2: AUTHENTICATION
+        print("\n🔐 PHASE 2: Testing AUTHENTICATION")
+        print("-" * 60)
+        
+        if not self.test_authentication():
+            print("❌ Authentication failed, skipping admin-only tests")
+            return
+        
+        # PHASE 3: ADMIN-ONLY ENDPOINTS (auth required)
+        print("\n🔒 PHASE 3: Testing ADMIN-ONLY Endpoints (Authentication Required)")
+        print("-" * 60)
+        
+        # Test ticket management (admin)
+        if ticket_id:
+            self.test_get_tickets_admin()
+            self.test_get_ticket_by_id_admin(ticket_id)
+            self.test_update_ticket_admin(ticket_id)
+        
+        # Test analytics (admin)
+        self.test_get_traffic_analytics_admin()
+        self.test_get_popular_pages_admin()
+        
+        # PHASE 4: EXISTING FEATURES VERIFICATION
+        print("\n✅ PHASE 4: Verifying EXISTING Features (Quick Check)")
+        print("-" * 60)
+        
+        # Property CRUD Tests (existing)
         print("\n📋 Testing Property CRUD Operations...")
         property_id = self.test_create_property()
         self.test_get_properties()
@@ -765,7 +807,7 @@ class BDSVietnamAPITester:
         self.test_search_properties()
         self.test_complex_filtering()
         
-        # News CRUD Tests
+        # News CRUD Tests (existing)
         print("\n📰 Testing News CRUD Operations...")
         article_id = self.test_create_news_article()
         self.test_get_news_articles()
@@ -773,12 +815,28 @@ class BDSVietnamAPITester:
         if article_id:
             self.test_get_news_article_by_id(article_id)
         
-        # Statistics Tests
-        print("\n📊 Testing Statistics...")
+        # PHASE 5: NEW CRUD FEATURES
+        print("\n🆕 PHASE 5: Testing NEW CRUD Features")
+        print("-" * 60)
+        
+        # Sims CRUD Tests
+        print("\n📱 Testing Sims CRUD Operations...")
+        sim_id = self.test_create_sim()
+        self.test_get_sims()
+        
+        # Lands CRUD Tests
+        print("\n🏞️ Testing Lands CRUD Operations...")
+        land_id = self.test_create_land()
+        self.test_get_lands()
+        
+        # Statistics Tests (enhanced)
+        print("\n📊 Testing Enhanced Statistics...")
         self.test_statistics()
         
-        # Cleanup - Delete created test data
-        print("\n🧹 Cleaning up test data...")
+        # PHASE 6: CLEANUP
+        print("\n🧹 PHASE 6: Cleaning up test data...")
+        print("-" * 60)
+        
         if property_id:
             self.test_delete_property(property_id)
         
