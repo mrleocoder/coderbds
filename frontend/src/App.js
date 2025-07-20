@@ -2003,28 +2003,34 @@ const Footer = () => {
 // Main App Component
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Header />
-        <main>
+    <AuthProvider>
+      <Router>
+        <div className="App">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/page/:id" element={<PropertyDetailPage />} />
-            <Route path="/post/:id" element={<NewsDetailPage />} />
-            <Route path="/tin-tuc" element={<NewsListPage />} />
-            <Route path="/tim-kiem" element={<SearchResultsPage />} />
-            <Route path="/bds/:filterType" element={<PropertyFilterPage />} />
-            <Route path="/loai-hinh/:filterType" element={<PropertyFilterPage />} />
-            <Route path="/lien-he" element={<ContactPage />} />
-            <Route path="/admin" element={<AdminSection />} />
+            {/* Public Routes */}
+            <Route path="/" element={<><Header /><HomePage /><Footer /></>} />
+            <Route path="/page/:id" element={<><Header /><PropertyDetailPage /><Footer /></>} />
+            <Route path="/post/:id" element={<><Header /><NewsDetailPage /><Footer /></>} />
+            <Route path="/tin-tuc" element={<><Header /><NewsListPage /><Footer /></>} />
+            <Route path="/tim-kiem" element={<><Header /><SearchResultsPage /><Footer /></>} />
+            <Route path="/bds/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+            <Route path="/loai-hinh/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+            <Route path="/lien-he" element={<><Header /><ContactPage /><Footer /></>} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin/login" element={<LoginPage />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
           </Routes>
-        </main>
-        <Footer />
-        
-        {/* FontAwesome CDN */}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      </div>
-    </Router>
+          
+          {/* FontAwesome CDN */}
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
