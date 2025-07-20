@@ -37,6 +37,7 @@ const AdminDashboard = () => {
   const [sims, setSims] = useState([]);
   const [lands, setLands] = useState([]);
   const [tickets, setTickets] = useState([]);
+  const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [stats, setStats] = useState({});
