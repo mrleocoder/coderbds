@@ -1512,6 +1512,51 @@ async def create_news_article(article_data: NewsArticleCreate, current_user: Use
     await db.news_articles.insert_one(article_obj.dict())
     return article_obj
 
+@api_router.put("/news/{article_id}", response_model=NewsArticle)
+async def update_news_article(article_id: str, article_data: dict, current_user: User = Depends(get_current_user)):
+    """Update news article - Admin only"""
+    # Remove None values from update data
+    update_data = {k: v for k, v in article_data.items() if v is not None}
+    
+    # Ensure required fields exist if updating
+    if 'slug' not in update_data and 'title' in update_data:
+        update_data['slug'] = update_data['title'].lower().replace(" ", "-").replace("--", "-")
+    
+    # Add updated timestamp
+    update_data['updated_at'] = datetime.utcnow()
+    
+    # Update the article
+    result = await db.news_articles.update_one(
+        {"id": article_id}, 
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    # Get updated article
+    updated_article = await db.news_articles.find_one({"id": article_id})
+    
+    # Ensure required fields exist
+    if "slug" not in updated_article or not updated_article["slug"]:
+        updated_article["slug"] = updated_article.get("title", "").lower().replace(" ", "-").replace("--", "-")
+    if "excerpt" not in updated_article or not updated_article["excerpt"]:
+        content = updated_article.get("content", "")
+        if content:
+            updated_article["excerpt"] = content[:150] + "..." if len(content) > 150 else content
+        else:
+            updated_article["excerpt"] = updated_article.get("title", "")[:100] + "..."
+    
+    return NewsArticle(**updated_article)
+
+@api_router.delete("/news/{article_id}")
+async def delete_news_article(article_id: str, current_user: User = Depends(get_current_user)):
+    """Delete news article - Admin only"""
+    result = await db.news_articles.delete_one({"id": article_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return {"message": "Article deleted successfully"}
+
 # Statistics Routes
 @api_router.get("/stats")
 async def get_statistics():
