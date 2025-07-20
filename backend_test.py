@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for BDS Vietnam Real Estate Platform
-Tests all CRUD operations, search, filtering, and statistics endpoints
+Tests all CRUD operations, search, filtering, statistics, authentication, tickets, and analytics endpoints
 """
 
 import requests
@@ -9,6 +9,7 @@ import json
 import time
 from datetime import datetime
 from typing import Dict, List, Any
+import uuid
 
 # Backend URL from environment
 BACKEND_URL = "https://7c75633b-3fda-414a-9cd6-498611641c2c.preview.emergentagent.com/api"
@@ -20,6 +21,11 @@ class BDSVietnamAPITester:
         self.test_results = []
         self.created_property_ids = []
         self.created_news_ids = []
+        self.created_sim_ids = []
+        self.created_land_ids = []
+        self.created_ticket_ids = []
+        self.auth_token = None
+        self.session_id = str(uuid.uuid4())
         
     def log_test(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
         """Log test results"""
