@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
 import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider, useAuth } from './components/AuthContext';
 import LoginPage from './components/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './components/AdminDashboard';
+import MemberDashboard from './components/MemberDashboard';
+import MemberAuth from './components/MemberAuth';
 import SimCard from './components/SimCard';
 import LandCard from './components/LandCard';
 import SimStorePage from './components/SimStorePage';
@@ -22,6 +24,8 @@ const Header = () => {
   const [showLandDropdown, setShowLandDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showMemberAuth, setShowMemberAuth] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <>
