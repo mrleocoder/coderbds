@@ -220,6 +220,69 @@ class UserLogin(BaseModel):
 async def root():
     return {"message": "BDS Vietnam API - Professional Real Estate Platform"}
 
+# Authentication Routes
+@api_router.post("/auth/login")
+async def login(user_credentials: UserLogin):
+    """Login user and return access token"""
+    user = await db.users.find_one({"username": user_credentials.username})
+    if not user or not verify_password(user_credentials.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["username"]}, expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"]
+        }
+    }
+
+@api_router.post("/auth/register")
+async def register(user_data: UserCreate):
+    """Register new user"""
+    # Check if user already exists
+    existing_user = await db.users.find_one({"username": user_data.username})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Check if email already exists
+    existing_email = await db.users.find_one({"email": user_data.email})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    hashed_password = hash_password(user_data.password)
+    user_dict = {
+        "id": str(uuid.uuid4()),
+        "username": user_data.username,
+        "email": user_data.email,
+        "hashed_password": hashed_password,
+        "is_active": True,
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.users.insert_one(user_dict)
+    return {"message": "User registered successfully", "user_id": user_dict["id"]}
+
+@api_router.get("/auth/me")
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current user information"""
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+        "is_active": current_user.is_active
+    }
+
 @api_router.get("/properties", response_model=List[Property])
 async def get_properties(
     skip: int = Query(0, ge=0),
