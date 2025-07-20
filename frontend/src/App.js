@@ -1457,9 +1457,172 @@ const HomePage = () => {
     <>
       <HeroSection />
       <PropertiesSection searchFilters={null} />
+      <LandSections />
       <NewsSlider />
       <FAQSection />
     </>
+  );
+};
+
+// Land Sections Component
+const LandSections = () => {
+  const [featuredLands, setFeaturedLands] = useState([]);
+  const [latestLands, setLatestLands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [featuredSkip, setFeaturedSkip] = useState(0);
+  const [latestSkip, setLatestSkip] = useState(0);
+  const [hasMoreFeatured, setHasMoreFeatured] = useState(true);
+  const [hasMoreLatest, setHasMoreLatest] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    fetchFeaturedLands();
+    fetchLatestLands();
+  }, []);
+
+  const fetchFeaturedLands = async (skip = 0, append = false) => {
+    try {
+      const response = await axios.get(`${API}/lands?featured=true&limit=6&skip=${skip}`);
+      const newFeatured = response.data;
+      
+      if (append) {
+        setFeaturedLands(prev => [...prev, ...newFeatured]);
+      } else {
+        setFeaturedLands(newFeatured);
+      }
+      
+      if (newFeatured.length < 6) {
+        setHasMoreFeatured(false);
+      }
+    } catch (error) {
+      console.error('Error fetching featured lands:', error);
+    }
+  };
+
+  const fetchLatestLands = async (skip = 0, append = false) => {
+    try {
+      const response = await axios.get(`${API}/lands?limit=6&skip=${skip}&sort_by=created_at&order=desc`);
+      const newLatest = response.data;
+      
+      if (append) {
+        setLatestLands(prev => [...prev, ...newLatest]);
+      } else {
+        setLatestLands(newLatest);
+        setLoading(false);
+      }
+      
+      if (newLatest.length < 6) {
+        setHasMoreLatest(false);
+      }
+    } catch (error) {
+      console.error('Error fetching latest lands:', error);
+      setLoading(false);
+    }
+  };
+
+  const loadMoreFeatured = async () => {
+    setLoadingMore(true);
+    const newSkip = featuredSkip + 6;
+    setFeaturedSkip(newSkip);
+    await fetchFeaturedLands(newSkip, true);
+    setLoadingMore(false);
+  };
+
+  const loadMoreLatest = async () => {
+    setLoadingMore(true);
+    const newSkip = latestSkip + 6;
+    setLatestSkip(newSkip);
+    await fetchLatestLands(newSkip, true);
+    setLoadingMore(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="py-16 flex items-center justify-center">
+        <div className="text-center">
+          <i className="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i>
+          <p className="text-gray-600">Đang tải dự án đất...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-16 bg-white">
+      {/* Featured Lands */}
+      {featuredLands.length > 0 && (
+        <section className="mb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <i className="fas fa-star text-emerald-600 text-2xl"></i>
+                <h2 className="text-3xl font-bold text-gray-800">Đất nổi bật</h2>
+              </div>
+              <p className="text-gray-600">Những dự án đất được lựa chọn kỹ càng với vị trí đắc địa</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredLands.map((land) => (
+                <LandCard key={land.id} land={land} />
+              ))}
+            </div>
+            
+            {hasMoreFeatured && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={loadMoreFeatured}
+                  disabled={loadingMore}
+                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? (
+                    <><i className="fas fa-spinner fa-spin mr-2"></i>Đang tải...</>
+                  ) : (
+                    <><i className="fas fa-plus mr-2"></i>Xem thêm</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Latest Lands */}
+      {latestLands.length > 0 && (
+        <section className="mb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <i className="fas fa-map text-emerald-600 text-2xl"></i>
+                <h2 className="text-3xl font-bold text-gray-800">Đất mới nhất</h2>
+              </div>
+              <p className="text-gray-600">Cập nhật những dự án đất mới được đăng gần đây</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestLands.map((land) => (
+                <LandCard key={land.id} land={land} />
+              ))}
+            </div>
+            
+            {hasMoreLatest && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={loadMoreLatest}
+                  disabled={loadingMore}
+                  className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? (
+                    <><i className="fas fa-spinner fa-spin mr-2"></i>Đang tải...</>
+                  ) : (
+                    <><i className="fas fa-plus mr-2"></i>Xem thêm</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+    </div>
   );
 };
 
