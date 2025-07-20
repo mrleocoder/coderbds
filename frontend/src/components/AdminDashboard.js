@@ -176,10 +176,13 @@ const AdminDashboard = () => {
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
       if (editingItem) {
-        await axios.put(`${API}/properties/${editingItem.id}`, propertyForm);
+        await axios.put(`${API}/properties/${editingItem.id}`, propertyForm, { headers });
       } else {
-        await axios.post(`${API}/properties`, propertyForm);
+        await axios.post(`${API}/properties`, propertyForm, { headers });
       }
       fetchAdminData();
       setShowForm(false);
