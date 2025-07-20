@@ -215,6 +215,115 @@ class SearchFilters(BaseModel):
     bedrooms: Optional[int] = None
     bathrooms: Optional[int] = None
 
+# Sim Models
+class Sim(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    phone_number: str
+    network: SimNetwork
+    sim_type: SimType
+    price: float
+    is_vip: bool = False
+    features: List[str] = []  # Features like "Số đẹp", "Phong thủy", etc
+    description: str
+    status: str = "available"  # available, sold, reserved
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    views: int = 0
+
+class SimCreate(BaseModel):
+    phone_number: str
+    network: SimNetwork
+    sim_type: SimType
+    price: float
+    is_vip: bool = False
+    features: List[str] = []
+    description: str
+
+class SimUpdate(BaseModel):
+    phone_number: Optional[str] = None
+    network: Optional[SimNetwork] = None
+    sim_type: Optional[SimType] = None
+    price: Optional[float] = None
+    is_vip: Optional[bool] = None
+    features: Optional[List[str]] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+
+# Land Models
+class Land(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    land_type: LandType
+    status: PropertyStatus
+    price: float
+    price_per_sqm: Optional[float] = None
+    area: float  # m2
+    width: Optional[float] = None  # mặt tiền (m)
+    length: Optional[float] = None  # chiều dài (m)
+    address: str
+    district: str
+    city: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    images: List[str] = []  # base64 images
+    featured: bool = False
+    legal_status: str  # Tình trạng pháp lý: "Sổ đỏ", "Sổ hồng", etc
+    orientation: Optional[str] = None  # Hướng: "Đông", "Tây", etc
+    road_width: Optional[float] = None  # Độ rộng đường (m)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    views: int = 0
+    contact_phone: str
+    contact_email: Optional[str] = None
+    agent_name: Optional[str] = None
+
+class LandCreate(BaseModel):
+    title: str
+    description: str
+    land_type: LandType
+    status: PropertyStatus
+    price: float
+    area: float
+    width: Optional[float] = None
+    length: Optional[float] = None
+    address: str
+    district: str
+    city: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    images: List[str] = []
+    featured: bool = False
+    legal_status: str
+    orientation: Optional[str] = None
+    road_width: Optional[float] = None
+    contact_phone: str
+    contact_email: Optional[str] = None
+    agent_name: Optional[str] = None
+
+class LandUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    land_type: Optional[LandType] = None
+    status: Optional[PropertyStatus] = None
+    price: Optional[float] = None
+    area: Optional[float] = None
+    width: Optional[float] = None
+    length: Optional[float] = None
+    address: Optional[str] = None
+    district: Optional[str] = None
+    city: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    images: Optional[List[str]] = None
+    featured: Optional[bool] = None
+    legal_status: Optional[str] = None
+    orientation: Optional[str] = None
+    road_width: Optional[float] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
+    agent_name: Optional[str] = None
+
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     username: str
