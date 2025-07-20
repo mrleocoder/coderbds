@@ -1,38 +1,297 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom styles for the real estate website */
 .App {
-    text-align: center;
+  text-align: left;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+
+/* Hero section animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Property card hover effects */
+.property-card {
+  transition: all 0.3s ease;
+}
+
+.property-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Custom input focus styles */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #10b981;
+  border-color: #10b981;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .mobile-grid-compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .mobile-card-horizontal {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+  }
+  
+  .mobile-card-horizontal img {
+    width: 120px;
+    height: 80px;
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+  
+  .mobile-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .mobile-card-content h3 {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mobile-card-content .price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 0.25rem;
+  }
+  
+  .mobile-card-content .details {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 }
 
-.App-link {
-    color: #61dafb;
+/* Loading animation */
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #10b981;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors duration-200 flex items-center justify-center space-x-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center space-x-2;
+}
+
+.btn-outline {
+  @apply border-2 border-emerald-600 text-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-600 hover:text-white transition-all duration-200 flex items-center justify-center space-x-2;
+}
+
+/* Search form styles */
+.search-form {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Property status badges */
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-semibold;
+}
+
+.status-for-sale {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-for-rent {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-sold {
+  @apply bg-gray-100 text-gray-800;
+}
+
+/* News card styles */
+.news-card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300;
+}
+
+/* FAQ accordion styles */
+.faq-item {
+  @apply bg-white rounded-lg shadow-md overflow-hidden mb-4;
+}
+
+.faq-header {
+  @apply w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset;
+}
+
+/* Admin panel styles */
+.admin-tab {
+  @apply py-4 px-6 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset transition-colors duration-200;
+}
+
+.admin-tab-active {
+  @apply border-emerald-600 text-emerald-600;
+}
+
+.admin-tab-inactive {
+  @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200;
+}
+
+.form-textarea {
+  @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 resize-vertical;
+}
+
+/* Fixed action buttons */
+.fixed-actions {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 40;
+}
+
+.fixed-action-btn {
+  @apply w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-all duration-200 hover:scale-105;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .container-mobile {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .text-mobile-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .grid-mobile-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Property detail styles */
+.property-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .property-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Statistics section styles */
+.stats-card {
+  @apply bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 text-center;
+}
+
+/* Footer styles */
+.footer-link {
+  @apply text-gray-300 hover:text-emerald-400 transition-colors duration-200;
+}
+
+/* Utility classes for mobile optimization */
+@media (max-width: 768px) {
+  .mobile-text-sm {
+    font-size: 0.875rem;
+  }
+  
+  .mobile-py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .mobile-px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .mobile-space-y-2 > * + * {
+    margin-top: 0.5rem;
+  }
+  
+  .mobile-grid-compact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
 }
