@@ -274,6 +274,25 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSubmitTicket = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingItem) {
+        const token = localStorage.getItem('token');
+        await axios.put(`${API}/tickets/${editingItem.id}`, ticketForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+      fetchAdminData();
+      setShowForm(false);
+      setEditingItem(null);
+      resetTicketForm();
+    } catch (error) {
+      console.error('Error submitting ticket:', error);
+      alert('Có lỗi xảy ra khi cập nhật ticket');
+    }
+  };
+
   const handleSubmitMember = async (e) => {
     e.preventDefault();
     try {
