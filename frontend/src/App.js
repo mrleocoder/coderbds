@@ -1766,6 +1766,8 @@ function App() {
             <Route path="/tim-kiem" element={<><Header /><SearchResultsPage /><Footer /></>} />
             <Route path="/bds/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
             <Route path="/loai-hinh/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+            <Route path="/dat/:filterType" element={<><Header /><LandFilterPage /><Footer /></>} />
+            <Route path="/kho-sim" element={<><Header /><SimStorePage /><Footer /></>} />
             <Route path="/lien-he" element={<><Header /><ContactPage /><Footer /></>} />
             
             {/* Admin Routes */}
