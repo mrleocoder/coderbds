@@ -219,90 +219,114 @@ const Header = () => {
               <span>Trang chủ</span>
             </Link>
             
-            {/* Property Links Mobile */}
+            {/* Property Accordion Mobile */}
             <div className="py-1">
-              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
-                <i className="fas fa-building mr-2"></i>
-                Bất động sản
-              </p>
-              <div className="pl-4 space-y-1">
-                <Link 
-                  to="/bat-dong-san/for_sale" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Nhà đất bán
-                </Link>
-                <Link 
-                  to="/bat-dong-san/for_rent" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Nhà đất cho thuê
-                </Link>
-              </div>
+              <button
+                onClick={() => setShowMobilePropertyDropdown(!showMobilePropertyDropdown)}
+                className="w-full text-left py-2 text-emerald-200 text-sm font-medium flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <i className="fas fa-building mr-2"></i>
+                  Bất động sản
+                </div>
+                <i className={`fas fa-chevron-${showMobilePropertyDropdown ? 'up' : 'down'} text-xs`}></i>
+              </button>
+              {showMobilePropertyDropdown && (
+                <div className="pl-6 space-y-1 mt-1">
+                  <Link 
+                    to="/bat-dong-san/for_sale" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Nhà đất bán
+                  </Link>
+                  <Link 
+                    to="/bat-dong-san/for_rent" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Nhà đất cho thuê
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {/* Property Types Mobile */}
+            {/* Property Types Accordion Mobile */}
             <div className="py-1">
-              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
-                <i className="fas fa-th-large mr-2"></i>
-                Loại hình BDS
-              </p>
-              <div className="pl-4 space-y-1">
-                <Link 
-                  to="/loai-hinh-bat-dong-san/apartment" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Căn hộ chung cư
-                </Link>
-                <Link 
-                  to="/loai-hinh-bat-dong-san/house" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Nhà riêng
-                </Link>
-                <Link 
-                  to="/loai-hinh-bat-dong-san/villa" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Biệt thự, liền kề
-                </Link>
-                <Link 
-                  to="/loai-hinh-bat-dong-san/shophouse" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Nhà mặt phố
-                </Link>
-              </div>
+              <button
+                onClick={() => setShowMobileTypeDropdown(!showMobileTypeDropdown)}
+                className="w-full text-left py-2 text-emerald-200 text-sm font-medium flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <i className="fas fa-th-large mr-2"></i>
+                  Loại hình BDS
+                </div>
+                <i className={`fas fa-chevron-${showMobileTypeDropdown ? 'up' : 'down'} text-xs`}></i>
+              </button>
+              {showMobileTypeDropdown && (
+                <div className="pl-6 space-y-1 mt-1">
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/apartment" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Căn hộ chung cư
+                  </Link>
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/house" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Nhà riêng
+                  </Link>
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/villa" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Biệt thự, liền kề
+                  </Link>
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/shophouse" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Nhà mặt phố
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {/* Land Projects Mobile */}
+            {/* Land Projects Accordion Mobile */}
             <div className="py-1">
-              <p className="text-emerald-200 text-sm font-medium mb-1 flex items-center">
-                <i className="fas fa-map mr-2"></i>
-                Dự án đất
-              </p>
-              <div className="pl-4 space-y-1">
-                <Link 
-                  to="/dat/for_sale" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Đất bán
-                </Link>
-                <Link 
-                  to="/dat/for_rent" 
-                  className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  • Đất thuê
-                </Link>
-              </div>
+              <button
+                onClick={() => setShowMobileLandDropdown(!showMobileLandDropdown)}
+                className="w-full text-left py-2 text-emerald-200 text-sm font-medium flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <i className="fas fa-map mr-2"></i>
+                  Dự án đất
+                </div>
+                <i className={`fas fa-chevron-${showMobileLandDropdown ? 'up' : 'down'} text-xs`}></i>
+              </button>
+              {showMobileLandDropdown && (
+                <div className="pl-6 space-y-1 mt-1">
+                  <Link 
+                    to="/dat/for_sale" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Đất bán
+                  </Link>
+                  <Link 
+                    to="/dat/for_rent" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Đất thuê
+                  </Link>
+                </div>
+              )}
             </div>
             
             <Link 
