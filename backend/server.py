@@ -94,6 +94,23 @@ class PropertyStatus(str, Enum):
     sold = "sold"
     rented = "rented"
 
+class SimNetwork(str, Enum):
+    viettel = "viettel"
+    mobifone = "mobifone"
+    vinaphone = "vinaphone"
+    vietnamobile = "vietnamobile"
+    itelecom = "itelecom"
+
+class SimType(str, Enum):
+    prepaid = "prepaid"
+    postpaid = "postpaid"
+    
+class LandType(str, Enum):
+    residential = "residential"  # Đất ở
+    commercial = "commercial"    # Đất thương mại
+    industrial = "industrial"    # Đất công nghiệp
+    agricultural = "agricultural" # Đất nông nghiệp
+
 # Pydantic Models
 class Property(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
