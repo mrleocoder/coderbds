@@ -464,6 +464,17 @@ const AdminDashboard = () => {
     });
   };
 
+  const resetMemberForm = () => {
+    setMemberForm({
+      status: 'active',
+      admin_notes: '',
+      full_name: '',
+      phone: '',
+      address: '',
+      email_verified: false
+    });
+  };
+
   // Chart configurations
   const getTrafficChartData = () => {
     return {
