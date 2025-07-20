@@ -366,8 +366,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Property detail view"
-    - "News section display"
+    - "Traffic Analytics API endpoints"
+    - "Ticket/Contact system API endpoints"
+    - "Admin Sim and Land Management Forms"
+    - "Analytics Dashboard with Charts"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
