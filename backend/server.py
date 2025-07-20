@@ -1491,6 +1491,17 @@ async def get_news_article(article_id: str):
     await db.news_articles.update_one({"id": article_id}, {"$inc": {"views": 1}})
     article["views"] += 1
     
+    # Ensure required fields exist
+    if "slug" not in article or not article["slug"]:
+        article["slug"] = article.get("title", "").lower().replace(" ", "-").replace("--", "-")
+    if "excerpt" not in article or not article["excerpt"]:
+        # Generate excerpt from content or title
+        content = article.get("content", "")
+        if content:
+            article["excerpt"] = content[:150] + "..." if len(content) > 150 else content
+        else:
+            article["excerpt"] = article.get("title", "")[:100] + "..."
+    
     return NewsArticle(**article)
 
 @api_router.post("/news", response_model=NewsArticle)
