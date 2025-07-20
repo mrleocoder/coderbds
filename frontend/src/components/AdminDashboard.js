@@ -197,14 +197,17 @@ const AdminDashboard = () => {
   const handleSubmitNews = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
       if (editingItem) {
-        await axios.put(`${API}/news/${editingItem.id}`, newsForm);
+        await axios.put(`${API}/news/${editingItem.id}`, newsForm, { headers });
       } else {
         const formWithSlug = {
           ...newsForm,
           slug: newsForm.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
         };
-        await axios.post(`${API}/news`, formWithSlug);
+        await axios.post(`${API}/news`, formWithSlug, { headers });
       }
       fetchAdminData();
       setShowForm(false);
