@@ -1316,6 +1316,505 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Tickets Data Check", False, f"Error: {str(e)}")
 
+    def test_admin_vs_public_data_synchronization(self):
+        """Test synchronization between admin and public endpoints - CRITICAL INVESTIGATION"""
+        print("\n🔍 CRITICAL SYNCHRONIZATION INVESTIGATION")
+        print("=" * 80)
+        print("Testing data consistency between admin and customer pages...")
+        
+        # Test 1: Compare admin vs public properties
+        print("\n1️⃣ Testing Properties Synchronization...")
+        try:
+            # Get admin properties (if endpoint exists)
+            admin_properties = []
+            try:
+                admin_response = self.session.get(f"{self.base_url}/admin/properties")
+                if admin_response.status_code == 200:
+                    admin_properties = admin_response.json()
+                    self.log_test("Admin Properties Endpoint", True, f"Retrieved {len(admin_properties)} admin properties")
+                elif admin_response.status_code == 404:
+                    self.log_test("Admin Properties Endpoint", False, "Admin properties endpoint does not exist")
+                else:
+                    self.log_test("Admin Properties Endpoint", False, f"Status: {admin_response.status_code}")
+            except Exception as e:
+                self.log_test("Admin Properties Endpoint", False, f"Error: {str(e)}")
+            
+            # Get public properties
+            public_properties = []
+            try:
+                public_response = self.session.get(f"{self.base_url}/properties")
+                if public_response.status_code == 200:
+                    public_properties = public_response.json()
+                    self.log_test("Public Properties Endpoint", True, f"Retrieved {len(public_properties)} public properties")
+                else:
+                    self.log_test("Public Properties Endpoint", False, f"Status: {public_response.status_code}")
+            except Exception as e:
+                self.log_test("Public Properties Endpoint", False, f"Error: {str(e)}")
+            
+            # Compare data
+            if admin_properties and public_properties:
+                admin_ids = set(prop.get('id') for prop in admin_properties)
+                public_ids = set(prop.get('id') for prop in public_properties)
+                
+                if admin_ids == public_ids:
+                    self.log_test("Properties Data Sync", True, f"Admin and public properties are synchronized ({len(admin_ids)} items)")
+                else:
+                    admin_only = admin_ids - public_ids
+                    public_only = public_ids - admin_ids
+                    self.log_test("Properties Data Sync", False, f"SYNC ISSUE: Admin-only: {len(admin_only)}, Public-only: {len(public_only)}")
+                    if admin_only:
+                        print(f"   🔴 Admin-only property IDs: {list(admin_only)[:5]}...")
+                    if public_only:
+                        print(f"   🔴 Public-only property IDs: {list(public_only)[:5]}...")
+            elif not admin_properties and public_properties:
+                self.log_test("Properties Data Sync", False, f"Admin endpoint missing/empty, public has {len(public_properties)} items")
+            elif admin_properties and not public_properties:
+                self.log_test("Properties Data Sync", False, f"Public endpoint empty, admin has {len(admin_properties)} items")
+            else:
+                self.log_test("Properties Data Sync", True, "Both endpoints empty (consistent)")
+                
+        except Exception as e:
+            self.log_test("Properties Synchronization Test", False, f"Error: {str(e)}")
+        
+        # Test 2: Compare admin vs public news
+        print("\n2️⃣ Testing News Synchronization...")
+        try:
+            # Get admin news (if endpoint exists)
+            admin_news = []
+            try:
+                admin_response = self.session.get(f"{self.base_url}/admin/news")
+                if admin_response.status_code == 200:
+                    admin_news = admin_response.json()
+                    self.log_test("Admin News Endpoint", True, f"Retrieved {len(admin_news)} admin news")
+                elif admin_response.status_code == 404:
+                    self.log_test("Admin News Endpoint", False, "Admin news endpoint does not exist")
+                else:
+                    self.log_test("Admin News Endpoint", False, f"Status: {admin_response.status_code}")
+            except Exception as e:
+                self.log_test("Admin News Endpoint", False, f"Error: {str(e)}")
+            
+            # Get public news
+            public_news = []
+            try:
+                public_response = self.session.get(f"{self.base_url}/news")
+                if public_response.status_code == 200:
+                    public_news = public_response.json()
+                    self.log_test("Public News Endpoint", True, f"Retrieved {len(public_news)} public news")
+                else:
+                    self.log_test("Public News Endpoint", False, f"Status: {public_response.status_code}")
+            except Exception as e:
+                self.log_test("Public News Endpoint", False, f"Error: {str(e)}")
+            
+            # Compare data
+            if admin_news and public_news:
+                admin_ids = set(article.get('id') for article in admin_news)
+                public_ids = set(article.get('id') for article in public_news)
+                
+                if admin_ids == public_ids:
+                    self.log_test("News Data Sync", True, f"Admin and public news are synchronized ({len(admin_ids)} items)")
+                else:
+                    admin_only = admin_ids - public_ids
+                    public_only = public_ids - admin_ids
+                    self.log_test("News Data Sync", False, f"SYNC ISSUE: Admin-only: {len(admin_only)}, Public-only: {len(public_only)}")
+            elif not admin_news and public_news:
+                self.log_test("News Data Sync", False, f"Admin endpoint missing/empty, public has {len(public_news)} items")
+            elif admin_news and not public_news:
+                self.log_test("News Data Sync", False, f"Public endpoint empty, admin has {len(admin_news)} items")
+            else:
+                self.log_test("News Data Sync", True, "Both endpoints empty (consistent)")
+                
+        except Exception as e:
+            self.log_test("News Synchronization Test", False, f"Error: {str(e)}")
+        
+        # Test 3: Compare admin vs public sims
+        print("\n3️⃣ Testing Sims Synchronization...")
+        try:
+            # Get admin sims (if endpoint exists)
+            admin_sims = []
+            try:
+                admin_response = self.session.get(f"{self.base_url}/admin/sims")
+                if admin_response.status_code == 200:
+                    admin_sims = admin_response.json()
+                    self.log_test("Admin Sims Endpoint", True, f"Retrieved {len(admin_sims)} admin sims")
+                elif admin_response.status_code == 404:
+                    self.log_test("Admin Sims Endpoint", False, "Admin sims endpoint does not exist")
+                else:
+                    self.log_test("Admin Sims Endpoint", False, f"Status: {admin_response.status_code}")
+            except Exception as e:
+                self.log_test("Admin Sims Endpoint", False, f"Error: {str(e)}")
+            
+            # Get public sims
+            public_sims = []
+            try:
+                public_response = self.session.get(f"{self.base_url}/sims")
+                if public_response.status_code == 200:
+                    public_sims = public_response.json()
+                    self.log_test("Public Sims Endpoint", True, f"Retrieved {len(public_sims)} public sims")
+                else:
+                    self.log_test("Public Sims Endpoint", False, f"Status: {public_response.status_code}")
+            except Exception as e:
+                self.log_test("Public Sims Endpoint", False, f"Error: {str(e)}")
+            
+            # Compare data
+            if admin_sims and public_sims:
+                admin_ids = set(sim.get('id') for sim in admin_sims)
+                public_ids = set(sim.get('id') for sim in public_sims)
+                
+                if admin_ids == public_ids:
+                    self.log_test("Sims Data Sync", True, f"Admin and public sims are synchronized ({len(admin_ids)} items)")
+                else:
+                    admin_only = admin_ids - public_ids
+                    public_only = public_ids - admin_ids
+                    self.log_test("Sims Data Sync", False, f"SYNC ISSUE: Admin-only: {len(admin_only)}, Public-only: {len(public_only)}")
+            elif not admin_sims and public_sims:
+                self.log_test("Sims Data Sync", False, f"Admin endpoint missing/empty, public has {len(public_sims)} items")
+            elif admin_sims and not public_sims:
+                self.log_test("Sims Data Sync", False, f"Public endpoint empty, admin has {len(admin_sims)} items")
+            else:
+                self.log_test("Sims Data Sync", True, "Both endpoints empty (consistent)")
+                
+        except Exception as e:
+            self.log_test("Sims Synchronization Test", False, f"Error: {str(e)}")
+        
+        # Test 4: Compare admin vs public lands
+        print("\n4️⃣ Testing Lands Synchronization...")
+        try:
+            # Get admin lands (if endpoint exists)
+            admin_lands = []
+            try:
+                admin_response = self.session.get(f"{self.base_url}/admin/lands")
+                if admin_response.status_code == 200:
+                    admin_lands = admin_response.json()
+                    self.log_test("Admin Lands Endpoint", True, f"Retrieved {len(admin_lands)} admin lands")
+                elif admin_response.status_code == 404:
+                    self.log_test("Admin Lands Endpoint", False, "Admin lands endpoint does not exist")
+                else:
+                    self.log_test("Admin Lands Endpoint", False, f"Status: {admin_response.status_code}")
+            except Exception as e:
+                self.log_test("Admin Lands Endpoint", False, f"Error: {str(e)}")
+            
+            # Get public lands
+            public_lands = []
+            try:
+                public_response = self.session.get(f"{self.base_url}/lands")
+                if public_response.status_code == 200:
+                    public_lands = public_response.json()
+                    self.log_test("Public Lands Endpoint", True, f"Retrieved {len(public_lands)} public lands")
+                else:
+                    self.log_test("Public Lands Endpoint", False, f"Status: {public_response.status_code}")
+            except Exception as e:
+                self.log_test("Public Lands Endpoint", False, f"Error: {str(e)}")
+            
+            # Compare data
+            if admin_lands and public_lands:
+                admin_ids = set(land.get('id') for land in admin_lands)
+                public_ids = set(land.get('id') for land in public_lands)
+                
+                if admin_ids == public_ids:
+                    self.log_test("Lands Data Sync", True, f"Admin and public lands are synchronized ({len(admin_ids)} items)")
+                else:
+                    admin_only = admin_ids - public_ids
+                    public_only = public_ids - admin_ids
+                    self.log_test("Lands Data Sync", False, f"SYNC ISSUE: Admin-only: {len(admin_only)}, Public-only: {len(public_only)}")
+            elif not admin_lands and public_lands:
+                self.log_test("Lands Data Sync", False, f"Admin endpoint missing/empty, public has {len(public_lands)} items")
+            elif admin_lands and not public_lands:
+                self.log_test("Lands Data Sync", False, f"Public endpoint empty, admin has {len(admin_lands)} items")
+            else:
+                self.log_test("Lands Data Sync", True, "Both endpoints empty (consistent)")
+                
+        except Exception as e:
+            self.log_test("Lands Synchronization Test", False, f"Error: {str(e)}")
+
+    def test_crud_operations_synchronization(self):
+        """Test CRUD operations synchronization between admin and public"""
+        print("\n🔄 CRUD OPERATIONS SYNCHRONIZATION TEST")
+        print("=" * 80)
+        
+        # Test 1: Create property via admin and check if it appears in public
+        print("\n1️⃣ Testing Property Creation Synchronization...")
+        test_property_data = {
+            "title": "SYNC TEST - Căn hộ test đồng bộ",
+            "description": "Căn hộ test để kiểm tra đồng bộ dữ liệu admin-public",
+            "property_type": "apartment",
+            "status": "for_sale",
+            "price": 3000000000,
+            "area": 75.0,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "123 Test Sync Street",
+            "district": "Test District",
+            "city": "Test City",
+            "contact_phone": "0987654321",
+            "featured": False
+        }
+        
+        try:
+            # Create property via admin
+            create_response = self.session.post(f"{self.base_url}/properties", json=test_property_data)
+            if create_response.status_code == 200:
+                created_property = create_response.json()
+                property_id = created_property.get("id")
+                self.log_test("Admin Create Property", True, f"Property created with ID: {property_id}")
+                
+                # Immediately check if it appears in public endpoint
+                time.sleep(1)  # Small delay to ensure data consistency
+                public_response = self.session.get(f"{self.base_url}/properties")
+                if public_response.status_code == 200:
+                    public_properties = public_response.json()
+                    public_property_ids = [prop.get('id') for prop in public_properties]
+                    
+                    if property_id in public_property_ids:
+                        self.log_test("Property Creation Sync", True, f"Property {property_id} immediately visible in public endpoint")
+                        
+                        # Test specific property retrieval
+                        specific_response = self.session.get(f"{self.base_url}/properties/{property_id}")
+                        if specific_response.status_code == 200:
+                            specific_property = specific_response.json()
+                            if specific_property.get("title") == test_property_data["title"]:
+                                self.log_test("Property Detail Sync", True, f"Property details match in public endpoint")
+                            else:
+                                self.log_test("Property Detail Sync", False, f"Property details mismatch")
+                        else:
+                            self.log_test("Property Detail Sync", False, f"Cannot retrieve specific property: {specific_response.status_code}")
+                        
+                        # Cleanup - delete the test property
+                        delete_response = self.session.delete(f"{self.base_url}/properties/{property_id}")
+                        if delete_response.status_code == 200:
+                            self.log_test("Property Cleanup", True, f"Test property deleted successfully")
+                        else:
+                            self.log_test("Property Cleanup", False, f"Failed to delete test property: {delete_response.status_code}")
+                    else:
+                        self.log_test("Property Creation Sync", False, f"Property {property_id} NOT visible in public endpoint immediately")
+                else:
+                    self.log_test("Property Creation Sync", False, f"Cannot retrieve public properties: {public_response.status_code}")
+            else:
+                self.log_test("Admin Create Property", False, f"Failed to create property: {create_response.status_code}")
+        except Exception as e:
+            self.log_test("Property Creation Synchronization", False, f"Error: {str(e)}")
+        
+        # Test 2: Create news via admin and check if it appears in public
+        print("\n2️⃣ Testing News Creation Synchronization...")
+        test_news_data = {
+            "title": "SYNC TEST - Tin tức test đồng bộ",
+            "slug": "sync-test-tin-tuc-test-dong-bo",
+            "content": "Nội dung tin tức test để kiểm tra đồng bộ dữ liệu admin-public",
+            "excerpt": "Tin tức test đồng bộ",
+            "category": "Test",
+            "tags": ["test", "sync"],
+            "published": True,
+            "author": "Test Author"
+        }
+        
+        try:
+            # Create news via admin
+            create_response = self.session.post(f"{self.base_url}/news", json=test_news_data)
+            if create_response.status_code == 200:
+                created_news = create_response.json()
+                news_id = created_news.get("id")
+                self.log_test("Admin Create News", True, f"News created with ID: {news_id}")
+                
+                # Immediately check if it appears in public endpoint
+                time.sleep(1)  # Small delay to ensure data consistency
+                public_response = self.session.get(f"{self.base_url}/news")
+                if public_response.status_code == 200:
+                    public_news = public_response.json()
+                    public_news_ids = [article.get('id') for article in public_news]
+                    
+                    if news_id in public_news_ids:
+                        self.log_test("News Creation Sync", True, f"News {news_id} immediately visible in public endpoint")
+                        
+                        # Test specific news retrieval
+                        specific_response = self.session.get(f"{self.base_url}/news/{news_id}")
+                        if specific_response.status_code == 200:
+                            specific_news = specific_response.json()
+                            if specific_news.get("title") == test_news_data["title"]:
+                                self.log_test("News Detail Sync", True, f"News details match in public endpoint")
+                            else:
+                                self.log_test("News Detail Sync", False, f"News details mismatch")
+                        else:
+                            self.log_test("News Detail Sync", False, f"Cannot retrieve specific news: {specific_response.status_code}")
+                    else:
+                        self.log_test("News Creation Sync", False, f"News {news_id} NOT visible in public endpoint immediately")
+                else:
+                    self.log_test("News Creation Sync", False, f"Cannot retrieve public news: {public_response.status_code}")
+            else:
+                self.log_test("Admin Create News", False, f"Failed to create news: {create_response.status_code}")
+        except Exception as e:
+            self.log_test("News Creation Synchronization", False, f"Error: {str(e)}")
+
+    def test_database_collection_verification(self):
+        """Test which MongoDB collections are being used by different endpoints"""
+        print("\n🗄️ DATABASE COLLECTION VERIFICATION")
+        print("=" * 80)
+        print("Analyzing which collections admin vs public endpoints access...")
+        
+        # This test analyzes the behavior to infer collection usage
+        # We can't directly access MongoDB, but we can infer from API behavior
+        
+        print("\n📊 Collection Usage Analysis:")
+        print("Based on API endpoint analysis:")
+        print("- Public /api/properties -> likely uses 'properties' collection")
+        print("- Public /api/news -> likely uses 'news_articles' collection") 
+        print("- Public /api/sims -> likely uses 'sims' collection")
+        print("- Public /api/lands -> likely uses 'lands' collection")
+        print("- Admin endpoints (if they exist) -> same collections or separate admin collections")
+        
+        # Test data consistency by creating and immediately retrieving
+        print("\n🔍 Testing Data Consistency Patterns...")
+        
+        # Create a property and see if it's immediately available
+        test_data = {
+            "title": "Collection Test Property",
+            "description": "Test property for collection verification",
+            "property_type": "apartment",
+            "status": "for_sale", 
+            "price": 1000000000,
+            "area": 50.0,
+            "bedrooms": 1,
+            "bathrooms": 1,
+            "address": "Test Address",
+            "district": "Test District",
+            "city": "Test City",
+            "contact_phone": "0123456789"
+        }
+        
+        try:
+            # Create property
+            create_response = self.session.post(f"{self.base_url}/properties", json=test_data)
+            if create_response.status_code == 200:
+                property_data = create_response.json()
+                property_id = property_data.get("id")
+                
+                # Immediately try to retrieve it
+                retrieve_response = self.session.get(f"{self.base_url}/properties/{property_id}")
+                if retrieve_response.status_code == 200:
+                    self.log_test("Same Collection Usage", True, "Created property immediately retrievable - same collection")
+                else:
+                    self.log_test("Same Collection Usage", False, "Created property not immediately retrievable - possible different collections")
+                
+                # Check if it appears in list
+                list_response = self.session.get(f"{self.base_url}/properties")
+                if list_response.status_code == 200:
+                    properties = list_response.json()
+                    property_ids = [p.get('id') for p in properties]
+                    if property_id in property_ids:
+                        self.log_test("List Consistency", True, "Created property appears in list immediately")
+                    else:
+                        self.log_test("List Consistency", False, "Created property does not appear in list - possible sync issue")
+                
+                # Cleanup
+                self.session.delete(f"{self.base_url}/properties/{property_id}")
+            else:
+                self.log_test("Collection Test Setup", False, f"Could not create test property: {create_response.status_code}")
+        except Exception as e:
+            self.log_test("Database Collection Verification", False, f"Error: {str(e)}")
+
+    def test_authentication_impact_on_data(self):
+        """Test if authentication headers affect which data is returned"""
+        print("\n🔐 AUTHENTICATION IMPACT ON DATA")
+        print("=" * 80)
+        print("Testing if authentication affects data visibility...")
+        
+        # Test 1: Compare authenticated vs non-authenticated requests
+        print("\n1️⃣ Testing Properties with/without Authentication...")
+        
+        try:
+            # Get properties with authentication (admin)
+            auth_response = self.session.get(f"{self.base_url}/properties")
+            auth_properties = []
+            if auth_response.status_code == 200:
+                auth_properties = auth_response.json()
+                self.log_test("Authenticated Properties Request", True, f"Retrieved {len(auth_properties)} properties with auth")
+            else:
+                self.log_test("Authenticated Properties Request", False, f"Status: {auth_response.status_code}")
+            
+            # Get properties without authentication
+            headers_backup = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            no_auth_response = self.session.get(f"{self.base_url}/properties")
+            no_auth_properties = []
+            if no_auth_response.status_code == 200:
+                no_auth_properties = no_auth_response.json()
+                self.log_test("Non-authenticated Properties Request", True, f"Retrieved {len(no_auth_properties)} properties without auth")
+            else:
+                self.log_test("Non-authenticated Properties Request", False, f"Status: {no_auth_response.status_code}")
+            
+            # Restore authentication
+            self.session.headers.update(headers_backup)
+            
+            # Compare results
+            if auth_properties and no_auth_properties:
+                auth_ids = set(p.get('id') for p in auth_properties)
+                no_auth_ids = set(p.get('id') for p in no_auth_properties)
+                
+                if auth_ids == no_auth_ids:
+                    self.log_test("Authentication Data Impact", True, f"Same data returned with/without auth ({len(auth_ids)} items)")
+                else:
+                    auth_only = auth_ids - no_auth_ids
+                    no_auth_only = no_auth_ids - auth_ids
+                    self.log_test("Authentication Data Impact", False, f"Different data: Auth-only: {len(auth_only)}, No-auth-only: {len(no_auth_only)}")
+                    if auth_only:
+                        print(f"   🔴 Auth-only property IDs: {list(auth_only)[:3]}...")
+                    if no_auth_only:
+                        print(f"   🔴 No-auth-only property IDs: {list(no_auth_only)[:3]}...")
+            elif len(auth_properties) != len(no_auth_properties):
+                self.log_test("Authentication Data Impact", False, f"Different counts: Auth: {len(auth_properties)}, No-auth: {len(no_auth_properties)}")
+            else:
+                self.log_test("Authentication Data Impact", True, "Both requests returned same empty result")
+                
+        except Exception as e:
+            self.log_test("Authentication Impact Test", False, f"Error: {str(e)}")
+        
+        # Test 2: Test other endpoints with/without auth
+        endpoints_to_test = [
+            ("/news", "News"),
+            ("/sims", "Sims"), 
+            ("/lands", "Lands"),
+            ("/stats", "Statistics")
+        ]
+        
+        for endpoint, name in endpoints_to_test:
+            print(f"\n2️⃣ Testing {name} with/without Authentication...")
+            try:
+                # With auth
+                auth_response = self.session.get(f"{self.base_url}{endpoint}")
+                auth_count = 0
+                if auth_response.status_code == 200:
+                    auth_data = auth_response.json()
+                    auth_count = len(auth_data) if isinstance(auth_data, list) else 1
+                    self.log_test(f"Authenticated {name} Request", True, f"Retrieved {auth_count} items with auth")
+                else:
+                    self.log_test(f"Authenticated {name} Request", False, f"Status: {auth_response.status_code}")
+                
+                # Without auth
+                headers_backup = self.session.headers.copy()
+                if 'Authorization' in self.session.headers:
+                    del self.session.headers['Authorization']
+                
+                no_auth_response = self.session.get(f"{self.base_url}{endpoint}")
+                no_auth_count = 0
+                if no_auth_response.status_code == 200:
+                    no_auth_data = no_auth_response.json()
+                    no_auth_count = len(no_auth_data) if isinstance(no_auth_data, list) else 1
+                    self.log_test(f"Non-authenticated {name} Request", True, f"Retrieved {no_auth_count} items without auth")
+                else:
+                    self.log_test(f"Non-authenticated {name} Request", False, f"Status: {no_auth_response.status_code}")
+                
+                # Restore auth
+                self.session.headers.update(headers_backup)
+                
+                # Compare
+                if auth_count == no_auth_count:
+                    self.log_test(f"{name} Auth Impact", True, f"Same count with/without auth ({auth_count} items)")
+                else:
+                    self.log_test(f"{name} Auth Impact", False, f"Different counts: Auth: {auth_count}, No-auth: {no_auth_count}")
+                    
+            except Exception as e:
+                self.log_test(f"{name} Authentication Test", False, f"Error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend API tests"""
         print("🚀 Starting BDS Vietnam Backend API Tests - COMPREHENSIVE ENHANCED VERSION")
