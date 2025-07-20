@@ -734,30 +734,6 @@ async def root():
     return {"message": "BDS Vietnam API - Professional Real Estate Platform"}
 
 # Authentication Routes
-@api_router.post("/auth/login")
-async def login(user_credentials: UserLogin):
-    """Login user and return access token"""
-    user = await db.users.find_one({"username": user_credentials.username})
-    if not user or not verify_password(user_credentials.password, user["hashed_password"]):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user["username"]}, expires_delta=access_token_expires
-    )
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"]
-        }
-    }
 
 # Enhanced Authentication Routes
 @api_router.post("/auth/register")
