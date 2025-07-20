@@ -126,7 +126,7 @@ const AdminDashboard = () => {
         axios.get(`${API}/sims?limit=100`),
         axios.get(`${API}/lands?limit=100`),
         axios.get(`${API}/tickets?limit=100`, { headers }),
-        axios.get(`${API}/stats`)
+        axios.get(`${API}/admin/dashboard/stats`, { headers })
       ]);
       
       setProperties(propertiesRes.data);
