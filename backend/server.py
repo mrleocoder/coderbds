@@ -1983,6 +1983,423 @@ async def get_popular_pages(
     popular_pages = await db.pageviews.aggregate(pipeline).to_list(limit)
     return popular_pages
 
+# Member Management APIs for Admin
+@api_router.get("/admin/members", response_model=List[UserProfile])
+async def get_all_members(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    role: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    current_user: User = Depends(get_current_admin)
+):
+    """Get all members - Admin only"""
+    filter_query = {}
+    if role:
+        filter_query["role"] = role
+    if status:
+        filter_query["status"] = status
+    
+    members = await db.users.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return [UserProfile(**member) for member in members]
+
+@api_router.get("/admin/members/{user_id}", response_model=UserProfile)
+async def get_member_details(user_id: str, current_user: User = Depends(get_current_admin)):
+    """Get member details - Admin only"""
+    member = await db.users.find_one({"id": user_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return UserProfile(**member)
+
+@api_router.put("/admin/members/{user_id}")
+async def update_member(user_id: str, update_data: dict, current_user: User = Depends(get_current_admin)):
+    """Update member - Admin only"""
+    update_fields = {k: v for k, v in update_data.items() if v is not None}
+    update_fields["updated_at"] = datetime.utcnow()
+    
+    result = await db.users.update_one({"id": user_id}, {"$set": update_fields})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    updated_member = await db.users.find_one({"id": user_id})
+    return UserProfile(**updated_member)
+
+@api_router.post("/admin/members/{user_id}/adjust-balance")
+async def adjust_member_balance(
+    user_id: str, 
+    amount: float, 
+    description: str,
+    current_user: User = Depends(get_current_admin)
+):
+    """Adjust member wallet balance - Admin only"""
+    member = await db.users.find_one({"id": user_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    new_balance = member.get("wallet_balance", 0.0) + amount
+    if new_balance < 0:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    
+    # Update balance
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"wallet_balance": new_balance, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Create transaction record
+    transaction = Transaction(
+        user_id=user_id,
+        amount=amount,
+        transaction_type=TransactionType.deposit if amount > 0 else TransactionType.withdrawal,
+        description=f"Admin adjustment: {description}",
+        status=TransactionStatus.completed,
+        admin_notes=f"Adjusted by admin {current_user.username}",
+        completed_at=datetime.utcnow()
+    )
+    await db.transactions.insert_one(transaction.dict())
+    
+    return {"message": "Balance adjusted successfully", "new_balance": new_balance}
+
+# Deposit Management APIs
+@api_router.get("/admin/deposits")
+async def get_pending_deposits(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    status: TransactionStatus = Query(TransactionStatus.pending),
+    current_user: User = Depends(get_current_admin)
+):
+    """Get deposit requests - Admin only"""
+    filter_query = {
+        "transaction_type": TransactionType.deposit,
+        "status": status
+    }
+    
+    deposits = await db.transactions.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Get user details for each deposit
+    enriched_deposits = []
+    for deposit in deposits:
+        user = await db.users.find_one({"id": deposit["user_id"]})
+        deposit["user_name"] = user.get("full_name", "Unknown") if user else "Unknown"
+        deposit["user_email"] = user.get("email", "Unknown") if user else "Unknown"
+        enriched_deposits.append(deposit)
+    
+    return enriched_deposits
+
+@api_router.put("/admin/deposits/{transaction_id}/approve")
+async def approve_deposit(
+    transaction_id: str,
+    admin_notes: str = "",
+    current_user: User = Depends(get_current_admin)
+):
+    """Approve deposit request - Admin only"""
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != TransactionStatus.pending:
+        raise HTTPException(status_code=400, detail="Transaction is not pending")
+    
+    # Update transaction status
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {
+            "$set": {
+                "status": TransactionStatus.completed,
+                "admin_notes": admin_notes,
+                "completed_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Add money to user wallet
+    user = await db.users.find_one({"id": transaction["user_id"]})
+    if user:
+        new_balance = user.get("wallet_balance", 0.0) + transaction["amount"]
+        await db.users.update_one(
+            {"id": transaction["user_id"]},
+            {"$set": {"wallet_balance": new_balance, "updated_at": datetime.utcnow()}}
+        )
+    
+    return {"message": "Deposit approved successfully"}
+
+@api_router.put("/admin/deposits/{transaction_id}/reject")
+async def reject_deposit(
+    transaction_id: str,
+    admin_notes: str,
+    current_user: User = Depends(get_current_admin)
+):
+    """Reject deposit request - Admin only"""
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != TransactionStatus.pending:
+        raise HTTPException(status_code=400, detail="Transaction is not pending")
+    
+    # Update transaction status
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {
+            "$set": {
+                "status": TransactionStatus.failed,
+                "admin_notes": admin_notes,
+                "completed_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": "Deposit rejected"}
+
+# Bank Transfer APIs
+@api_router.post("/member/deposits/create")
+async def create_deposit_request(
+    amount: float,
+    bank_transfer_image: str,  # base64 image
+    transfer_content: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Create deposit request with bank transfer proof"""
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be positive")
+    
+    if amount < 50000:  # Minimum 50k VND
+        raise HTTPException(status_code=400, detail="Minimum deposit amount is 50,000 VND")
+    
+    # Create transaction record
+    transaction = Transaction(
+        user_id=current_user.id,
+        amount=amount,
+        transaction_type=TransactionType.deposit,
+        description=f"Bank transfer deposit - {transfer_content}",
+        status=TransactionStatus.pending,
+        reference_id=transfer_content,
+        admin_notes=f"Bank transfer proof uploaded. Content: {transfer_content}"
+    )
+    
+    # Store bank transfer image
+    transaction_dict = transaction.dict()
+    transaction_dict["bank_transfer_image"] = bank_transfer_image
+    transaction_dict["transfer_content"] = transfer_content
+    
+    await db.transactions.insert_one(transaction_dict)
+    
+    return {
+        "message": "Deposit request created successfully", 
+        "transaction_id": transaction.id,
+        "status": "pending_approval"
+    }
+
+@api_router.get("/member/bank-info")
+async def get_bank_info(current_user: User = Depends(get_current_user)):
+    """Get bank information for deposits"""
+    return {
+        "bank_name": "Ngân hàng Techcombank",
+        "account_number": "19036856789012",
+        "account_name": "CONG TY TNHH BDS VIET NAM",
+        "qr_code": "data:image/png;base64,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",
+        "transfer_note": "NapTien [UserID]",
+        "minimum_amount": 50000,
+        "maximum_amount": 50000000,
+        "processing_time": "15-30 phút sau khi chuyển tiền"
+    }
+
+# Member Posts APIs (Enhanced)
+@api_router.get("/member/posts")
+async def get_member_posts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, le=50),
+    post_type: Optional[str] = Query(None),  # properties, lands, sims
+    status: Optional[str] = Query(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Get member's posts"""
+    filter_query = {"user_id": current_user.id}
+    if post_type:
+        filter_query["post_type"] = post_type
+    if status:
+        filter_query["status"] = status
+    
+    posts = await db.member_posts.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    return posts
+
+@api_router.post("/member/posts/create")
+async def create_member_post(
+    post_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Create member post (property/land/sim)"""
+    # Check wallet balance for posting fee (50k VND)
+    POSTING_FEE = 50000
+    if current_user.wallet_balance < POSTING_FEE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Insufficient balance. Need {POSTING_FEE:,} VND to post. Current balance: {current_user.wallet_balance:,} VND"
+        )
+    
+    # Deduct posting fee
+    new_balance = current_user.wallet_balance - POSTING_FEE
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {"wallet_balance": new_balance, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Create transaction record
+    transaction = Transaction(
+        user_id=current_user.id,
+        amount=-POSTING_FEE,
+        transaction_type=TransactionType.withdrawal,
+        description=f"Posting fee for {post_data.get('post_type', 'unknown')} post",
+        status=TransactionStatus.completed,
+        completed_at=datetime.utcnow()
+    )
+    await db.transactions.insert_one(transaction.dict())
+    
+    # Create member post
+    member_post = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user.id,
+        "post_type": post_data.get("post_type", "properties"),
+        "status": "pending",
+        "data": post_data,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+    
+    await db.member_posts.insert_one(member_post)
+    
+    return {
+        "message": "Post created successfully", 
+        "post_id": member_post["id"],
+        "remaining_balance": new_balance,
+        "status": "pending_approval"
+    }
+
+# Admin Member Posts Management
+@api_router.get("/admin/member-posts")
+async def get_pending_member_posts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, le=100),
+    post_type: Optional[str] = Query(None),
+    status: str = Query("pending"),
+    current_user: User = Depends(get_current_admin)
+):
+    """Get member posts for admin approval"""
+    filter_query = {"status": status}
+    if post_type:
+        filter_query["post_type"] = post_type
+    
+    posts = await db.member_posts.find(filter_query).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Get user details for each post
+    enriched_posts = []
+    for post in posts:
+        user = await db.users.find_one({"id": post["user_id"]})
+        post["user_name"] = user.get("full_name", "Unknown") if user else "Unknown"
+        post["user_email"] = user.get("email", "Unknown") if user else "Unknown"
+        enriched_posts.append(post)
+    
+    return enriched_posts
+
+@api_router.put("/admin/member-posts/{post_id}/approve")
+async def approve_member_post(
+    post_id: str,
+    admin_notes: str = "",
+    current_user: User = Depends(get_current_admin)
+):
+    """Approve member post and move to main collection"""
+    post = await db.member_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Post is not pending")
+    
+    # Move post data to appropriate collection
+    post_data = post["data"]
+    post_type = post["post_type"]
+    
+    # Add common fields
+    post_data["id"] = str(uuid.uuid4())
+    post_data["created_at"] = datetime.utcnow()
+    post_data["updated_at"] = datetime.utcnow()
+    post_data["views"] = 0
+    
+    # Insert to appropriate collection
+    if post_type == "properties":
+        await db.properties.insert_one(post_data)
+    elif post_type == "lands":
+        await db.lands.insert_one(post_data)
+    elif post_type == "sims":
+        await db.sims.insert_one(post_data)
+    
+    # Update member post status
+    await db.member_posts.update_one(
+        {"id": post_id},
+        {
+            "$set": {
+                "status": "approved",
+                "admin_notes": admin_notes,
+                "approved_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": f"{post_type} post approved successfully"}
+
+@api_router.put("/admin/member-posts/{post_id}/reject")
+async def reject_member_post(
+    post_id: str,
+    admin_notes: str,
+    current_user: User = Depends(get_current_admin)
+):
+    """Reject member post"""
+    post = await db.member_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Post is not pending")
+    
+    # Update member post status
+    await db.member_posts.update_one(
+        {"id": post_id},
+        {
+            "$set": {
+                "status": "rejected",
+                "admin_notes": admin_notes,
+                "rejected_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Refund posting fee
+    user = await db.users.find_one({"id": post["user_id"]})
+    if user:
+        POSTING_FEE = 50000
+        new_balance = user.get("wallet_balance", 0.0) + POSTING_FEE
+        await db.users.update_one(
+            {"id": post["user_id"]},
+            {"$set": {"wallet_balance": new_balance, "updated_at": datetime.utcnow()}}
+        )
+        
+        # Create refund transaction
+        transaction = Transaction(
+            user_id=post["user_id"],
+            amount=POSTING_FEE,
+            transaction_type=TransactionType.deposit,
+            description=f"Refund for rejected {post['post_type']} post",
+            status=TransactionStatus.completed,
+            admin_notes=f"Refunded by admin {current_user.username}",
+            completed_at=datetime.utcnow()
+        )
+        await db.transactions.insert_one(transaction.dict())
+    
+    return {"message": f"{post['post_type']} post rejected and fee refunded"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
