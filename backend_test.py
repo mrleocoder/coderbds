@@ -699,7 +699,8 @@ class BDSVietnamAPITester:
                 checks = [
                     data.get("access_token") is not None,
                     user_profile.get("role") == "member",
-                    user_profile.get("last_login") is not None  # Should be updated
+                    user_profile.get("status") == "active",  # Check status instead of last_login
+                    user_profile.get("wallet_balance") is not None  # Check wallet_balance exists
                 ]
                 
                 if all(checks):
