@@ -21,13 +21,25 @@ const LoginPage = () => {
     setLoading(true);
     setError('');
 
-    const result = await login(credentials.username, credentials.password);
-    
-    if (!result.success) {
-      setError(result.message);
+    try {
+      const result = await login(credentials.username, credentials.password);
+      if (result.success) {
+        // Check user role and redirect appropriately
+        if (result.user.role === 'admin') {
+          navigate('/admin');
+        } else if (result.user.role === 'member') {
+          navigate('/member');
+        } else {
+          navigate('/');
+        }
+      } else {
+        setError(result.error || 'Đăng nhập thất bại');
+      }
+    } catch (error) {
+      setError('Có lỗi xảy ra khi đăng nhập');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleChange = (e) => {
