@@ -233,6 +233,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ SIMS CRUD FULLY WORKING: Complete Sims management system implemented and tested. GET /api/sims working with filtering by network, sim_type, price range, VIP status. GET /api/sims/{id} working with view increment. POST /api/sims (admin) working for creating new sims. PUT /api/sims/{id} (admin) working for updates. DELETE /api/sims/{id} (admin) working. GET /api/sims/search working for phone number and feature searches. All CRUD operations tested successfully."
+      - working: true
+        agent: "testing"
+        comment: "✅ ADMIN SIMS CRUD AUTHORIZATION FIX VERIFIED: Tested admin sims CRUD operations after authorization fix. All operations working perfectly with admin authentication (get_current_admin): CREATE (POST) ✅, UPDATE (PUT) ✅, DELETE ✅. No 403 Forbidden errors found. Authorization fix successful."
 
   - task: "Lands CRUD API endpoints"
     implemented: true
