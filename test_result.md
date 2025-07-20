@@ -435,6 +435,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Admin Member Management Tab"
     - "Admin Sim and Land Management Forms"
     - "Analytics Dashboard with Charts"
     - "Contact Form on Website"
