@@ -766,6 +766,16 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <i className="fas fa-users text-2xl text-purple-600"></i>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-purple-600">Thành viên</p>
+                        <p className="text-xl font-bold text-purple-900">{members.length || stats.total_members || 0}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
