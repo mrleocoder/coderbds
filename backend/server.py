@@ -412,7 +412,8 @@ async def update_property(property_id: str, property_update: PropertyUpdate, cur
     return Property(**updated_property)
 
 @api_router.delete("/properties/{property_id}")
-async def delete_property(property_id: str):
+async def delete_property(property_id: str, current_user: User = Depends(get_current_user)):
+    """Delete property - Admin only"""
     """Delete property"""
     result = await db.properties.delete_one({"id": property_id})
     if result.deleted_count == 0:
