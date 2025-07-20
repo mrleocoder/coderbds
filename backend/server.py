@@ -1507,15 +1507,13 @@ async def create_news_article(article_data: NewsArticleCreate, current_user: Use
 # Statistics Routes
 @api_router.get("/stats")
 async def get_statistics():
-    """Get website statistics"""
+    """Get website statistics (public)"""
     total_properties = await db.properties.count_documents({})
     total_for_sale = await db.properties.count_documents({"status": "for_sale"})
     total_for_rent = await db.properties.count_documents({"status": "for_rent"})
     total_news = await db.news_articles.count_documents({"published": True})
     total_sims = await db.sims.count_documents({})
     total_lands = await db.lands.count_documents({})
-    total_tickets = await db.tickets.count_documents({})
-    total_pageviews = await db.pageviews.count_documents({})
     
     # Get today's traffic
     today = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1538,10 +1536,6 @@ async def get_statistics():
     ]
     cities = await db.properties.aggregate(pipeline).to_list(10)
     
-    # Get ticket statistics
-    open_tickets = await db.tickets.count_documents({"status": "open"})
-    resolved_tickets = await db.tickets.count_documents({"status": "resolved"})
-    
     return {
         "total_properties": total_properties,
         "properties_for_sale": total_for_sale,
@@ -1549,10 +1543,6 @@ async def get_statistics():
         "total_news_articles": total_news,
         "total_sims": total_sims,
         "total_lands": total_lands,
-        "total_tickets": total_tickets,
-        "open_tickets": open_tickets,
-        "resolved_tickets": resolved_tickets,
-        "total_pageviews": total_pageviews,
         "today_pageviews": today_pageviews,
         "today_unique_visitors": today_unique_visitors,
         "top_cities": cities
