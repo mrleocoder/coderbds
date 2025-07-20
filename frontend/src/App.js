@@ -14,6 +14,7 @@ const API = `${BACKEND_URL}/api`;
 const Header = () => {
   const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [showLandDropdown, setShowLandDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   return (
