@@ -119,7 +119,6 @@ const Header = () => {
               <Link to="/loai-hinh/can-ho" className="py-2 hover:text-emerald-200">Căn hộ</Link>
               <Link to="/loai-hinh/nha-pho" className="py-2 hover:text-emerald-200">Nhà phố</Link>
               <Link to="/tin-tuc" className="py-2 hover:text-emerald-200">Tin tức</Link>
-              <Link to="/admin" className="py-2 hover:text-emerald-200">Admin</Link>
             </div>
           </div>
         )}
