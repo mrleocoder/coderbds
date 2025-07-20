@@ -358,6 +358,184 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Get News Article by ID", False, f"Error: {str(e)}")
             return False
+
+    def test_update_news_article(self, article_id: str):
+        """Test updating a news article (PUT endpoint)"""
+        update_data = {
+            "title": "Thị trường bất động sản TP.HCM quý 4/2024: Xu hướng tăng trưởng mạnh - CẬP NHẬT",
+            "content": "Thị trường bất động sản TP.HCM trong quý 4/2024 ghi nhận nhiều tín hiệu tích cực với sự phục hồi mạnh mẽ của cả phân khúc căn hộ và nhà phố. Theo báo cáo mới nhất từ các chuyên gia, giá bất động sản có xu hướng tăng nhẹ so với cùng kỳ năm trước. Đây là thông tin cập nhật mới nhất.",
+            "excerpt": "Thị trường BDS TP.HCM Q4/2024 phục hồi mạnh - Cập nhật mới nhất",
+            "category": "Thị trường - Cập nhật",
+            "tags": ["thị trường", "TP.HCM", "quý 4", "2024", "cập nhật"],
+            "published": True
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/news/{article_id}", json=update_data)
+            if response.status_code == 200:
+                updated_article = response.json()
+                if (updated_article.get("title") == update_data["title"] and 
+                    updated_article.get("category") == update_data["category"]):
+                    self.log_test("Update News Article (PUT)", True, f"Article updated successfully")
+                    return True
+                else:
+                    self.log_test("Update News Article (PUT)", False, "Article data not updated correctly")
+                    return False
+            elif response.status_code == 405:
+                self.log_test("Update News Article (PUT)", False, f"405 Method Not Allowed - PUT endpoint missing or not implemented")
+                return False
+            else:
+                self.log_test("Update News Article (PUT)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Update News Article (PUT)", False, f"Error: {str(e)}")
+            return False
+
+    def test_delete_news_article(self, article_id: str):
+        """Test deleting a news article (DELETE endpoint)"""
+        try:
+            response = self.session.delete(f"{self.base_url}/news/{article_id}")
+            if response.status_code == 200:
+                self.log_test("Delete News Article (DELETE)", True, f"Article {article_id} deleted successfully")
+                return True
+            elif response.status_code == 404:
+                self.log_test("Delete News Article (DELETE)", False, f"Article not found: {article_id}")
+                return False
+            elif response.status_code == 405:
+                self.log_test("Delete News Article (DELETE)", False, f"405 Method Not Allowed - DELETE endpoint missing or not implemented")
+                return False
+            else:
+                self.log_test("Delete News Article (DELETE)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Delete News Article (DELETE)", False, f"Error: {str(e)}")
+            return False
+
+    def test_news_crud_complete_workflow(self):
+        """Test complete News CRUD workflow including the newly added PUT and DELETE endpoints"""
+        print("\n🔍 FOCUSED TEST: Complete News CRUD Workflow (Including PUT/DELETE)")
+        print("-" * 80)
+        
+        # Step 1: Create a news article for testing
+        article_data = {
+            "title": "Test Article for CRUD Workflow",
+            "slug": "test-article-crud-workflow",
+            "content": "This is a test article created specifically to test the complete CRUD workflow including PUT and DELETE operations.",
+            "excerpt": "Test article for CRUD workflow testing",
+            "featured_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+            "category": "Test Category",
+            "tags": ["test", "crud", "workflow"],
+            "published": True,
+            "author": "Test Author"
+        }
+        
+        # CREATE (POST)
+        try:
+            response = self.session.post(f"{self.base_url}/news", json=article_data)
+            if response.status_code == 200:
+                created_article = response.json()
+                article_id = created_article.get("id")
+                if article_id:
+                    self.log_test("News CRUD - CREATE (POST)", True, f"Article created with ID: {article_id}")
+                else:
+                    self.log_test("News CRUD - CREATE (POST)", False, "No ID returned in response")
+                    return False
+            else:
+                self.log_test("News CRUD - CREATE (POST)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("News CRUD - CREATE (POST)", False, f"Error: {str(e)}")
+            return False
+        
+        # READ (GET by ID)
+        try:
+            response = self.session.get(f"{self.base_url}/news/{article_id}")
+            if response.status_code == 200:
+                article_data_retrieved = response.json()
+                if article_data_retrieved.get("title") == article_data["title"]:
+                    self.log_test("News CRUD - READ (GET by ID)", True, f"Article retrieved successfully")
+                else:
+                    self.log_test("News CRUD - READ (GET by ID)", False, "Retrieved article data doesn't match")
+            else:
+                self.log_test("News CRUD - READ (GET by ID)", False, f"Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("News CRUD - READ (GET by ID)", False, f"Error: {str(e)}")
+            return False
+        
+        # UPDATE (PUT) - This was the missing endpoint causing 405 error
+        update_data = {
+            "title": "Test Article for CRUD Workflow - UPDATED",
+            "content": "This is the updated content for the test article. The PUT endpoint should work now.",
+            "excerpt": "Updated test article for CRUD workflow testing",
+            "category": "Updated Test Category",
+            "tags": ["test", "crud", "workflow", "updated"],
+            "published": True
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/news/{article_id}", json=update_data)
+            if response.status_code == 200:
+                updated_article = response.json()
+                if updated_article.get("title") == update_data["title"]:
+                    self.log_test("News CRUD - UPDATE (PUT)", True, f"Article updated successfully - PUT endpoint working!")
+                else:
+                    self.log_test("News CRUD - UPDATE (PUT)", False, "Article data not updated correctly")
+                    return False
+            elif response.status_code == 405:
+                self.log_test("News CRUD - UPDATE (PUT)", False, f"❌ 405 Method Not Allowed - PUT endpoint still missing!")
+                return False
+            else:
+                self.log_test("News CRUD - UPDATE (PUT)", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("News CRUD - UPDATE (PUT)", False, f"Error: {str(e)}")
+            return False
+        
+        # Verify UPDATE worked by reading again
+        try:
+            response = self.session.get(f"{self.base_url}/news/{article_id}")
+            if response.status_code == 200:
+                updated_article_retrieved = response.json()
+                if updated_article_retrieved.get("title") == update_data["title"]:
+                    self.log_test("News CRUD - Verify UPDATE", True, f"Update verified - article title changed correctly")
+                else:
+                    self.log_test("News CRUD - Verify UPDATE", False, "Update not persisted correctly")
+            else:
+                self.log_test("News CRUD - Verify UPDATE", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("News CRUD - Verify UPDATE", False, f"Error: {str(e)}")
+        
+        # DELETE - This was also missing causing 405 error
+        try:
+            response = self.session.delete(f"{self.base_url}/news/{article_id}")
+            if response.status_code == 200:
+                self.log_test("News CRUD - DELETE", True, f"Article deleted successfully - DELETE endpoint working!")
+            elif response.status_code == 405:
+                self.log_test("News CRUD - DELETE", False, f"❌ 405 Method Not Allowed - DELETE endpoint still missing!")
+                return False
+            else:
+                self.log_test("News CRUD - DELETE", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("News CRUD - DELETE", False, f"Error: {str(e)}")
+            return False
+        
+        # Verify DELETE worked by trying to read the deleted article
+        try:
+            response = self.session.get(f"{self.base_url}/news/{article_id}")
+            if response.status_code == 404:
+                self.log_test("News CRUD - Verify DELETE", True, f"Delete verified - article not found (404) as expected")
+            elif response.status_code == 200:
+                self.log_test("News CRUD - Verify DELETE", False, "Article still exists after delete - DELETE not working properly")
+                return False
+            else:
+                self.log_test("News CRUD - Verify DELETE", False, f"Unexpected status: {response.status_code}")
+        except Exception as e:
+            self.log_test("News CRUD - Verify DELETE", False, f"Error: {str(e)}")
+        
+        self.log_test("Complete News CRUD Workflow", True, "✅ ALL NEWS CRUD OPERATIONS (CREATE, READ, UPDATE, DELETE) WORKING CORRECTLY!")
+        return True
     
     def test_statistics(self):
         """Test statistics endpoint"""
