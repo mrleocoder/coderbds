@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 # Backend URL from environment
-BACKEND_URL = "https://104f4e7b-e6d7-49b2-a5ea-b1dc3187a568.preview.emergentagent.com/api"
+BACKEND_URL = "https://7edf40fb-3994-4423-bf0c-6470e5d61ac8.preview.emergentagent.com/api"
 
 class AdminDashboardVerificationTester:
     def __init__(self):
