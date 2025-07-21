@@ -58,6 +58,23 @@ const Header = () => {
   
   const { user, isAuthenticated, logout } = useAuth();
 
+  // Load site settings from API
+  useEffect(() => {
+    const loadSiteSettings = async () => {
+      try {
+        const response = await axios.get(`${API}/settings`);
+        if (response.data) {
+          setSiteSettings(response.data);
+        }
+      } catch (error) {
+        console.error('Error loading site settings:', error);
+        // Fallback to default values if API fails
+      }
+    };
+    
+    loadSiteSettings();
+  }, []);
+
   // Helper functions để đóng tất cả dropdowns
   const closeAllDropdowns = () => {
     setShowPropertyDropdown(false);
