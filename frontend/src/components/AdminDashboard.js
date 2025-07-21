@@ -1174,21 +1174,57 @@ const AdminDashboard = () => {
                   <>
                     {/* Property Form */}
                     {modalType === 'property' && (
-                      <form onSubmit={(e) => {
+                      <form onSubmit={async (e) => {
                         e.preventDefault();
-                        toast.success('Cập nhật bất động sản thành công!');
-                        closeModal();
-                        fetchAdminData();
+                        const formData = new FormData(e.target);
+                        try {
+                          const token = localStorage.getItem('token');
+                          const propertyData = {
+                            title: formData.get('title'),
+                            property_type: formData.get('property_type'),
+                            price: parseFloat(formData.get('price')),
+                            area: parseFloat(formData.get('area')),
+                            bedrooms: parseInt(formData.get('bedrooms')) || 0,
+                            bathrooms: parseInt(formData.get('bathrooms')) || 0,
+                            address: formData.get('address'),
+                            district: formData.get('district') || '',
+                            city: formData.get('city') || 'TP. Hồ Chí Minh',
+                            contact_phone: formData.get('contact_phone'),
+                            description: formData.get('description'),
+                            featured: formData.get('featured') === 'on',
+                            status: 'available',
+                            images: []
+                          };
+
+                          if (editingItem) {
+                            await axios.put(`${API}/admin/properties/${editingItem.id}`, propertyData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Cập nhật bất động sản thành công!');
+                          } else {
+                            await axios.post(`${API}/admin/properties`, propertyData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Thêm bất động sản thành công!');
+                          }
+                          closeModal();
+                          fetchAdminData();
+                        } catch (error) {
+                          console.error('Error saving property:', error);
+                          toast.error('Có lỗi xảy ra khi lưu bất động sản!');
+                        }
                       }} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <input
                             type="text"
+                            name="title"
                             placeholder="Tiêu đề"
                             defaultValue={editingItem?.title || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <select
+                            name="property_type"
                             defaultValue={editingItem?.property_type || 'apartment'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1199,6 +1235,7 @@ const AdminDashboard = () => {
                           </select>
                           <input
                             type="number"
+                            name="price"
                             placeholder="Giá (VNĐ)"
                             defaultValue={editingItem?.price || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1206,13 +1243,29 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="number"
+                            name="area"
                             placeholder="Diện tích (m²)"
                             defaultValue={editingItem?.area || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <input
+                            type="number"
+                            name="bedrooms"
+                            placeholder="Số phòng ngủ"
+                            defaultValue={editingItem?.bedrooms || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          />
+                          <input
+                            type="number"
+                            name="bathrooms"
+                            placeholder="Số phòng tắm"
+                            defaultValue={editingItem?.bathrooms || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          />
+                          <input
                             type="text"
+                            name="address"
                             placeholder="Địa chỉ"
                             defaultValue={editingItem?.address || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1220,6 +1273,7 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="tel"
+                            name="contact_phone"
                             placeholder="Số điện thoại"
                             defaultValue={editingItem?.contact_phone || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1227,6 +1281,7 @@ const AdminDashboard = () => {
                           />
                         </div>
                         <textarea
+                          name="description"
                           placeholder="Mô tả chi tiết"
                           defaultValue={editingItem?.description || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1243,9 +1298,29 @@ const AdminDashboard = () => {
                                   <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
                                 </p>
                               </div>
-                              <input type="file" className="hidden" multiple accept="image/*" />
+                              <input 
+                                type="file" 
+                                name="images" 
+                                className="hidden" 
+                                multiple 
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const files = Array.from(e.target.files);
+                                  console.log('Selected files:', files);
+                                }}
+                              />
                             </label>
                           </div>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            name="featured"
+                            defaultChecked={editingItem?.featured || false}
+                            className="mr-2"
+                            id="featured_property"
+                          />
+                          <label htmlFor="featured_property" className="text-sm text-gray-700">BDS nổi bật</label>
                         </div>
                         <div className="flex justify-end space-x-4 border-t pt-4">
                           <button
