@@ -12,7 +12,12 @@ from typing import Dict, List, Any
 import uuid
 
 # Backend URL from environment
-BACKEND_URL = "http://localhost:8001/api"
+import os
+from dotenv import load_dotenv
+
+# Load frontend environment to get the correct backend URL
+load_dotenv('/app/frontend/.env')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001') + '/api'
 
 class BDSVietnamAPITester:
     def __init__(self):
