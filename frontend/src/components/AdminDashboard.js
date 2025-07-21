@@ -170,6 +170,7 @@ const AdminDashboard = () => {
       setTickets(ticketsRes.data || []);
       setMembers(membersRes.data || []);
       setDeposits(depositsRes.data || []);
+      setMemberPosts(memberPostsRes.data || []);
       setSiteSettings(settingsRes.data || {
         site_title: 'BDS Việt Nam',
         site_description: 'Premium Real Estate Platform',
