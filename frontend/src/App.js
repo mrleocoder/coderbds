@@ -2189,6 +2189,31 @@ const LandSections = () => {
 
 // Footer Component
 const Footer = () => {
+  const [siteSettings, setSiteSettings] = useState({
+    site_title: 'BDS Việt Nam',
+    company_name: 'Premium Real Estate',
+    contact_phone: '0123 456 789',
+    contact_email: 'info@bdsvietnam.com',
+    company_address: '123 Nguyễn Huệ, Quận 1, TP.HCM'
+  });
+
+  // Load site settings from API
+  useEffect(() => {
+    const loadSiteSettings = async () => {
+      try {
+        const response = await axios.get(`${API}/settings`);
+        if (response.data) {
+          setSiteSettings(response.data);
+        }
+      } catch (error) {
+        console.error('Error loading site settings for footer:', error);
+        // Fallback to default values if API fails
+      }
+    };
+    
+    loadSiteSettings();
+  }, []);
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
