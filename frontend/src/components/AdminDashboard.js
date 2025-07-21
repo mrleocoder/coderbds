@@ -157,6 +157,7 @@ const AdminDashboard = () => {
         tickets: ticketsRes.data?.length,
         members: membersRes.data?.length,
         deposits: depositsRes.data?.length,
+        settings: settingsRes.data ? 'loaded' : 'empty',
         stats: statsRes.data
       });
       
@@ -167,6 +168,17 @@ const AdminDashboard = () => {
       setTickets(ticketsRes.data || []);
       setMembers(membersRes.data || []);
       setDeposits(depositsRes.data || []);
+      setSiteSettings(settingsRes.data || {
+        site_title: 'BDS Việt Nam',
+        site_description: 'Premium Real Estate Platform',
+        site_keywords: 'bất động sản, nhà đất, căn hộ, biệt thự',
+        contact_email: 'info@bdsvietnam.com',
+        contact_phone: '1900 123 456',
+        contact_address: '123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh',
+        logo_url: '',
+        favicon_url: '',
+        banner_image: ''
+      });
       setStats(statsRes.data || {});
       
       // Fetch analytics data
