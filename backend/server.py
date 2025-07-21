@@ -2017,7 +2017,7 @@ async def create_message(message: MessageCreate, current_user: User = Depends(ge
     message_data["from_type"] = current_user.role
     
     # Insert into database
-    result = db.messages.insert_one(Message(**message_data).dict())
+    result = await db.messages.insert_one(Message(**message_data).dict())
     
     return {"message": "Tin nhắn đã được gửi", "id": str(result.inserted_id)}
 
