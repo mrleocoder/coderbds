@@ -78,7 +78,18 @@ const ContactForm = ({ onClose }) => {
     setSubmitStatus(null);
 
     try {
-      await axios.post(`${API}/tickets`, contactForm);
+      // Add authentication header for logged in users
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      // Auto-fill user info if logged in
+      const formData = {
+        ...contactForm,
+        name: contactForm.name || user?.full_name || user?.username || '',
+        email: contactForm.email || user?.email || ''
+      };
+      
+      await axios.post(`${API}/tickets`, formData, { headers });
       setSubmitStatus('success');
       setContactForm({
         name: '',
