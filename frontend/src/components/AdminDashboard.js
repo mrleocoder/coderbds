@@ -749,6 +749,20 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => {
+                  setActiveTab('settings');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'settings'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-cog mr-2"></i>
+                Cài đặt Website
+              </button>
+              <button
+                onClick={() => {
                   setActiveTab('analytics');
                   setShowForm(false);
                 }}
