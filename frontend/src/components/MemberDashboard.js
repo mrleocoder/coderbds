@@ -307,6 +307,17 @@ const MemberDashboard = () => {
                 Ví tiền
               </button>
               <button
+                onClick={() => setActiveTab('messages')}
+                className={`py-4 px-2 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap ${
+                  activeTab === 'messages'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-envelope mr-2"></i>
+                Tin nhắn
+              </button>
+              <button
                 onClick={() => setActiveTab('create')}
                 className={`py-4 px-2 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === 'create'
