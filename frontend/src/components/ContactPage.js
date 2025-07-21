@@ -6,6 +6,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const ContactPage = () => {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,9 +25,10 @@ const ContactPage = () => {
       await axios.post(`${API}/tickets`, formData);
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      toast.success('Gửi tin nhắn thành công! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.');
     } catch (error) {
       console.error('Error submitting contact form:', error);
-      alert('Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau.');
+      toast.error('Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau.');
     } finally {
       setSubmitting(false);
     }
