@@ -69,6 +69,7 @@ const AdminDashboard = () => {
     contact_phone: '',
     contact_email: '',
     agent_name: '',
+    featured: false,
     images: []
   });
 
@@ -78,7 +79,8 @@ const AdminDashboard = () => {
     excerpt: '',
     category: '',
     author: '',
-    published: true
+    published: true,
+    images: []
   });
 
   const [simForm, setSimForm] = useState({
