@@ -109,7 +109,7 @@ const AdminDashboard = () => {
     contact_phone: '',
     contact_email: '',
     agent_name: '',
-    featured: false
+    images: []
   });
 
   const [ticketForm, setTicketForm] = useState({
