@@ -658,18 +658,19 @@ const HeroSection = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 text-white text-center">
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-emerald-400">1000+</div>
-            <div className="text-lg">Bất động sản</div>
+        {/* Stats section với responsive design */}
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-2 sm:gap-8 mt-8 sm:mt-12 text-white text-center">
+          <div className="space-y-1 sm:space-y-2">
+            <div className="text-xl sm:text-3xl font-bold text-emerald-400">1000+</div>
+            <div className="text-sm sm:text-lg">Bất động sản</div>
           </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-emerald-400">500+</div>
-            <div className="text-lg">Khách hàng hài lòng</div>
+          <div className="space-y-1 sm:space-y-2">
+            <div className="text-xl sm:text-3xl font-bold text-emerald-400">500+</div>
+            <div className="text-sm sm:text-lg">Khách hàng hài lòng</div>
           </div>
-          <div className="space-y-2">
-            <div className="text-3xl font-bold text-emerald-400">24/7</div>
-            <div className="text-lg">Hỗ trợ</div>
+          <div className="space-y-1 sm:space-y-2">
+            <div className="text-xl sm:text-3xl font-bold text-emerald-400">24/7</div>
+            <div className="text-sm sm:text-lg">Hỗ trợ</div>
           </div>
         </div>
       </div>
