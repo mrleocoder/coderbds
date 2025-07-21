@@ -154,6 +154,7 @@ const AdminDashboard = () => {
         lands: landsRes.data?.length,
         tickets: ticketsRes.data?.length,
         members: membersRes.data?.length,
+        deposits: depositsRes.data?.length,
         stats: statsRes.data
       });
       
@@ -163,6 +164,7 @@ const AdminDashboard = () => {
       setLands(landsRes.data || []);
       setTickets(ticketsRes.data || []);
       setMembers(membersRes.data || []);
+      setDeposits(depositsRes.data || []);
       setStats(statsRes.data || {});
       
       // Fetch analytics data
