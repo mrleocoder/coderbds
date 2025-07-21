@@ -408,6 +408,106 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <i className="fas fa-chart-line text-emerald-600 mr-2"></i>
+                      Traffic 7 ngày qua
+                    </h3>
+                    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <div className="text-center">
+                        <i className="fas fa-chart-line text-4xl text-gray-400 mb-2"></i>
+                        <p className="text-gray-500">Biểu đồ traffic sẽ hiển thị ở đây</p>
+                        <p className="text-sm text-gray-400">Coming soon...</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <i className="fas fa-chart-pie text-emerald-600 mr-2"></i>
+                      Phân bố loại BDS
+                    </h3>
+                    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                      <div className="text-center">
+                        <i className="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
+                        <p className="text-gray-500">Biểu đồ phân bố BDS</p>
+                        <p className="text-sm text-gray-400">Coming soon...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <i className="fas fa-clock text-emerald-600 mr-2"></i>
+                    Hoạt động gần đây
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                          <i className="fas fa-plus text-green-600 text-xs"></i>
+                        </div>
+                        <div>
+                          <p className="font-medium">Thêm BDS mới</p>
+                          <p className="text-sm text-gray-500">Căn hộ cao cấp tại Quận 1</p>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-400">2 giờ trước</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <i className="fas fa-user text-blue-600 text-xs"></i>
+                        </div>
+                        <div>
+                          <p className="font-medium">Thành viên mới</p>
+                          <p className="text-sm text-gray-500">member1 đã đăng ký</p>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-400">4 giờ trước</span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                          <i className="fas fa-coins text-yellow-600 text-xs"></i>
+                        </div>
+                        <div>
+                          <p className="font-medium">Yêu cầu nạp tiền</p>
+                          <p className="text-sm text-gray-500">500,000 VNĐ - Chờ duyệt</p>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-400">6 giờ trước</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top cities */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-4">Thành phố có nhiều BDS nhất</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Hồ Chí Minh</span>
+                      <span className="text-emerald-600 font-semibold">15 BDS</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Hà Nội</span>
+                      <span className="text-emerald-600 font-semibold">8 BDS</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Đà Nẵng</span>
+                      <span className="text-emerald-600 font-semibold">4 BDS</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Cần Thơ</span>
+                      <span className="text-emerald-600 font-semibold">3 BDS</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
