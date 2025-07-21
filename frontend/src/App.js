@@ -515,36 +515,32 @@ const HeroSection = () => {
             <h3 className="text-emerald-600 font-semibold text-lg">Tìm kiếm bất động sản</h3>
           </div>
 
-          {/* Search Type Radio Buttons - Chia thành 2 rows */}
-          <div className="space-y-3 mb-4 p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="property"
-                  checked={searchForm.searchType === 'property'}
-                  onChange={(e) => handleSearchTypeChange(e.target.value)}
-                  className="text-emerald-600 focus:ring-emerald-500"
-                />
-                <i className="fas fa-building text-emerald-600"></i>
-                <span className="font-medium text-gray-700">Bất động sản</span>
-              </label>
-            </div>
-            <div className="flex items-center justify-center">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="land"
-                  checked={searchForm.searchType === 'land'}
-                  onChange={(e) => handleSearchTypeChange(e.target.value)}
-                  className="text-emerald-600 focus:ring-emerald-500"
-                />
-                <i className="fas fa-map text-emerald-600"></i>
-                <span className="font-medium text-gray-700">Dự án đất</span>
-              </label>
-            </div>
+          {/* Search Type Radio Buttons */}
+          <div className="flex items-center space-x-6 mb-4 p-3 bg-gray-50 rounded-lg">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                name="searchType"
+                value="property"
+                checked={searchForm.searchType === 'property'}
+                onChange={(e) => handleSearchTypeChange(e.target.value)}
+                className="text-emerald-600 focus:ring-emerald-500"
+              />
+              <i className="fas fa-building text-emerald-600"></i>
+              <span className="font-medium text-gray-700">Bất động sản</span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                name="searchType"
+                value="land"
+                checked={searchForm.searchType === 'land'}
+                onChange={(e) => handleSearchTypeChange(e.target.value)}
+                className="text-emerald-600 focus:ring-emerald-500"
+              />
+              <i className="fas fa-map text-emerald-600"></i>
+              <span className="font-medium text-gray-700">Dự án đất</span>
+            </label>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
