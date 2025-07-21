@@ -2232,6 +2232,154 @@ class BDSVietnamAPITester:
             except Exception as e:
                 self.log_test(f"{name} Authentication Test", False, f"Error: {str(e)}")
 
+    # ========================================
+    # WEBSITE SETTINGS TESTING
+    # ========================================
+
+    def test_admin_settings_get(self):
+        """Test GET /api/admin/settings - Admin settings retrieval"""
+        try:
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                settings = response.json()
+                
+                # Check for required default fields
+                required_fields = [
+                    "site_title", "site_description", "contact_email", 
+                    "contact_phone", "contact_address", "updated_at"
+                ]
+                
+                missing_fields = [field for field in required_fields if field not in settings]
+                if not missing_fields:
+                    self.log_test("Admin Get Settings", True, f"Settings retrieved with all required fields. Title: {settings.get('site_title')}")
+                    return settings
+                else:
+                    self.log_test("Admin Get Settings", False, f"Missing required fields: {missing_fields}")
+                    return None
+            elif response.status_code == 401:
+                self.log_test("Admin Get Settings", False, "Unauthorized - admin authentication required")
+                return None
+            elif response.status_code == 403:
+                self.log_test("Admin Get Settings", False, "Forbidden - admin role required")
+                return None
+            else:
+                self.log_test("Admin Get Settings", False, f"Status: {response.status_code}, Response: {response.text}")
+                return None
+        except Exception as e:
+            self.log_test("Admin Get Settings", False, f"Error: {str(e)}")
+            return None
+
+    def test_admin_settings_update(self):
+        """Test PUT /api/admin/settings - Admin settings update"""
+        update_data = {
+            "site_title": "TEST - BDS Việt Nam Updated",
+            "site_description": "Updated description for testing",
+            "contact_email": "test@updated.com",
+            "contact_phone": "1900 999 888"
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/admin/settings", json=update_data)
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message"):
+                    self.log_test("Admin Update Settings", True, f"Settings updated successfully: {result.get('message')}")
+                    
+                    # Verify the update by getting settings again
+                    verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                    if verify_response.status_code == 200:
+                        updated_settings = verify_response.json()
+                        
+                        # Check if updates were applied
+                        checks = [
+                            updated_settings.get("site_title") == update_data["site_title"],
+                            updated_settings.get("site_description") == update_data["site_description"],
+                            updated_settings.get("contact_email") == update_data["contact_email"],
+                            updated_settings.get("contact_phone") == update_data["contact_phone"]
+                        ]
+                        
+                        if all(checks):
+                            self.log_test("Verify Settings Update", True, f"All settings updated correctly")
+                            return True
+                        else:
+                            self.log_test("Verify Settings Update", False, f"Settings not updated correctly: {updated_settings}")
+                            return False
+                    else:
+                        self.log_test("Verify Settings Update", False, f"Could not verify update: {verify_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Admin Update Settings", False, f"No success message in response: {result}")
+                    return False
+            elif response.status_code == 401:
+                self.log_test("Admin Update Settings", False, "Unauthorized - admin authentication required")
+                return False
+            elif response.status_code == 403:
+                self.log_test("Admin Update Settings", False, "Forbidden - admin role required")
+                return False
+            else:
+                self.log_test("Admin Update Settings", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Update Settings", False, f"Error: {str(e)}")
+            return False
+
+    def test_admin_settings_authentication(self):
+        """Test that admin settings endpoints require admin authentication"""
+        try:
+            # Remove auth header to test unauthorized access
+            headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            # Test GET without auth
+            get_response = self.session.get(f"{self.base_url}/admin/settings")
+            
+            # Test PUT without auth
+            put_response = self.session.put(f"{self.base_url}/admin/settings", json={"site_title": "Test"})
+            
+            # Restore auth header
+            self.session.headers.update(headers)
+            
+            # Both should return 401 or 403
+            get_blocked = get_response.status_code in [401, 403]
+            put_blocked = put_response.status_code in [401, 403]
+            
+            if get_blocked and put_blocked:
+                self.log_test("Admin Settings Authentication", True, f"Unauthorized access properly blocked (GET: {get_response.status_code}, PUT: {put_response.status_code})")
+                return True
+            else:
+                self.log_test("Admin Settings Authentication", False, f"Unauthorized access not blocked (GET: {get_response.status_code}, PUT: {put_response.status_code})")
+                return False
+        except Exception as e:
+            self.log_test("Admin Settings Authentication", False, f"Error: {str(e)}")
+            return False
+
+    def test_website_settings_complete_workflow(self):
+        """Test complete website settings workflow"""
+        print("\n🔍 FOCUSED TEST: Website Settings Complete Workflow")
+        print("-" * 80)
+        
+        # Step 1: Test authentication requirement
+        auth_result = self.test_admin_settings_authentication()
+        
+        # Step 2: Test getting default settings (or existing settings)
+        initial_settings = self.test_admin_settings_get()
+        if not initial_settings:
+            return False
+        
+        # Step 3: Test updating settings
+        update_result = self.test_admin_settings_update()
+        
+        # Step 4: Test getting settings again to verify persistence
+        final_settings = self.test_admin_settings_get()
+        
+        if auth_result and initial_settings and update_result and final_settings:
+            self.log_test("Complete Website Settings Workflow", True, "✅ ALL WEBSITE SETTINGS OPERATIONS WORKING CORRECTLY!")
+            return True
+        else:
+            self.log_test("Complete Website Settings Workflow", False, "❌ Some website settings operations failed")
+            return False
+
     def run_all_tests(self):
         """Run all backend API tests with CRITICAL SYNCHRONIZATION INVESTIGATION FIRST"""
         print("🚀 Starting BDS Vietnam Backend API Tests - SYNCHRONIZATION INVESTIGATION")
