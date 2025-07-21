@@ -36,6 +36,12 @@ const API = `${BACKEND_URL}/api`;
 
 // Header Component with Dropdown Menus
 const Header = () => {
+  const [siteSettings, setSiteSettings] = useState({
+    site_title: 'BDS Việt Nam',
+    site_description: 'Premium Real Estate',
+    contact_phone: '',
+    contact_email: ''
+  });
   const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showLandDropdown, setShowLandDropdown] = useState(false);
