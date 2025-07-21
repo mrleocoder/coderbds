@@ -605,23 +605,25 @@ const HeroSection = () => {
               </div>
             </div>
             
-            <div className="space-y-2">
-              <label className="flex items-center space-x-1 text-gray-700">
-                <i className="fas fa-bed text-emerald-600"></i>
-                <span>Phòng ngủ</span>
-              </label>
-              <select 
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={searchForm.bedrooms}
-                onChange={(e) => setSearchForm({...searchForm, bedrooms: e.target.value})}
-              >
-                <option value="">Tất cả</option>
-                <option value="1">1 phòng</option>
-                <option value="2">2 phòng</option>
-                <option value="3">3 phòng</option>
-                <option value="4">4+ phòng</option>
-              </select>
-            </div>
+            {searchForm.searchType === 'property' && (
+              <div className="space-y-2">
+                <label className="flex items-center space-x-1 text-gray-700">
+                  <i className="fas fa-bed text-emerald-600"></i>
+                  <span>Phòng ngủ</span>
+                </label>
+                <select 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  value={searchForm.bedrooms}
+                  onChange={(e) => setSearchForm({...searchForm, bedrooms: e.target.value})}
+                >
+                  <option value="">Tất cả</option>
+                  <option value="1">1 phòng</option>
+                  <option value="2">2 phòng</option>
+                  <option value="3">3 phòng</option>
+                  <option value="4">4+ phòng</option>
+                </select>
+              </div>
+            )}
             
             <div className="flex items-end">
               <button 
