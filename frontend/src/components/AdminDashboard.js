@@ -197,8 +197,10 @@ const AdminDashboard = () => {
       
       if (editingItem) {
         await axios.put(`${API}/properties/${editingItem.id}`, propertyForm, { headers });
+        toast.success('Cập nhật bất động sản thành công!');
       } else {
         await axios.post(`${API}/properties`, propertyForm, { headers });
+        toast.success('Thêm bất động sản mới thành công!');
       }
       fetchAdminData();
       setShowForm(false);
@@ -206,7 +208,7 @@ const AdminDashboard = () => {
       resetPropertyForm();
     } catch (error) {
       console.error('Error submitting property:', error);
-      alert('Có lỗi xảy ra khi lưu bất động sản');
+      toast.error('Có lỗi xảy ra khi lưu bất động sản. Vui lòng thử lại.');
     }
   };
 
