@@ -193,6 +193,12 @@ class SiteSettingsUpdate(BaseModel):
     bank_name: Optional[str] = None
     bank_branch: Optional[str] = None
     bank_qr_code: Optional[str] = None
+    contact_button_1_text: Optional[str] = None
+    contact_button_1_link: Optional[str] = None
+    contact_button_2_text: Optional[str] = None
+    contact_button_2_link: Optional[str] = None
+    contact_button_3_text: Optional[str] = None
+    contact_button_3_link: Optional[str] = None
 
 # Pydantic Models
 class Property(BaseModel):
