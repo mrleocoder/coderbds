@@ -2547,6 +2547,164 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Member Posts Tab */}
+            {activeTab === 'member-posts' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Duyệt tin Member</h2>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <span>Chờ duyệt ({memberPosts.filter(p => p.status === 'pending').length})</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Đã duyệt ({memberPosts.filter(p => p.status === 'approved').length})</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span>Từ chối ({memberPosts.filter(p => p.status === 'rejected').length})</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {memberPosts.length > 0 ? memberPosts
+                    .sort((a, b) => {
+                      // Sort by status (pending first) and then by date
+                      if (a.status !== b.status) {
+                        if (a.status === 'pending') return -1;
+                        if (b.status === 'pending') return 1;
+                        return 0;
+                      }
+                      return new Date(b.created_at) - new Date(a.created_at);
+                    })
+                    .map((post) => (
+                    <div key={post.id} className={`border rounded-lg p-6 transition-colors ${
+                      post.status === 'pending' ? 'border-yellow-200 bg-yellow-50' :
+                      post.status === 'approved' ? 'border-green-200 bg-green-50' :
+                      'border-red-200 bg-red-50'
+                    }`}>
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <h3 className="font-semibold text-lg">{post.title}</h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              post.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {post.status === 'pending' ? 'Chờ duyệt' : 
+                               post.status === 'approved' ? 'Đã duyệt' : 'Từ chối'}
+                            </span>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              post.type === 'property' ? 'bg-blue-100 text-blue-800' :
+                              post.type === 'land' ? 'bg-green-100 text-green-800' :
+                              'bg-purple-100 text-purple-800'
+                            }`}>
+                              {post.type === 'property' ? 'Bất động sản' : 
+                               post.type === 'land' ? 'Dự án đất' : 
+                               post.type === 'sim' ? 'Sim số đẹp' : 'Khác'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+                            <div>
+                              <p><strong>Người đăng:</strong> {post.author?.username || 'N/A'}</p>
+                              <p><strong>Email:</strong> {post.author?.email || 'N/A'}</p>
+                              <p><strong>Loại:</strong> {post.category || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <p><strong>Thời gian:</strong> {new Date(post.created_at).toLocaleString('vi-VN')}</p>
+                              {post.processed_at && (
+                                <p><strong>Xử lý lúc:</strong> {new Date(post.processed_at).toLocaleString('vi-VN')}</p>
+                              )}
+                              {post.price && (
+                                <p><strong>Giá:</strong> {parseInt(post.price).toLocaleString()} VNĐ</p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mb-4">
+                            <p className="text-sm text-gray-700 leading-relaxed">
+                              <strong>Mô tả:</strong> {post.description?.substring(0, 200)}
+                              {post.description?.length > 200 && '...'}
+                            </p>
+                          </div>
+
+                          {post.images && post.images.length > 0 && (
+                            <div className="mb-4">
+                              <p className="font-medium text-sm text-gray-700 mb-2">Hình ảnh đính kèm:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {post.images.slice(0, 3).map((image, index) => (
+                                  <img 
+                                    key={index}
+                                    src={image} 
+                                    alt={`Post image ${index + 1}`}
+                                    className="w-20 h-20 object-cover border border-gray-200 rounded-lg shadow-sm cursor-pointer"
+                                    onClick={() => window.open(image, '_blank')}
+                                  />
+                                ))}
+                                {post.images.length > 3 && (
+                                  <div className="w-20 h-20 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-xs text-gray-600">
+                                    +{post.images.length - 3}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {post.admin_notes && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                              <p className="font-medium text-sm text-blue-900 mb-1">Ghi chú của admin:</p>
+                              <p className="text-sm text-blue-800">{post.admin_notes}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {post.status === 'pending' && (
+                          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                            <button
+                              onClick={() => handleApproveMemberPost(post.id, 'approved')}
+                              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                            >
+                              <i className="fas fa-check mr-2"></i>
+                              Duyệt
+                            </button>
+                            <button
+                              onClick={() => {
+                                const reason = window.prompt('Lý do từ chối:');
+                                if (reason) {
+                                  handleApproveMemberPost(post.id, 'rejected');
+                                }
+                              }}
+                              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                            >
+                              <i className="fas fa-times mr-2"></i>
+                              Từ chối
+                            </button>
+                            <button
+                              onClick={() => handleDeleteMemberPost(post.id)}
+                              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center"
+                            >
+                              <i className="fas fa-trash mr-2"></i>
+                              Xóa
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-12">
+                      <i className="fas fa-user-edit text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500 text-lg">Chưa có tin nào</p>
+                      <p className="text-gray-400 text-sm mt-2">Các bài đăng của thành viên sẽ hiển thị tại đây</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div>
