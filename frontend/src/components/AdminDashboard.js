@@ -356,10 +356,20 @@ const AdminDashboard = () => {
         const token = localStorage.getItem('token');
         const headers = { Authorization: `Bearer ${token}` };
         await axios.delete(`${API}/${type}/${id}`, { headers });
+        
+        const typeNames = {
+          properties: 'bất động sản',
+          news: 'tin tức', 
+          sims: 'sim',
+          lands: 'dự án đất',
+          tickets: 'ticket'
+        };
+        
+        toast.success(`Xóa ${typeNames[type] || 'mục'} thành công!`);
         fetchAdminData();
       } catch (error) {
         console.error('Error deleting:', error);
-        alert('Có lỗi xảy ra khi xóa');
+        toast.error('Có lỗi xảy ra khi xóa. Vui lòng thử lại.');
       }
     }
   };
