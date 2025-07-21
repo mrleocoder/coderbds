@@ -2279,15 +2279,15 @@ const Footer = () => {
             <div className="space-y-3">
               <p className="flex items-center space-x-2 text-gray-300">
                 <i className="fas fa-map-marker-alt text-emerald-400"></i>
-                <span>123 Nguyễn Huệ, Quận 1, TP.HCM</span>
+                <span>{siteSettings.company_address || '123 Nguyễn Huệ, Quận 1, TP.HCM'}</span>
               </p>
               <p className="flex items-center space-x-2 text-gray-300">
                 <i className="fas fa-phone text-emerald-400"></i>
-                <span>0123 456 789</span>
+                <span>{siteSettings.contact_phone || '0123 456 789'}</span>
               </p>
               <p className="flex items-center space-x-2 text-gray-300">
                 <i className="fas fa-envelope text-emerald-400"></i>
-                <span>info@bdsvietnam.com</span>
+                <span>{siteSettings.contact_email || 'info@bdsvietnam.com'}</span>
               </p>
               <p className="flex items-center space-x-2 text-gray-300">
                 <i className="fas fa-clock text-emerald-400"></i>
