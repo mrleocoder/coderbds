@@ -1735,61 +1735,161 @@ const SearchResultsPage = () => {
   return <PropertiesSection searchFilters={searchFilters} hideTitle={false} />;
 };
 
-// FAQ Section
+// FAQ Section  
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('real-estate');
 
-  const faqs = [
-    {
-      question: "Làm thế nào để đăng tin bất động sản?",
-      answer: "Bạn có thể đăng tin bất động sản bằng cách liên hệ với chúng tôi qua hotline hoặc email. Đội ngũ tư vấn viên sẽ hỗ trợ bạn đăng tin một cách nhanh chóng và hiệu quả nhất."
+  const faqCategories = {
+    'real-estate': {
+      title: 'Bất động sản',
+      icon: 'fas fa-home',
+      faqs: [
+        {
+          question: "Làm thế nào để đăng tin bất động sản?",
+          answer: "Bạn có thể đăng tin bằng cách: 1) Đăng ký tài khoản thành viên, 2) Chọn 'Đăng tin' và điền đầy đủ thông tin bất động sản, 3) Upload hình ảnh chất lượng cao, 4) Chờ admin duyệt tin (thường trong vòng 24h). Tin đăng sẽ hiển thị ngay sau khi được duyệt."
+        },
+        {
+          question: "Chi phí đăng tin như thế nào?",
+          answer: "Chúng tôi có các gói đăng tin: Gói Cơ bản (Miễn phí - hiển thị 30 ngày), Gói Nổi bật (100,000 VNĐ - hiển thị ưu tiên 60 ngày), Gói VIP (300,000 VNĐ - hiển thị đầu trang 90 ngày). Tất cả đều bao gồm tối đa 10 hình ảnh và mô tả chi tiết."
+        },
+        {
+          question: "Thời gian tin đăng được duyệt bao lâu?",
+          answer: "Tin đăng thường được duyệt trong vòng 12-24 giờ (ngày làm việc). Các tin đăng VIP sẽ được ưu tiên duyệt nhanh hơn trong vòng 6-12 giờ. Chúng tôi sẽ thông báo qua email/SMS khi tin được duyệt hoặc cần chỉnh sửa."
+        },
+        {
+          question: "Làm thế nào để xem nhà/liên hệ chủ nhà?",
+          answer: "Bạn có thể: 1) Gọi trực tiếp số điện thoại trên tin đăng, 2) Gửi tin nhắn qua form liên hệ trên website, 3) Gọi hotline 1900 123 456 để được hỗ trợ sắp xếp lịch xem nhà. Đội ngũ tư vấn sẽ hỗ trợ bạn 24/7."
+        },
+        {
+          question: "Tôi có thể tin tưởng thông tin trên website không?",
+          answer: "Tất cả tin đăng đều được kiểm duyệt kỹ lưỡng. Chúng tôi xác minh thông tin liên hệ, hình ảnh thực tế và giá cả hợp lý. Mọi tin đăng gian lận sẽ bị xóa ngay lập tức. Bạn có thể báo cáo tin đăng vi phạm qua hotline."
+        },
+        {
+          question: "Làm thế nào để tìm kiếm bất động sản phù hợp?",
+          answer: "Sử dụng bộ lọc tìm kiếm với các tiêu chí: địa điểm, loại hình (căn hộ/nhà phố/biệt thự), mức giá, diện tích, số phòng ngủ. Bạn cũng có thể lưu bộ lọc yêu thích để nhận thông báo khi có tin mới phù hợp."
+        }
+      ]
     },
-    {
-      question: "Chi phí đăng tin như thế nào?",
-      answer: "Chúng tôi có nhiều gói đăng tin khác nhau phù hợp với nhu cầu của bạn. Vui lòng liên hệ để được tư vấn chi tiết về bảng giá và các ưu đãi hiện có."
-    },
-    {
-      question: "Thời gian tin đăng được duyệt bao lâu?",
-      answer: "Tin đăng sẽ được kiểm duyệt và đăng lên website trong vòng 2-4 giờ làm việc sau khi nhận được thông tin đầy đủ từ khách hàng."
-    },
-    {
-      question: "Có hỗ trợ tư vấn pháp lý không?",
-      answer: "Chúng tôi có đội ngũ luật sư chuyên về bất động sản sẵn sàng hỗ trợ khách hàng trong các thủ tục pháp lý liên quan đến mua bán, cho thuê bất động sản."
-    },
-    {
-      question: "Làm thế nào để được hỗ trợ xem nhà?",
-      answer: "Bạn có thể liên hệ trực tiếp với số điện thoại trên tin đăng hoặc gọi hotline của chúng tôi. Chúng tôi sẽ sắp xếp lịch xem nhà phù hợp với thời gian của bạn."
+    'sim-cards': {
+      title: 'Sim số đẹp',
+      icon: 'fas fa-sim-card',
+      faqs: [
+        {
+          question: "Làm thế nào để mua sim số đẹp?",
+          answer: "Quy trình mua sim: 1) Chọn sim số đẹp phù hợp trên website, 2) Đặt cọc qua chuyển khoản/ví điện tử, 3) Cung cấp giấy tờ tùy thân để làm hợp đồng, 4) Nhận sim và thanh toán số tiền còn lại. Chúng tôi hỗ trợ giao hàng tận nơi trong nội thành."
+        },
+        {
+          question: "Giá sim được tính như thế nào?",
+          answer: "Giá sim phụ thuộc vào độ đẹp của số: Sim thần tài (đuôi 39, 79) từ 2-10 triệu VNĐ, Sim lộc phát (đuôi 68, 86) từ 5-20 triệu VNĐ, Sim taxi (10 số giống nhau) từ 50 triệu VNĐ trở lên. Giá đã bao gồm phí chuyển tên chính chủ."
+        },
+        {
+          question: "Sim có đảm bảo chính hãng không?",
+          answer: "Tất cả sim đều chính hãng từ các nhà mạng Viettel, Vinaphone, Mobifone, Vietnamobile. Chúng tôi cung cấp hóa đơn đỏ, giấy tờ chuyển tên đầy đủ và bảo hành sim trọn đời (không bị khóa vĩnh viễn)."
+        },
+        {
+          question: "Thủ tục chuyển tên sim như thế nào?",
+          answer: "Cần giấy tờ: CMND/CCCD + 2 bản photo công chứng, giấy đăng ký tạm trú (nếu không trùng địa chỉ CMND). Chúng tôi sẽ hỗ trợ làm hợp đồng và chuyển tên tại nhà mạng. Thời gian hoàn tất: 1-3 ngày làm việc."
+        },
+        {
+          question: "Có thể đổi/trả sim nếu không hài lòng không?",
+          answer: "Chính sách đổi/trả trong 7 ngày: 1) Đổi sim khác cùng giá trị (miễn phí), 2) Trả sim hoàn tiền 90% giá trị (trừ phí chuyển tên), 3) Sim phải còn nguyên vẹn, chưa sử dụng quá 100 phút gọi/100 tin nhắn."
+        },
+        {
+          question: "Làm thế nào để kiểm tra sim số đẹp có ý nghĩa tốt?",
+          answer: "Chúng tôi cung cấp dịch vụ tư vấn ý nghĩa số theo phong thủy: xem tuổi, mệnh, năm sinh để chọn sim hợp. Bạn có thể gọi hotline để được tư vấn miễn phí bởi chuyên gia phong thủy có kinh nghiệm 10+ năm."
+        }
+      ]
     }
-  ];
+  };
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <i className="fas fa-question-circle text-emerald-600 text-2xl"></i>
-            <h2 className="text-3xl font-bold text-gray-800">Câu hỏi thường gặp</h2>
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <i className="fas fa-question-circle text-emerald-600 text-3xl"></i>
+            <h2 className="text-4xl font-bold text-gray-800">Câu hỏi thường gặp</h2>
           </div>
-          <p className="text-gray-600">Những câu hỏi thường gặp về dịch vụ của chúng tôi</p>
+          <p className="text-gray-600 text-lg">Giải đáp mọi thắc mắc về dịch vụ của chúng tôi</p>
         </div>
 
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Category Tabs */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-white rounded-lg shadow-lg p-1">
+            {Object.entries(faqCategories).map(([key, category]) => (
+              <button
+                key={key}
+                onClick={() => {
+                  setActiveCategory(key);
+                  setOpenIndex(null);
+                }}
+                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
+                  activeCategory === key
+                    ? 'bg-emerald-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
+                }`}
+              >
+                <i className={`${category.icon} text-lg`}></i>
+                <span>{category.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {faqCategories[activeCategory].faqs.map((faq, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
-                <span className="font-semibold text-gray-800">{faq.question}</span>
-                <i className={`fas fa-chevron-${openIndex === index ? 'up' : 'down'} text-emerald-600`}></i>
+                <span className="font-semibold text-gray-800 pr-4">{faq.question}</span>
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  openIndex === index ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  <i className={`fas fa-chevron-${openIndex === index ? 'up' : 'down'} text-sm`}></i>
+                </div>
               </button>
               {openIndex === index && (
-                <div className="px-6 pb-4">
-                  <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                <div className="px-6 pb-5 border-t border-gray-50">
+                  <div className="pt-4">
+                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </div>
                 </div>
               )}
             </div>
           ))}
+        </div>
+
+        {/* Contact CTA */}
+        <div className="mt-16 text-center">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-8">
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <i className="fas fa-headset text-emerald-600 text-2xl"></i>
+              <h3 className="text-xl font-bold text-emerald-800">Vẫn còn thắc mắc?</h3>
+            </div>
+            <p className="text-emerald-700 mb-6">
+              Đội ngũ tư vấn chuyên nghiệp của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="tel:1900123456"
+                className="flex items-center space-x-2 bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors"
+              >
+                <i className="fas fa-phone"></i>
+                <span>Gọi ngay: 1900 123 456</span>
+              </a>
+              <Link
+                to="/lien-he"
+                className="flex items-center space-x-2 border border-emerald-600 text-emerald-600 px-6 py-3 rounded-lg hover:bg-emerald-600 hover:text-white transition-colors"
+              >
+                <i className="fas fa-envelope"></i>
+                <span>Gửi tin nhắn</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
