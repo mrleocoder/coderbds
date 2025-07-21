@@ -146,7 +146,7 @@ const AdminDashboard = () => {
         axios.get(`${API}/lands?limit=50`, { headers }),
         axios.get(`${API}/tickets?limit=50`, { headers }),
         axios.get(`${API}/admin/members?limit=50`, { headers }),
-        axios.get(`${API}/admin/deposits?limit=50`, { headers }),
+        axios.get(`${API}/admin/transactions?limit=50`, { headers }),
         axios.get(`${API}/admin/member-posts?limit=50`, { headers }),
         axios.get(`${API}/admin/settings`, { headers }),
         axios.get(`${API}/admin/dashboard/stats`, { headers }) // Use admin-specific stats API
