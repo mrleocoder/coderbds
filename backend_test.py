@@ -4266,8 +4266,11 @@ if __name__ == "__main__":
     import sys
     tester = BDSVietnamAPITester()
     
+    # Check if admin dashboard improvements testing is requested
+    if len(sys.argv) > 1 and sys.argv[1] == "admin-dashboard":
+        tester.run_admin_dashboard_improvements_testing()
     # Check if final verification mode is requested
-    if len(sys.argv) > 1 and sys.argv[1] == "final":
+    elif len(sys.argv) > 1 and sys.argv[1] == "final":
         tester.run_final_verification_tests()
     # Check if health check mode is requested
     elif len(sys.argv) > 1 and sys.argv[1] == "health":
