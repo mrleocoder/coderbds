@@ -1815,27 +1815,25 @@ const FAQSection = () => {
           <p className="text-gray-600 text-lg">Giải đáp mọi thắc mắc về dịch vụ của chúng tôi</p>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white rounded-lg shadow-lg p-1">
-            {Object.entries(faqCategories).map(([key, category]) => (
-              <button
-                key={key}
-                onClick={() => {
-                  setActiveCategory(key);
-                  setOpenIndex(null);
-                }}
-                className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 ${
-                  activeCategory === key
-                    ? 'bg-emerald-600 text-white shadow-lg'
-                    : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
-                }`}
-              >
-                <i className={`${category.icon} text-lg`}></i>
-                <span>{category.title}</span>
-              </button>
-            ))}
-          </div>
+        {/* Category Tabs - Tách riêng 2 buttons */}
+        <div className="flex justify-center items-center space-x-4 mb-12">
+          {Object.entries(faqCategories).map(([key, category]) => (
+            <button
+              key={key}
+              onClick={() => {
+                setActiveCategory(key);
+                setOpenIndex(null);
+              }}
+              className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg ${
+                activeCategory === key
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
+              }`}
+            >
+              <i className={`${category.icon} text-lg`}></i>
+              <span>{category.title}</span>
+            </button>
+          ))}
         </div>
 
         {/* FAQ Content */}
