@@ -170,6 +170,12 @@ class SiteSettings(BaseModel):
     bank_name: str = "Ngân hàng Vietcombank"
     bank_branch: Optional[str] = "Chi nhánh TP.HCM"
     bank_qr_code: Optional[str] = None
+    contact_button_1_text: str = "Zalo"
+    contact_button_1_link: str = "https://zalo.me/123456789"
+    contact_button_2_text: str = "Telegram"
+    contact_button_2_link: str = "https://t.me/bdsvietnam"
+    contact_button_3_text: str = "WhatsApp"
+    contact_button_3_link: str = "https://wa.me/1234567890"
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SiteSettingsUpdate(BaseModel):
