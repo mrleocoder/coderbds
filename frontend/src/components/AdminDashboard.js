@@ -786,6 +786,20 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => {
+                  setActiveTab('member-posts');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'member-posts'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-user-edit mr-2"></i>
+                Duyệt tin Member ({memberPosts.filter(p => p.status === 'pending').length})
+              </button>
+              <button
+                onClick={() => {
                   setActiveTab('settings');
                   setShowForm(false);
                 }}
