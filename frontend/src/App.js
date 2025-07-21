@@ -434,21 +434,21 @@ const Header = () => {
                   <Link 
                     to="/kho-sim" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Kho Sim
                   </Link>
                   <Link 
                     to="/tin-tuc" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Tin tức
                   </Link>
                   <Link 
                     to="/lien-he" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Liên hệ
                   </Link>
