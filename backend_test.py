@@ -2442,6 +2442,13 @@ class BDSVietnamAPITester:
             print("❌ Admin authentication failed, skipping admin-only tests")
             return
         
+        # PHASE 2.1: WEBSITE SETTINGS TESTING (NEW FEATURE)
+        print("\n⚙️ PHASE 2.1: Testing WEBSITE SETTINGS (NEW FEATURE)")
+        print("-" * 80)
+        
+        # Test complete website settings workflow
+        self.test_website_settings_complete_workflow()
+        
         # PHASE 3: WALLET & TRANSACTION SYSTEM
         print("\n💰 PHASE 3: Testing WALLET & TRANSACTION SYSTEM")
         print("-" * 80)
