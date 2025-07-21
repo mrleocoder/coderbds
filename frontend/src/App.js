@@ -2309,26 +2309,48 @@ const Footer = () => {
       
       {/* Fixed Action Buttons */}
       <div className="fixed bottom-6 right-6 space-y-2 z-40">
-        <a 
-          href="https://zalo.me/0123456789" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors block"
-        >
-          <i className="fas fa-comment-alt text-xl"></i>
-        </a>
-        <a 
-          href="tel:0123456789"
-          className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition-colors block"
-        >
-          <i className="fas fa-phone text-xl"></i>
-        </a>
-        <a 
-          href="#"
-          className="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors block"
-        >
-          <i className="fas fa-headset text-xl"></i>
-        </a>
+        {siteSettings.contact_button_1_link && (
+          <a 
+            href={siteSettings.contact_button_1_link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors block"
+            title={siteSettings.contact_button_1_text || 'Liên hệ'}
+          >
+            <i className="fas fa-comment-alt text-xl"></i>
+          </a>
+        )}
+        {siteSettings.contact_phone && (
+          <a 
+            href={`tel:${siteSettings.contact_phone.replace(/\s/g, '')}`}
+            className="bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition-colors block"
+            title="Gọi điện"
+          >
+            <i className="fas fa-phone text-xl"></i>
+          </a>
+        )}
+        {siteSettings.contact_button_2_link && (
+          <a 
+            href={siteSettings.contact_button_2_link}
+            target="_blank"
+            rel="noopener noreferrer" 
+            className="bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors block"
+            title={siteSettings.contact_button_2_text || 'Chat'}
+          >
+            <i className="fas fa-paper-plane text-xl"></i>
+          </a>
+        )}
+        {siteSettings.contact_button_3_link && (
+          <a 
+            href={siteSettings.contact_button_3_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors block"
+            title={siteSettings.contact_button_3_text || 'WhatsApp'}
+          >
+            <i className="fas fa-headset text-xl"></i>
+          </a>
+        )}
       </div>
     </footer>
   );
