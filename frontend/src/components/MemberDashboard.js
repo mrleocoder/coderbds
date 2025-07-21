@@ -784,6 +784,11 @@ const MemberDashboard = () => {
               </div>
             )}
 
+            {/* Messages Tab */}
+            {activeTab === 'messages' && (
+              <Messages user={user} />
+            )}
+
             {/* Create Post Tab */}
             {activeTab === 'create' && (
               <div>
