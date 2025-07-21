@@ -2108,7 +2108,9 @@ function App() {
               <Route path="/tin-tuc" element={<><Header /><NewsListPage /><Footer /></>} />
               <Route path="/tim-kiem" element={<><Header /><SearchResultsPage /><Footer /></>} />
               <Route path="/bds/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+              <Route path="/bat-dong-san/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
               <Route path="/loai-hinh/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+              <Route path="/loai-hinh-bat-dong-san/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
               <Route path="/dat/:filterType" element={<><Header /><LandFilterPage /><Footer /></>} />
               <Route path="/land/:id" element={<><Header /><LandDetailPage /><Footer /></>} />
               <Route path="/kho-sim" element={<><Header /><SimStorePage /><Footer /></>} />
