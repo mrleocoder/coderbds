@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://7edf40fb-3994-4423-bf0c-6470e5d61ac8.preview.emergentagent.com/api"
+BACKEND_URL = "https://d58ccc94-f71a-4270-8308-36434653c228.preview.emergentagent.com/api"
 
 class WebsiteSettingsTester:
     def __init__(self):
