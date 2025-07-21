@@ -2038,7 +2038,7 @@ async def get_messages(
     if deposit_id:
         query["deposit_id"] = deposit_id
     
-    messages = list(db.messages.find(query).sort("created_at", 1).limit(limit))
+    messages = await db.messages.find(query).sort("created_at", 1).limit(limit).to_list(limit)
     
     for message in messages:
         message["_id"] = str(message["_id"])
