@@ -947,8 +947,10 @@ const AdminDashboard = () => {
                 isOpen={showModal}
                 onClose={closeModal}
                 title={
+                  modalType === 'property' ? (editingItem ? 'Sửa bất động sản' : 'Thêm BDS mới') :
+                  modalType === 'news' ? (editingItem ? 'Sửa tin tức' : 'Thêm tin tức mới') :
                   modalType === 'sim' ? (editingItem ? 'Sửa SIM' : 'Thêm SIM mới') :
-                  modalType === 'land' ? (editingItem ? 'Sửa đất' : 'Thêm đất mới') :
+                  modalType === 'land' ? (editingItem ? 'Sửa đất' : 'Thêm dự án đất mới') :
                   modalType === 'deposit' ? 'Duyệt nạp tiền' :
                   modalType === 'member' ? 'Sửa thông tin thành viên' :
                   modalType === 'ticket' ? 'Xử lý Support Ticket' :
