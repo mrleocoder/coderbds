@@ -1005,20 +1005,96 @@ const MemberDashboard = () => {
         </div>
       </div>
 
-      {/* Mobile-friendly Footer */}
-      <footer className="bg-gray-800 text-white mt-8">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <i className="fas fa-home text-emerald-500"></i>
-              <span className="font-bold">BDS Việt Nam</span>
+      {/* Footer giống trang chủ */}
+      <footer className="bg-gray-900 text-white mt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <i className="fas fa-home text-2xl text-emerald-400"></i>
+                <div>
+                  <h3 className="text-xl font-bold">BDS Việt Nam</h3>
+                  <p className="text-sm text-gray-300">Premium Real Estate</p>
+                </div>
+              </div>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                Nền tảng bất động sản hàng đầu Việt Nam, kết nối người mua và người bán cách hiệu quả 
+                nhất với dịch vụ chuyên nghiệp và uy tín.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  <i className="fab fa-facebook-f text-xl"></i>
+                </a>
+                <a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  <i className="fab fa-youtube text-xl"></i>
+                </a>
+                <a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">
+                  <i className="fab fa-messenger text-xl"></i>
+                </a>
+              </div>
             </div>
-            <p className="text-sm text-gray-400">Premium Real Estate Platform</p>
-            <div className="flex justify-center space-x-4 mt-4 text-sm">
-              <Link to="/" className="hover:text-emerald-500">Trang chủ</Link>
-              <Link to="/tin-tuc" className="hover:text-emerald-500">Tin tức</Link>
-              <button onClick={() => {}} className="hover:text-emerald-500">Liên hệ</button>
+
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <i className="fas fa-question-circle text-emerald-400"></i>
+                <h4 className="font-semibold">Hướng dẫn</h4>
+              </div>
+              <ul className="space-y-2">
+                <li><Link to="/" className="text-gray-300 hover:text-emerald-400 transition-colors">Trang chủ</Link></li>
+                <li><Link to="/tin-tuc" className="text-gray-300 hover:text-emerald-400 transition-colors">Tin tức</Link></li>
+                <li><Link to="/lien-he" className="text-gray-300 hover:text-emerald-400 transition-colors">Liên hệ</Link></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Hướng dẫn đăng tin</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Hướng dẫn tìm kiếm</a></li>
+              </ul>
             </div>
+
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <i className="fas fa-gavel text-emerald-400"></i>
+                <h4 className="font-semibold">Quy định</h4>
+              </div>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Điều khoản sử dụng</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách bảo mật</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Quy định đăng tin</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách hoàn tiền</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Báo cáo vi phạm</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <i className="fas fa-phone text-emerald-400"></i>
+                <h4 className="font-semibold">Thông tin liên hệ</h4>
+              </div>
+              <div className="space-y-3">
+                <p className="flex items-center space-x-2 text-gray-300">
+                  <i className="fas fa-map-marker-alt text-emerald-400"></i>
+                  <span>123 Nguyễn Huệ, Quận 1, TP.HCM</span>
+                </p>
+                <p className="flex items-center space-x-2 text-gray-300">
+                  <i className="fas fa-phone text-emerald-400"></i>
+                  <span>0123 456 789</span>
+                </p>
+                <p className="flex items-center space-x-2 text-gray-300">
+                  <i className="fas fa-envelope text-emerald-400"></i>
+                  <span>info@bdsvietnam.com</span>
+                </p>
+                <p className="flex items-center space-x-2 text-gray-300">
+                  <i className="fas fa-clock text-emerald-400"></i>
+                  <span>T2-T6: 8:00-18:00 | T7: 8:00-12:00</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="text-gray-300">
+              © 2025 BDS Việt Nam. All rights reserved.
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Bản quyền bởi <a href="https://toicodedao.com" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">TOICODEDAO.COM</a>
+            </p>
           </div>
         </div>
       </footer>
