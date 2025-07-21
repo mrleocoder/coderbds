@@ -2621,6 +2621,9 @@ class BDSVietnamAPITester:
         print("=" * 80)
         print("Investigating admin vs customer page synchronization issues...")
         
+        # Run the focused data synchronization check first
+        self.test_data_synchronization_check()
+        
         self.test_admin_vs_public_data_synchronization()
         self.test_crud_operations_synchronization()
         self.test_database_collection_verification()
