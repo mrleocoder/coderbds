@@ -402,14 +402,14 @@ const Header = () => {
                   <Link 
                     to="/dat/for_sale" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Đất bán
                   </Link>
                   <Link 
                     to="/dat/for_rent" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Đất thuê
                   </Link>
