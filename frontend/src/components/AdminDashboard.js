@@ -3,6 +3,8 @@ import { useAuth } from './AuthContext';
 import { useToast } from './Toast';
 import axios from "axios";
 import Modal from './Modal';
+import TicketDetail from './TicketDetail';
+import DepositDetail from './DepositDetail';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
