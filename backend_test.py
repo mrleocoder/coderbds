@@ -2848,7 +2848,351 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Issue 5 - Website Settings with Bank Info", False, f"Error: {str(e)}")
 
-    def run_all_tests(self):
+    def test_review_request_comprehensive(self):
+        """
+        Comprehensive test for review request focusing on:
+        1. Authentication & User Management (admin/admin123, member_demo/member123)
+        2. Core CRUD Operations (Properties, News, Sims, Lands with minimal sample data)
+        3. Admin Management APIs
+        4. Messaging System
+        5. Member Features
+        6. Public APIs
+        """
+        print("\n🎯 COMPREHENSIVE REVIEW REQUEST TESTING")
+        print("=" * 80)
+        
+        # 1. AUTHENTICATION & USER MANAGEMENT
+        print("\n1️⃣ AUTHENTICATION & USER MANAGEMENT")
+        print("-" * 50)
+        
+        # Test admin login (admin/admin123)
+        admin_login_data = {"username": "admin", "password": "admin123"}
+        try:
+            response = self.session.post(f"{self.base_url}/auth/login", json=admin_login_data)
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get("access_token")
+                self.session.headers.update({"Authorization": f"Bearer {self.auth_token}"})
+                user_info = data.get("user", {})
+                self.log_test("Admin Login (admin/admin123)", True, f"✅ Admin login successful, role: {user_info.get('role')}")
+            else:
+                self.log_test("Admin Login (admin/admin123)", False, f"❌ Status: {response.status_code}")
+                return False
+        except Exception as e:
+            self.log_test("Admin Login (admin/admin123)", False, f"❌ Error: {str(e)}")
+            return False
+        
+        # Test member login (member_demo/member123)
+        member_login_data = {"username": "member_demo", "password": "member123"}
+        try:
+            # Remove admin auth temporarily
+            headers_backup = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json=member_login_data)
+            
+            # Restore admin auth
+            self.session.headers.update(headers_backup)
+            
+            if response.status_code == 200:
+                data = response.json()
+                member_token = data.get("access_token")
+                user_info = data.get("user", {})
+                self.log_test("Member Login (member_demo/member123)", True, f"✅ Member login successful, role: {user_info.get('role')}")
+            else:
+                self.log_test("Member Login (member_demo/member123)", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Login (member_demo/member123)", False, f"❌ Error: {str(e)}")
+        
+        # Test user profile APIs
+        try:
+            response = self.session.get(f"{self.base_url}/auth/me")
+            if response.status_code == 200:
+                profile = response.json()
+                self.log_test("User Profile API", True, f"✅ Profile retrieved: {profile.get('username')}")
+            else:
+                self.log_test("User Profile API", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("User Profile API", False, f"❌ Error: {str(e)}")
+        
+        # 2. CORE CRUD OPERATIONS (should have 1 sample each)
+        print("\n2️⃣ CORE CRUD OPERATIONS")
+        print("-" * 50)
+        
+        # Properties CRUD
+        try:
+            response = self.session.get(f"{self.base_url}/properties")
+            if response.status_code == 200:
+                properties = response.json()
+                self.log_test("Properties CRUD - GET", True, f"✅ Retrieved {len(properties)} properties")
+                
+                if properties:
+                    # Test individual property
+                    prop_id = properties[0].get('id')
+                    prop_response = self.session.get(f"{self.base_url}/properties/{prop_id}")
+                    if prop_response.status_code == 200:
+                        self.log_test("Properties CRUD - GET by ID", True, f"✅ Property details retrieved")
+                    else:
+                        self.log_test("Properties CRUD - GET by ID", False, f"❌ Status: {prop_response.status_code}")
+            else:
+                self.log_test("Properties CRUD - GET", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Properties CRUD - GET", False, f"❌ Error: {str(e)}")
+        
+        # News CRUD
+        try:
+            response = self.session.get(f"{self.base_url}/news")
+            if response.status_code == 200:
+                news = response.json()
+                self.log_test("News CRUD - GET", True, f"✅ Retrieved {len(news)} news articles")
+                
+                if news:
+                    # Test individual news
+                    news_id = news[0].get('id')
+                    news_response = self.session.get(f"{self.base_url}/news/{news_id}")
+                    if news_response.status_code == 200:
+                        self.log_test("News CRUD - GET by ID", True, f"✅ News details retrieved")
+                    else:
+                        self.log_test("News CRUD - GET by ID", False, f"❌ Status: {news_response.status_code}")
+            else:
+                self.log_test("News CRUD - GET", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("News CRUD - GET", False, f"❌ Error: {str(e)}")
+        
+        # Sims CRUD
+        try:
+            response = self.session.get(f"{self.base_url}/sims")
+            if response.status_code == 200:
+                sims = response.json()
+                self.log_test("Sims CRUD - GET", True, f"✅ Retrieved {len(sims)} sims")
+                
+                if sims:
+                    # Test individual sim
+                    sim_id = sims[0].get('id')
+                    sim_response = self.session.get(f"{self.base_url}/sims/{sim_id}")
+                    if sim_response.status_code == 200:
+                        self.log_test("Sims CRUD - GET by ID", True, f"✅ Sim details retrieved")
+                    else:
+                        self.log_test("Sims CRUD - GET by ID", False, f"❌ Status: {sim_response.status_code}")
+            else:
+                self.log_test("Sims CRUD - GET", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sims CRUD - GET", False, f"❌ Error: {str(e)}")
+        
+        # Lands CRUD
+        try:
+            response = self.session.get(f"{self.base_url}/lands")
+            if response.status_code == 200:
+                lands = response.json()
+                self.log_test("Lands CRUD - GET", True, f"✅ Retrieved {len(lands)} lands")
+                
+                if lands:
+                    # Test individual land
+                    land_id = lands[0].get('id')
+                    land_response = self.session.get(f"{self.base_url}/lands/{land_id}")
+                    if land_response.status_code == 200:
+                        self.log_test("Lands CRUD - GET by ID", True, f"✅ Land details retrieved")
+                    else:
+                        self.log_test("Lands CRUD - GET by ID", False, f"❌ Status: {land_response.status_code}")
+            else:
+                self.log_test("Lands CRUD - GET", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Lands CRUD - GET", False, f"❌ Error: {str(e)}")
+        
+        # 3. ADMIN MANAGEMENT APIs
+        print("\n3️⃣ ADMIN MANAGEMENT APIs")
+        print("-" * 50)
+        
+        # Admin dashboard stats
+        try:
+            response = self.session.get(f"{self.base_url}/admin/dashboard/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                self.log_test("Admin Dashboard Stats", True, f"✅ Stats retrieved with {len(stats)} fields")
+            else:
+                self.log_test("Admin Dashboard Stats", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Dashboard Stats", False, f"❌ Error: {str(e)}")
+        
+        # Member management
+        try:
+            response = self.session.get(f"{self.base_url}/admin/users")
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test("Member Management", True, f"✅ Retrieved {len(users)} users")
+            else:
+                self.log_test("Member Management", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Management", False, f"❌ Error: {str(e)}")
+        
+        # Transactions management
+        try:
+            response = self.session.get(f"{self.base_url}/admin/transactions")
+            if response.status_code == 200:
+                transactions = response.json()
+                self.log_test("Transactions Management", True, f"✅ Retrieved {len(transactions)} transactions")
+            else:
+                self.log_test("Transactions Management", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Transactions Management", False, f"❌ Error: {str(e)}")
+        
+        # Tickets management
+        try:
+            response = self.session.get(f"{self.base_url}/tickets")
+            if response.status_code == 200:
+                tickets = response.json()
+                self.log_test("Tickets Management", True, f"✅ Retrieved {len(tickets)} tickets")
+            else:
+                self.log_test("Tickets Management", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Tickets Management", False, f"❌ Error: {str(e)}")
+        
+        # Member posts approval
+        try:
+            response = self.session.get(f"{self.base_url}/admin/posts")
+            if response.status_code == 200:
+                posts = response.json()
+                self.log_test("Member Posts Management", True, f"✅ Retrieved {len(posts)} member posts")
+            else:
+                self.log_test("Member Posts Management", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Posts Management", False, f"❌ Error: {str(e)}")
+        
+        # 4. MESSAGING SYSTEM
+        print("\n4️⃣ MESSAGING SYSTEM")
+        print("-" * 50)
+        
+        # Get messages
+        try:
+            response = self.session.get(f"{self.base_url}/messages")
+            if response.status_code == 200:
+                messages = response.json()
+                self.log_test("Messages System - GET", True, f"✅ Retrieved {len(messages)} messages")
+            else:
+                self.log_test("Messages System - GET", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Messages System - GET", False, f"❌ Error: {str(e)}")
+        
+        # 5. MEMBER FEATURES
+        print("\n5️⃣ MEMBER FEATURES")
+        print("-" * 50)
+        
+        # Test with member token
+        member_token = None
+        try:
+            headers_backup = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json={"username": "member_demo", "password": "member123"})
+            if response.status_code == 200:
+                member_token = response.json().get("access_token")
+                self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+                
+                # Member posts
+                posts_response = self.session.get(f"{self.base_url}/member/posts")
+                if posts_response.status_code == 200:
+                    member_posts = posts_response.json()
+                    self.log_test("Member Posts", True, f"✅ Retrieved {len(member_posts)} member posts")
+                else:
+                    self.log_test("Member Posts", False, f"❌ Status: {posts_response.status_code}")
+                
+                # Wallet balance
+                wallet_response = self.session.get(f"{self.base_url}/wallet/balance")
+                if wallet_response.status_code == 200:
+                    wallet = wallet_response.json()
+                    self.log_test("Wallet Balance", True, f"✅ Balance: {wallet.get('balance', 0):,.0f} VNĐ")
+                else:
+                    self.log_test("Wallet Balance", False, f"❌ Status: {wallet_response.status_code}")
+                
+                # Transaction history
+                txn_response = self.session.get(f"{self.base_url}/wallet/transactions")
+                if txn_response.status_code == 200:
+                    transactions = txn_response.json()
+                    self.log_test("Member Transactions", True, f"✅ Retrieved {len(transactions)} transactions")
+                else:
+                    self.log_test("Member Transactions", False, f"❌ Status: {txn_response.status_code}")
+            
+            # Restore admin auth
+            self.session.headers.update(headers_backup)
+            
+        except Exception as e:
+            self.log_test("Member Features", False, f"❌ Error: {str(e)}")
+            # Restore admin auth
+            if headers_backup:
+                self.session.headers.update(headers_backup)
+        
+        # 6. PUBLIC APIs
+        print("\n6️⃣ PUBLIC APIs")
+        print("-" * 50)
+        
+        # Remove auth for public APIs
+        headers_backup = self.session.headers.copy()
+        if 'Authorization' in self.session.headers:
+            del self.session.headers['Authorization']
+        
+        # Public properties listing
+        try:
+            response = self.session.get(f"{self.base_url}/properties")
+            if response.status_code == 200:
+                properties = response.json()
+                self.log_test("Public Properties Listing", True, f"✅ Retrieved {len(properties)} properties")
+            else:
+                self.log_test("Public Properties Listing", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public Properties Listing", False, f"❌ Error: {str(e)}")
+        
+        # Public news listing
+        try:
+            response = self.session.get(f"{self.base_url}/news")
+            if response.status_code == 200:
+                news = response.json()
+                self.log_test("Public News Listing", True, f"✅ Retrieved {len(news)} news articles")
+            else:
+                self.log_test("Public News Listing", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public News Listing", False, f"❌ Error: {str(e)}")
+        
+        # Public sims listing
+        try:
+            response = self.session.get(f"{self.base_url}/sims")
+            if response.status_code == 200:
+                sims = response.json()
+                self.log_test("Public Sims Listing", True, f"✅ Retrieved {len(sims)} sims")
+            else:
+                self.log_test("Public Sims Listing", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public Sims Listing", False, f"❌ Error: {str(e)}")
+        
+        # Public lands listing
+        try:
+            response = self.session.get(f"{self.base_url}/lands")
+            if response.status_code == 200:
+                lands = response.json()
+                self.log_test("Public Lands Listing", True, f"✅ Retrieved {len(lands)} lands")
+            else:
+                self.log_test("Public Lands Listing", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public Lands Listing", False, f"❌ Error: {str(e)}")
+        
+        # Public statistics
+        try:
+            response = self.session.get(f"{self.base_url}/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                self.log_test("Public Statistics", True, f"✅ Stats retrieved with {len(stats)} fields")
+            else:
+                self.log_test("Public Statistics", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public Statistics", False, f"❌ Error: {str(e)}")
+        
+        # Restore admin auth
+        self.session.headers.update(headers_backup)
+        
+        print("\n🎯 COMPREHENSIVE REVIEW REQUEST TESTING COMPLETED")
+        print("=" * 80)
+        return True
         """Run all backend API tests with CRITICAL SYNCHRONIZATION INVESTIGATION FIRST"""
         print("🚀 Starting BDS Vietnam Backend API Tests - CRITICAL 6 ISSUES REVIEW")
         print(f"Backend URL: {self.base_url}")
