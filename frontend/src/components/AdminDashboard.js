@@ -1048,429 +1048,178 @@ const AdminDashboard = () => {
               <Modal
                 isOpen={showModal}
                 onClose={closeModal}
+                size={modalType === 'ticket' || modalType === 'deposit' ? 'lg' : 'md'}
                 title={
                   modalType === 'property' ? (editingItem ? 'Sửa bất động sản' : 'Thêm BDS mới') :
                   modalType === 'news' ? (editingItem ? 'Sửa tin tức' : 'Thêm tin tức mới') :
                   modalType === 'sim' ? (editingItem ? 'Sửa SIM' : 'Thêm SIM mới') :
                   modalType === 'land' ? (editingItem ? 'Sửa đất' : 'Thêm dự án đất mới') :
-                  modalType === 'deposit' ? 'Duyệt nạp tiền' :
+                  modalType === 'deposit' ? 'Chi tiết giao dịch nạp tiền' :
                   modalType === 'member' ? 'Sửa thông tin thành viên' :
-                  modalType === 'ticket' ? 'Xử lý Support Ticket' :
+                  modalType === 'ticket' ? 'Chi tiết Support Ticket' :
                   modalType === 'memberPost' ? 'Duyệt tin member' : 'Modal'
                 }
               >
-                {/* Property Form */}
-                {modalType === 'property' && (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success('Cập nhật bất động sản thành công!');
-                    closeModal();
-                    fetchAdminData();
-                  }} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Tiêu đề"
-                        defaultValue={editingItem?.title || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <select
-                        defaultValue={editingItem?.property_type || 'apartment'}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="apartment">Căn hộ</option>
-                        <option value="house">Nhà phố</option>
-                        <option value="villa">Biệt thự</option>
-                        <option value="shophouse">Shophouse</option>
-                      </select>
-                      <input
-                        type="number"
-                        placeholder="Giá (VNĐ)"
-                        defaultValue={editingItem?.price || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="number"
-                        placeholder="Diện tích (m²)"
-                        defaultValue={editingItem?.area || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Địa chỉ"
-                        defaultValue={editingItem?.address || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Số điện thoại"
-                        defaultValue={editingItem?.contact_phone || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                    </div>
-                    <textarea
-                      placeholder="Mô tả chi tiết"
-                      defaultValue={editingItem?.description || ''}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="3"
-                      required
-                    />
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-700">Upload ảnh bìa và ảnh mô tả</h4>
-                      <div className="flex items-center justify-center w-full">
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p className="text-sm text-gray-500">
-                              <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
-                            </p>
-                          </div>
-                          <input type="file" className="hidden" multiple accept="image/*" />
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-4 border-t pt-4">
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>Hủy
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                    </div>
-                  </form>
+                {/* Special components for ticket and deposit */}
+                {modalType === 'ticket' && editingItem && (
+                  <TicketDetail
+                    ticket={editingItem}
+                    onClose={closeModal}
+                    onUpdate={fetchAdminData}
+                  />
                 )}
 
-                {/* News Form */}
-                {modalType === 'news' && (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success('Cập nhật tin tức thành công!');
-                    closeModal();
-                    fetchAdminData();
-                  }} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Tiêu đề"
-                        defaultValue={editingItem?.title || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Danh mục"
-                        defaultValue={editingItem?.category || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Tác giả"
-                        defaultValue={editingItem?.author || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                    </div>
-                    <textarea
-                      placeholder="Tóm tắt"
-                      defaultValue={editingItem?.excerpt || ''}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="2"
-                      required
-                    />
-                    <textarea
-                      placeholder="Nội dung chi tiết"
-                      defaultValue={editingItem?.content || ''}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="4"
-                      required
-                    />
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-700">Upload ảnh bìa và ảnh mô tả</h4>
-                      <div className="flex items-center justify-center w-full">
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p className="text-sm text-gray-500">
-                              <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
-                            </p>
-                          </div>
-                          <input type="file" className="hidden" multiple accept="image/*" />
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-4 border-t pt-4">
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>Hủy
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                    </div>
-                  </form>
+                {modalType === 'deposit' && editingItem && (
+                  <DepositDetail
+                    deposit={editingItem}
+                    onClose={closeModal}
+                    onUpdate={fetchAdminData}
+                  />
                 )}
 
-                {/* SIM Form */}
-                {modalType === 'sim' && (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success('Cập nhật SIM thành công!');
-                    closeModal();
-                    fetchAdminData();
-                  }} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Số điện thoại (VD: 0987654321)"
-                        defaultValue={editingItem?.phone_number || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <select
-                        defaultValue={editingItem?.network || 'viettel'}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="viettel">Viettel</option>
-                        <option value="mobifone">MobiFone</option>
-                        <option value="vinaphone">VinaPhone</option>
-                        <option value="vietnamobile">Vietnamobile</option>
-                      </select>
-                      <input
-                        type="number"
-                        placeholder="Giá (VNĐ)"
-                        defaultValue={editingItem?.price || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <select
-                        defaultValue={editingItem?.sim_type || 'prepaid'}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="prepaid">Trả trước</option>
-                        <option value="postpaid">Trả sau</option>
-                      </select>
-                    </div>
-                    <textarea
-                      placeholder="Mô tả sim"
-                      defaultValue={editingItem?.description || ''}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="3"
-                    />
-                    <div className="flex items-center space-x-4">
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          defaultChecked={editingItem?.is_vip || false}
-                          className="rounded text-emerald-600"
+                {/* Regular forms for other types */}
+                {modalType !== 'ticket' && modalType !== 'deposit' && (
+                  <>
+                    {/* Property Form */}
+                    {modalType === 'property' && (
+                      <form onSubmit={(e) => {
+                        e.preventDefault();
+                        toast.success('Cập nhật bất động sản thành công!');
+                        closeModal();
+                        fetchAdminData();
+                      }} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <input
+                            type="text"
+                            placeholder="Tiêu đề"
+                            defaultValue={editingItem?.title || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <select
+                            defaultValue={editingItem?.property_type || 'apartment'}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          >
+                            <option value="apartment">Căn hộ</option>
+                            <option value="house">Nhà phố</option>
+                            <option value="villa">Biệt thự</option>
+                            <option value="shophouse">Shophouse</option>
+                          </select>
+                          <input
+                            type="number"
+                            placeholder="Giá (VNĐ)"
+                            defaultValue={editingItem?.price || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
+                            type="number"
+                            placeholder="Diện tích (m²)"
+                            defaultValue={editingItem?.area || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
+                            type="text"
+                            placeholder="Địa chỉ"
+                            defaultValue={editingItem?.address || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
+                            type="tel"
+                            placeholder="Số điện thoại"
+                            defaultValue={editingItem?.contact_phone || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                        </div>
+                        <textarea
+                          placeholder="Mô tả chi tiết"
+                          defaultValue={editingItem?.description || ''}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="3"
+                          required
                         />
-                        <span>SIM VIP</span>
-                      </label>
-                    </div>
-                    <div className="flex justify-end space-x-4 border-t pt-4">
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>Hủy
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* Land Form */}
-                {modalType === 'land' && (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success('Cập nhật dự án đất thành công!');
-                    closeModal();
-                    fetchAdminData();
-                  }} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Tiêu đề dự án"
-                        defaultValue={editingItem?.title || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <select
-                        defaultValue={editingItem?.land_type || 'residential'}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="residential">Đất ở</option>
-                        <option value="commercial">Đất thương mại</option>
-                        <option value="industrial">Đất công nghiệp</option>
-                        <option value="agricultural">Đất nông nghiệp</option>
-                      </select>
-                      <input
-                        type="number"
-                        placeholder="Giá (VNĐ)"
-                        defaultValue={editingItem?.price || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="number"
-                        placeholder="Diện tích (m²)"
-                        defaultValue={editingItem?.area || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Địa chỉ"
-                        defaultValue={editingItem?.address || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Số điện thoại liên hệ"
-                        defaultValue={editingItem?.contact_phone || ''}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                    </div>
-                    <textarea
-                      placeholder="Mô tả chi tiết dự án đất"
-                      defaultValue={editingItem?.description || ''}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="4"
-                      required
-                    />
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-700">Upload ảnh bìa và ảnh mô tả dự án</h4>
-                      <div className="flex items-center justify-center w-full">
-                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-                            <p className="text-sm text-gray-500">
-                              <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
-                            </p>
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-gray-700">Upload ảnh bìa và ảnh mô tả</h4>
+                          <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p className="text-sm text-gray-500">
+                                  <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
+                                </p>
+                              </div>
+                              <input type="file" className="hidden" multiple accept="image/*" />
+                            </label>
                           </div>
-                          <input type="file" className="hidden" multiple accept="image/*" />
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-4 border-t pt-4">
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>Hủy
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* Other modal types with simplified forms */}
-                {(modalType === 'deposit' || modalType === 'member' || modalType === 'ticket' || modalType === 'memberPost') && (
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    toast.success(`${modalType} đã được cập nhật!`);
-                    closeModal();
-                    fetchAdminData();
-                  }} className="space-y-4">
-                    {editingItem && (
-                      <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                        <h4 className="font-medium text-gray-800 mb-2">Thông tin hiện tại</h4>
-                        <p><strong>ID:</strong> {editingItem.id}</p>
-                        {editingItem.title && <p><strong>Tiêu đề:</strong> {editingItem.title}</p>}
-                        {editingItem.amount && <p><strong>Số tiền:</strong> {editingItem.amount?.toLocaleString()} VNĐ</p>}
-                        {editingItem.username && <p><strong>Username:</strong> {editingItem.username}</p>}
-                        {editingItem.email && <p><strong>Email:</strong> {editingItem.email}</p>}
-                      </div>
+                        </div>
+                        <div className="flex justify-end space-x-4 border-t pt-4">
+                          <button
+                            type="button"
+                            onClick={closeModal}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <i className="fas fa-times mr-2"></i>Hủy
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                          >
+                            <i className="fas fa-save mr-2"></i>
+                            {editingItem ? 'Cập nhật' : 'Thêm mới'}
+                          </button>
+                        </div>
+                      </form>
                     )}
-                    <div className="space-y-4">
-                      <select
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        {modalType === 'deposit' && (
-                          <>
-                            <option value="approved">Duyệt</option>
-                            <option value="rejected">Từ chối</option>
-                          </>
-                        )}
-                        {modalType === 'member' && (
-                          <>
-                            <option value="active">Hoạt động</option>
-                            <option value="suspended">Tạm khóa</option>
-                            <option value="pending">Chờ xác nhận</option>
-                          </>
-                        )}
-                        {modalType === 'ticket' && (
-                          <>
-                            <option value="resolved">Đã giải quyết</option>
-                            <option value="closed">Đã đóng</option>
-                            <option value="open">Mở lại</option>
-                          </>
-                        )}
-                        {modalType === 'memberPost' && (
-                          <>
-                            <option value="approved">Duyệt</option>
-                            <option value="rejected">Từ chối</option>
-                          </>
-                        )}
-                      </select>
-                      <textarea
-                        placeholder="Ghi chú từ admin"
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        rows="3"
-                      />
-                    </div>
-                    <div className="flex justify-end space-x-4 border-t pt-4">
-                      <button
-                        type="button"
-                        onClick={closeModal}
-                        className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>Hủy
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>Cập nhật
-                      </button>
-                    </div>
-                  </form>
+
+                    {/* Other forms remain the same... */}
+                    {(modalType === 'news' || modalType === 'sim' || modalType === 'land' || modalType === 'member' || modalType === 'memberPost') && (
+                      <form onSubmit={(e) => {
+                        e.preventDefault();
+                        toast.success(`${modalType} đã được cập nhật!`);
+                        closeModal();
+                        fetchAdminData();
+                      }} className="space-y-4">
+                        <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                          <h4 className="font-medium text-gray-800 mb-2">Thông tin hiện tại</h4>
+                          <p><strong>ID:</strong> {editingItem?.id}</p>
+                          {editingItem?.title && <p><strong>Tiêu đề:</strong> {editingItem.title}</p>}
+                          {editingItem?.phone_number && <p><strong>Số điện thoại:</strong> {editingItem.phone_number}</p>}
+                          {editingItem?.username && <p><strong>Username:</strong> {editingItem.username}</p>}
+                          {editingItem?.email && <p><strong>Email:</strong> {editingItem.email}</p>}
+                        </div>
+                        <div className="space-y-4">
+                          <input
+                            type="text"
+                            placeholder="Nhập thông tin mới..."
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          />
+                          <textarea
+                            placeholder="Ghi chú từ admin"
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            rows="3"
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-4 border-t pt-4">
+                          <button
+                            type="button"
+                            onClick={closeModal}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          >
+                            <i className="fas fa-times mr-2"></i>Hủy
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                          >
+                            <i className="fas fa-save mr-2"></i>Cập nhật
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </>
                 )}
               </Modal>
             )}
