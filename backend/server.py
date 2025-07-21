@@ -188,6 +188,7 @@ class SiteSettingsUpdate(BaseModel):
     contact_email: Optional[str] = None
     contact_phone: Optional[str] = None
     contact_address: Optional[str] = None
+    company_address: Optional[str] = None
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     banner_image: Optional[str] = None
