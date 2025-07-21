@@ -1847,28 +1847,33 @@ const FAQSection = () => {
 
         {/* FAQ Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {faqCategories[activeCategory].faqs.map((faq, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-semibold text-gray-800 pr-4">{faq.question}</span>
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  openIndex === index ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600'
-                }`}>
-                  <i className={`fas fa-chevron-${openIndex === index ? 'up' : 'down'} text-sm`}></i>
-                </div>
-              </button>
-              {openIndex === index && (
-                <div className="px-6 pb-5 border-t border-gray-50">
-                  <div className="pt-4">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+          {faqCategories[activeCategory].faqs.map((faq, index) => {
+            const uniqueKey = `${activeCategory}-${index}`;
+            const isOpen = openIndex === uniqueKey;
+            
+            return (
+              <div key={uniqueKey} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                <button
+                  onClick={() => handleFaqToggle(index)}
+                  className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-800 pr-4">{faq.question}</span>
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isOpen ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'} text-sm`}></i>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                </button>
+                {isOpen && (
+                  <div className="px-6 pb-5 border-t border-gray-50">
+                    <div className="pt-4">
+                      <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Contact CTA */}
