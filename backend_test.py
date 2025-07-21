@@ -4611,12 +4611,527 @@ class BDSVietnamAPITester:
         print(f"\n🎉 Final verification completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 80)
 
+    def run_review_request_tests(self):
+        """
+        Run tests specifically for the review request focusing on:
+        1. Admin Authentication (admin/admin123)
+        2. Minimal Sample Data Verification (1 property, 1 news, 1 sim, 1 land, 1 ticket, 1 member, 1 transaction)
+        3. Admin CRUD Operations and real-time sync
+        4. Member Authentication (member_demo/member123)
+        5. Messages System
+        """
+        print("🎯 REVIEW REQUEST TESTING - BDS Vietnam Backend API")
+        print(f"Backend URL: {self.base_url}")
+        print("=" * 80)
+        print("Testing focus:")
+        print("1. Admin Authentication (admin/admin123)")
+        print("2. Minimal Sample Data Verification (1 item each)")
+        print("3. Admin CRUD Operations and real-time sync")
+        print("4. Member Authentication (member_demo/member123)")
+        print("5. Messages System")
+        print("=" * 80)
+        
+        # Test API connectivity
+        if not self.test_api_root():
+            print("❌ API not accessible, stopping tests")
+            return
+        
+        # 1. ADMIN AUTHENTICATION TEST
+        print("\n1️⃣ ADMIN AUTHENTICATION TEST")
+        print("-" * 50)
+        
+        # Test admin login (admin/admin123)
+        admin_login_data = {"username": "admin", "password": "admin123"}
+        try:
+            response = self.session.post(f"{self.base_url}/auth/login", json=admin_login_data)
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get("access_token")
+                self.session.headers.update({"Authorization": f"Bearer {self.auth_token}"})
+                user_info = data.get("user", {})
+                self.log_test("Admin Authentication (admin/admin123)", True, 
+                            f"✅ Admin login successful - User: {user_info.get('username')}, Role: {user_info.get('role')}")
+                
+                # Verify admin role and permissions
+                if user_info.get('role') == 'admin':
+                    self.log_test("Admin Role Verification", True, "✅ Admin role confirmed")
+                else:
+                    self.log_test("Admin Role Verification", False, f"❌ Expected admin role, got: {user_info.get('role')}")
+            else:
+                self.log_test("Admin Authentication (admin/admin123)", False, f"❌ Login failed - Status: {response.status_code}")
+                return
+        except Exception as e:
+            self.log_test("Admin Authentication (admin/admin123)", False, f"❌ Error: {str(e)}")
+            return
+        
+        # 2. MINIMAL SAMPLE DATA VERIFICATION
+        print("\n2️⃣ MINIMAL SAMPLE DATA VERIFICATION")
+        print("-" * 50)
+        print("Verifying minimal sample data: 1 property, 1 news, 1 sim, 1 land, 1 ticket, 1 member, 1 transaction")
+        
+        # Check Properties
+        try:
+            response = self.session.get(f"{self.base_url}/properties")
+            if response.status_code == 200:
+                properties = response.json()
+                self.log_test("Sample Data - Properties", True, f"✅ Found {len(properties)} properties")
+            else:
+                self.log_test("Sample Data - Properties", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Properties", False, f"❌ Error: {str(e)}")
+        
+        # Check News
+        try:
+            response = self.session.get(f"{self.base_url}/news")
+            if response.status_code == 200:
+                news = response.json()
+                self.log_test("Sample Data - News", True, f"✅ Found {len(news)} news articles")
+            else:
+                self.log_test("Sample Data - News", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - News", False, f"❌ Error: {str(e)}")
+        
+        # Check Sims
+        try:
+            response = self.session.get(f"{self.base_url}/sims")
+            if response.status_code == 200:
+                sims = response.json()
+                self.log_test("Sample Data - Sims", True, f"✅ Found {len(sims)} sims")
+            else:
+                self.log_test("Sample Data - Sims", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Sims", False, f"❌ Error: {str(e)}")
+        
+        # Check Lands
+        try:
+            response = self.session.get(f"{self.base_url}/lands")
+            if response.status_code == 200:
+                lands = response.json()
+                self.log_test("Sample Data - Lands", True, f"✅ Found {len(lands)} lands")
+            else:
+                self.log_test("Sample Data - Lands", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Lands", False, f"❌ Error: {str(e)}")
+        
+        # Check Tickets
+        try:
+            response = self.session.get(f"{self.base_url}/tickets")
+            if response.status_code == 200:
+                tickets = response.json()
+                self.log_test("Sample Data - Tickets", True, f"✅ Found {len(tickets)} tickets")
+            else:
+                self.log_test("Sample Data - Tickets", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Tickets", False, f"❌ Error: {str(e)}")
+        
+        # Check Members
+        try:
+            response = self.session.get(f"{self.base_url}/admin/users", params={"role": "member"})
+            if response.status_code == 200:
+                members = response.json()
+                self.log_test("Sample Data - Members", True, f"✅ Found {len(members)} members")
+            else:
+                self.log_test("Sample Data - Members", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Members", False, f"❌ Error: {str(e)}")
+        
+        # Check Transactions
+        try:
+            response = self.session.get(f"{self.base_url}/admin/transactions")
+            if response.status_code == 200:
+                transactions = response.json()
+                self.log_test("Sample Data - Transactions", True, f"✅ Found {len(transactions)} transactions")
+            else:
+                self.log_test("Sample Data - Transactions", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Sample Data - Transactions", False, f"❌ Error: {str(e)}")
+        
+        # 3. ADMIN CRUD OPERATIONS AND REAL-TIME SYNC
+        print("\n3️⃣ ADMIN CRUD OPERATIONS AND REAL-TIME SYNC")
+        print("-" * 50)
+        print("Testing admin can create new items and they appear immediately in public APIs")
+        
+        # Test Property Creation and Real-time Sync
+        self.test_admin_property_crud_and_sync()
+        
+        # Test News Creation and Real-time Sync
+        self.test_admin_news_crud_and_sync()
+        
+        # Test Sim Creation and Real-time Sync
+        self.test_admin_sim_crud_and_sync()
+        
+        # Test Land Creation and Real-time Sync
+        self.test_admin_land_crud_and_sync()
+        
+        # 4. MEMBER AUTHENTICATION TEST
+        print("\n4️⃣ MEMBER AUTHENTICATION TEST")
+        print("-" * 50)
+        
+        # Test member login (member_demo/member123)
+        member_login_data = {"username": "member_demo", "password": "member123"}
+        try:
+            # Remove admin auth temporarily
+            headers_backup = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json=member_login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                member_token = data.get("access_token")
+                user_info = data.get("user", {})
+                self.log_test("Member Authentication (member_demo/member123)", True, 
+                            f"✅ Member login successful - User: {user_info.get('username')}, Role: {user_info.get('role')}")
+                
+                # Test member dashboard APIs
+                if member_token:
+                    self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+                    self.test_member_dashboard_apis()
+            else:
+                self.log_test("Member Authentication (member_demo/member123)", False, f"❌ Status: {response.status_code}")
+            
+            # Restore admin auth
+            self.session.headers.update(headers_backup)
+            
+        except Exception as e:
+            self.log_test("Member Authentication (member_demo/member123)", False, f"❌ Error: {str(e)}")
+            # Restore admin auth
+            if 'headers_backup' in locals():
+                self.session.headers.update(headers_backup)
+        
+        # 5. MESSAGES SYSTEM TEST
+        print("\n5️⃣ MESSAGES SYSTEM TEST")
+        print("-" * 50)
+        
+        # Test GET /api/messages
+        try:
+            response = self.session.get(f"{self.base_url}/messages")
+            if response.status_code == 200:
+                messages = response.json()
+                self.log_test("Messages System - GET /api/messages", True, f"✅ Retrieved {len(messages)} messages")
+                
+                # Look for sample message from admin to member
+                admin_to_member_messages = [msg for msg in messages if msg.get('from_type') == 'admin' and msg.get('to_type') == 'member']
+                if admin_to_member_messages:
+                    self.log_test("Sample Admin-to-Member Message", True, f"✅ Found {len(admin_to_member_messages)} admin-to-member messages")
+                else:
+                    self.log_test("Sample Admin-to-Member Message", False, "❌ No admin-to-member messages found")
+            else:
+                self.log_test("Messages System - GET /api/messages", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Messages System - GET /api/messages", False, f"❌ Error: {str(e)}")
+        
+        # Print summary
+        self.print_review_summary()
+
+    def test_admin_property_crud_and_sync(self):
+        """Test admin property CRUD and verify real-time sync with public API"""
+        print("\n📋 Testing Property CRUD and Real-time Sync...")
+        
+        # Create property via admin
+        property_data = {
+            "title": "SYNC TEST - Căn hộ test real-time sync",
+            "description": "Căn hộ test để kiểm tra đồng bộ real-time",
+            "property_type": "apartment",
+            "status": "for_sale",
+            "price": 3500000000,
+            "area": 80.0,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "123 Test Sync Street",
+            "district": "Test District",
+            "city": "Test City",
+            "contact_phone": "0901234567",
+            "featured": True
+        }
+        
+        try:
+            # Create property
+            response = self.session.post(f"{self.base_url}/properties", json=property_data)
+            if response.status_code == 200:
+                created_property = response.json()
+                property_id = created_property.get("id")
+                self.log_test("Admin Property Creation", True, f"✅ Property created: {property_id}")
+                
+                # Immediately check if it appears in public API
+                import time
+                time.sleep(1)  # Small delay for potential database sync
+                
+                public_response = self.session.get(f"{self.base_url}/properties")
+                if public_response.status_code == 200:
+                    public_properties = public_response.json()
+                    property_found = any(prop.get("id") == property_id for prop in public_properties)
+                    
+                    if property_found:
+                        self.log_test("Property Real-time Sync", True, "✅ Property immediately visible in public API - Real-time sync working!")
+                        
+                        # Cleanup - delete the test property
+                        delete_response = self.session.delete(f"{self.base_url}/properties/{property_id}")
+                        if delete_response.status_code == 200:
+                            self.log_test("Property Cleanup", True, "✅ Test property deleted")
+                    else:
+                        self.log_test("Property Real-time Sync", False, "❌ Property NOT visible in public API - Sync issue!")
+                else:
+                    self.log_test("Property Real-time Sync", False, f"❌ Could not check public API: {public_response.status_code}")
+            else:
+                self.log_test("Admin Property Creation", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Property CRUD and Sync", False, f"❌ Error: {str(e)}")
+
+    def test_admin_news_crud_and_sync(self):
+        """Test admin news CRUD and verify real-time sync with public API"""
+        print("\n📰 Testing News CRUD and Real-time Sync...")
+        
+        # Create news via admin
+        news_data = {
+            "title": "SYNC TEST - Tin tức test real-time sync",
+            "slug": "sync-test-tin-tuc-real-time",
+            "content": "Nội dung tin tức test để kiểm tra đồng bộ real-time",
+            "excerpt": "Tin tức test real-time sync",
+            "category": "Test",
+            "tags": ["test", "sync", "realtime"],
+            "published": True,
+            "author": "Admin Test"
+        }
+        
+        try:
+            # Create news
+            response = self.session.post(f"{self.base_url}/news", json=news_data)
+            if response.status_code == 200:
+                created_news = response.json()
+                news_id = created_news.get("id")
+                self.log_test("Admin News Creation", True, f"✅ News created: {news_id}")
+                
+                # Immediately check if it appears in public API
+                import time
+                time.sleep(1)  # Small delay for potential database sync
+                
+                public_response = self.session.get(f"{self.base_url}/news")
+                if public_response.status_code == 200:
+                    public_news = public_response.json()
+                    news_found = any(article.get("id") == news_id for article in public_news)
+                    
+                    if news_found:
+                        self.log_test("News Real-time Sync", True, "✅ News immediately visible in public API - Real-time sync working!")
+                        
+                        # Cleanup - delete the test news
+                        delete_response = self.session.delete(f"{self.base_url}/news/{news_id}")
+                        if delete_response.status_code == 200:
+                            self.log_test("News Cleanup", True, "✅ Test news deleted")
+                    else:
+                        self.log_test("News Real-time Sync", False, "❌ News NOT visible in public API - Sync issue!")
+                else:
+                    self.log_test("News Real-time Sync", False, f"❌ Could not check public API: {public_response.status_code}")
+            else:
+                self.log_test("Admin News Creation", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin News CRUD and Sync", False, f"❌ Error: {str(e)}")
+
+    def test_admin_sim_crud_and_sync(self):
+        """Test admin sim CRUD and verify real-time sync with public API"""
+        print("\n📱 Testing Sim CRUD and Real-time Sync...")
+        
+        # Create sim via admin
+        sim_data = {
+            "phone_number": "0987654321",
+            "network": "viettel",
+            "sim_type": "prepaid",
+            "price": 500000,
+            "is_vip": True,
+            "features": ["Số đẹp", "Test sync"],
+            "description": "Sim test real-time sync"
+        }
+        
+        try:
+            # Create sim
+            response = self.session.post(f"{self.base_url}/sims", json=sim_data)
+            if response.status_code == 200:
+                created_sim = response.json()
+                sim_id = created_sim.get("id")
+                self.log_test("Admin Sim Creation", True, f"✅ Sim created: {sim_id}")
+                
+                # Immediately check if it appears in public API
+                import time
+                time.sleep(1)  # Small delay for potential database sync
+                
+                public_response = self.session.get(f"{self.base_url}/sims")
+                if public_response.status_code == 200:
+                    public_sims = public_response.json()
+                    sim_found = any(sim.get("id") == sim_id for sim in public_sims)
+                    
+                    if sim_found:
+                        self.log_test("Sim Real-time Sync", True, "✅ Sim immediately visible in public API - Real-time sync working!")
+                        
+                        # Cleanup - delete the test sim
+                        delete_response = self.session.delete(f"{self.base_url}/sims/{sim_id}")
+                        if delete_response.status_code == 200:
+                            self.log_test("Sim Cleanup", True, "✅ Test sim deleted")
+                    else:
+                        self.log_test("Sim Real-time Sync", False, "❌ Sim NOT visible in public API - Sync issue!")
+                else:
+                    self.log_test("Sim Real-time Sync", False, f"❌ Could not check public API: {public_response.status_code}")
+            else:
+                self.log_test("Admin Sim Creation", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Sim CRUD and Sync", False, f"❌ Error: {str(e)}")
+
+    def test_admin_land_crud_and_sync(self):
+        """Test admin land CRUD and verify real-time sync with public API"""
+        print("\n🏞️ Testing Land CRUD and Real-time Sync...")
+        
+        # Create land via admin
+        land_data = {
+            "title": "SYNC TEST - Đất test real-time sync",
+            "description": "Đất test để kiểm tra đồng bộ real-time",
+            "land_type": "residential",
+            "status": "for_sale",
+            "price": 2000000000,
+            "area": 100.0,
+            "width": 10.0,
+            "length": 10.0,
+            "address": "123 Test Land Street",
+            "district": "Test District",
+            "city": "Test City",
+            "legal_status": "Sổ đỏ",
+            "contact_phone": "0901234567"
+        }
+        
+        try:
+            # Create land
+            response = self.session.post(f"{self.base_url}/lands", json=land_data)
+            if response.status_code == 200:
+                created_land = response.json()
+                land_id = created_land.get("id")
+                self.log_test("Admin Land Creation", True, f"✅ Land created: {land_id}")
+                
+                # Immediately check if it appears in public API
+                import time
+                time.sleep(1)  # Small delay for potential database sync
+                
+                public_response = self.session.get(f"{self.base_url}/lands")
+                if public_response.status_code == 200:
+                    public_lands = public_response.json()
+                    land_found = any(land.get("id") == land_id for land in public_lands)
+                    
+                    if land_found:
+                        self.log_test("Land Real-time Sync", True, "✅ Land immediately visible in public API - Real-time sync working!")
+                        
+                        # Cleanup - delete the test land
+                        delete_response = self.session.delete(f"{self.base_url}/lands/{land_id}")
+                        if delete_response.status_code == 200:
+                            self.log_test("Land Cleanup", True, "✅ Test land deleted")
+                    else:
+                        self.log_test("Land Real-time Sync", False, "❌ Land NOT visible in public API - Sync issue!")
+                else:
+                    self.log_test("Land Real-time Sync", False, f"❌ Could not check public API: {public_response.status_code}")
+            else:
+                self.log_test("Admin Land Creation", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Land CRUD and Sync", False, f"❌ Error: {str(e)}")
+
+    def test_member_dashboard_apis(self):
+        """Test member dashboard APIs"""
+        print("\n👤 Testing Member Dashboard APIs...")
+        
+        # Test member profile
+        try:
+            response = self.session.get(f"{self.base_url}/auth/me")
+            if response.status_code == 200:
+                profile = response.json()
+                self.log_test("Member Profile API", True, f"✅ Profile retrieved: {profile.get('username')}")
+            else:
+                self.log_test("Member Profile API", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Profile API", False, f"❌ Error: {str(e)}")
+        
+        # Test member posts
+        try:
+            response = self.session.get(f"{self.base_url}/member/posts")
+            if response.status_code == 200:
+                posts = response.json()
+                self.log_test("Member Posts API", True, f"✅ Retrieved {len(posts)} member posts")
+            else:
+                self.log_test("Member Posts API", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Posts API", False, f"❌ Error: {str(e)}")
+        
+        # Test wallet balance
+        try:
+            response = self.session.get(f"{self.base_url}/wallet/balance")
+            if response.status_code == 200:
+                wallet = response.json()
+                self.log_test("Member Wallet API", True, f"✅ Balance: {wallet.get('balance', 0):,.0f} VNĐ")
+            else:
+                self.log_test("Member Wallet API", False, f"❌ Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Member Wallet API", False, f"❌ Error: {str(e)}")
+
+    def print_review_summary(self):
+        """Print review-specific test summary"""
+        print("\n" + "=" * 80)
+        print("🎯 REVIEW REQUEST TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t["success"]])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {total_tests}")
+        print(f"   ✅ Passed: {passed_tests}")
+        print(f"   ❌ Failed: {failed_tests}")
+        print(f"   📈 Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        # Categorize results by test area
+        categories = {
+            "Admin Authentication": ["Admin Authentication", "Admin Role"],
+            "Sample Data": ["Sample Data"],
+            "Real-time Sync": ["Real-time Sync", "CRUD and Sync"],
+            "Member Authentication": ["Member Authentication", "Member Profile", "Member Posts", "Member Wallet"],
+            "Messages System": ["Messages System"]
+        }
+        
+        print(f"\n📋 RESULTS BY CATEGORY:")
+        for category, keywords in categories.items():
+            category_tests = [t for t in self.test_results if any(keyword in t["test"] for keyword in keywords)]
+            if category_tests:
+                category_passed = len([t for t in category_tests if t["success"]])
+                category_total = len(category_tests)
+                print(f"   {category}: {category_passed}/{category_total} ({'✅' if category_passed == category_total else '⚠️'})")
+        
+        # Critical issues
+        critical_failures = [t for t in self.test_results if not t["success"] and 
+                           any(keyword in t["test"].lower() for keyword in ["authentication", "sync", "crud"])]
+        
+        if critical_failures:
+            print(f"\n🚨 CRITICAL ISSUES:")
+            for failure in critical_failures:
+                print(f"   ❌ {failure['test']}: {failure['details']}")
+        else:
+            print(f"\n🎉 NO CRITICAL ISSUES FOUND - All core functionality working!")
+        
+        # Real-time sync verification
+        sync_tests = [t for t in self.test_results if "sync" in t["test"].lower()]
+        sync_passed = len([t for t in sync_tests if t["success"]])
+        sync_total = len(sync_tests)
+        
+        if sync_total > 0:
+            print(f"\n🔄 REAL-TIME SYNC STATUS: {sync_passed}/{sync_total} tests passed")
+            if sync_passed == sync_total:
+                print("   ✅ Real-time synchronization working correctly!")
+            else:
+                print("   ⚠️ Some synchronization issues detected")
+
 if __name__ == "__main__":
     import sys
     tester = BDSVietnamAPITester()
     
+    # Check if review request testing is requested
+    if len(sys.argv) > 1 and sys.argv[1] == "review":
+        tester.run_review_request_tests()
     # Check if admin dashboard improvements testing is requested
-    if len(sys.argv) > 1 and sys.argv[1] == "admin-dashboard":
+    elif len(sys.argv) > 1 and sys.argv[1] == "admin-dashboard":
         tester.run_admin_dashboard_improvements_testing()
     # Check if final verification mode is requested
     elif len(sys.argv) > 1 and sys.argv[1] == "final":
