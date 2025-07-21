@@ -1344,12 +1344,12 @@ const AdminDashboard = () => {
                             bedrooms: parseInt(formData.get('bedrooms')) || 0,
                             bathrooms: parseInt(formData.get('bathrooms')) || 0,
                             address: formData.get('address'),
-                            district: formData.get('district') || '',
-                            city: formData.get('city') || 'TP. Hồ Chí Minh',
+                            district: formData.get('district'),
+                            city: formData.get('city'),
                             contact_phone: formData.get('contact_phone'),
                             description: formData.get('description'),
                             featured: formData.get('featured') === 'on',
-                            status: 'available',
+                            status: 'for_sale',
                             images: images.length > 0 ? images : (editingItem?.images || [])
                           };
 
