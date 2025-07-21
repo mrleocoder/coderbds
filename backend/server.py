@@ -1330,6 +1330,52 @@ async def get_admin_dashboard_stats(current_admin: User = Depends(get_current_ad
         "top_cities": top_cities
     }
 
+# Admin Settings Routes
+@api_router.get("/admin/settings")
+async def get_site_settings(current_admin: User = Depends(get_current_admin)):
+    """Get site settings (admin only)"""
+    settings = await db.site_settings.find_one({})
+    if not settings:
+        # Return default settings
+        default_settings = SiteSettings()
+        settings_dict = default_settings.dict()
+        settings_dict.pop('id', None)  # Remove id for frontend
+        return settings_dict
+    
+    # Convert MongoDB _id to id and remove _id
+    settings['id'] = str(settings['_id'])
+    del settings['_id']
+    return settings
+
+@api_router.put("/admin/settings")
+async def update_site_settings(
+    settings_update: SiteSettingsUpdate,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Update site settings (admin only)"""
+    update_data = {k: v for k, v in settings_update.dict().items() if v is not None}
+    update_data['updated_at'] = datetime.utcnow()
+    
+    # Check if settings exist
+    existing_settings = await db.site_settings.find_one({})
+    
+    if existing_settings:
+        # Update existing settings
+        result = await db.site_settings.update_one(
+            {"_id": existing_settings["_id"]},
+            {"$set": update_data}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="Không thể cập nhật cài đặt")
+    else:
+        # Create new settings
+        new_settings = SiteSettings(**update_data)
+        settings_dict = new_settings.dict()
+        settings_dict.pop('id', None)  # Remove the id field for MongoDB
+        await db.site_settings.insert_one(settings_dict)
+    
+    return {"message": "Cập nhật cài đặt thành công"}
+
 # Property Routes
 @api_router.get("/properties", response_model=List[Property])
 async def get_properties(
