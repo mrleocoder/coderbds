@@ -1201,9 +1201,9 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {showForm && (
+                {showModal && (
                   <Modal 
-                    isOpen={showForm}
+                    isOpen={showModal}
                     onClose={() => {
                       setShowModal(false);
                       setEditingItem(null);
@@ -1433,9 +1433,9 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {showForm && (
+                {showModal && (
                   <Modal 
-                    isOpen={showForm}
+                    isOpen={showModal}
                     onClose={() => {
                       setShowModal(false);
                       setEditingItem(null);
@@ -1589,7 +1589,7 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {showForm && (
+                {showModal && (
                   <form onSubmit={handleSubmitSim} className="mb-8 p-6 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4">
                       {editingItem ? 'Sửa sim' : 'Thêm sim mới'}
@@ -1749,7 +1749,7 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {showForm && (
+                {showModal && (
                   <form onSubmit={handleSubmitLand} className="mb-8 p-6 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4">
                       {editingItem ? 'Sửa dự án đất' : 'Thêm dự án đất mới'}
@@ -1990,7 +1990,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Support Tickets</h2>
                 </div>
 
-                {showForm && editingItem && (
+                {showModal && editingItem && (
                   <form onSubmit={handleSubmitTicket} className="mb-8 p-6 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4">Cập nhật Ticket</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -2131,7 +2131,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Thành viên</h2>
                 </div>
 
-                {showForm && editingItem && (
+                {showModal && editingItem && (
                   <form onSubmit={handleSubmitMember} className="mb-8 p-6 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-semibold mb-4">Chỉnh sửa thông tin thành viên</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
