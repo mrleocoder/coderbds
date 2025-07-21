@@ -43,7 +43,8 @@ const AdminDashboard = () => {
   const [deposits, setDeposits] = useState([]);
   const [siteSettings, setSiteSettings] = useState({});
   const [memberPosts, setMemberPosts] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
   const [editingItem, setEditingItem] = useState(null);
   const [stats, setStats] = useState({});
   const [trafficData, setTrafficData] = useState([]);
