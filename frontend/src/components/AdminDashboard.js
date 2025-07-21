@@ -1403,21 +1403,49 @@ const AdminDashboard = () => {
 
                     {/* SIM Form */}
                     {modalType === 'sim' && (
-                      <form onSubmit={(e) => {
+                      <form onSubmit={async (e) => {
                         e.preventDefault();
-                        toast.success('Cập nhật SIM thành công!');
-                        closeModal();
-                        fetchAdminData();
+                        const formData = new FormData(e.target);
+                        try {
+                          const token = localStorage.getItem('token');
+                          const simData = {
+                            phone_number: formData.get('phone_number'),
+                            network: formData.get('network'),
+                            sim_type: formData.get('sim_type'),
+                            price: parseFloat(formData.get('price')),
+                            is_vip: formData.get('is_vip') === 'on',
+                            description: formData.get('description')
+                          };
+
+                          if (editingItem) {
+                            await axios.put(`${API}/admin/sims/${editingItem.id}`, simData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Cập nhật SIM thành công!');
+                          } else {
+                            await axios.post(`${API}/admin/sims`, simData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Thêm SIM thành công!');
+                          }
+                          closeModal();
+                          fetchAdminData();
+                        } catch (error) {
+                          console.error('Error saving sim:', error);
+                          toast.error('Có lỗi xảy ra khi lưu SIM!');
+                        }
                       }} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <input
                             type="text"
+                            name="phone_number"
                             placeholder="Số điện thoại"
                             defaultValue={editingItem?.phone_number || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <select
+                            name="network"
                             defaultValue={editingItem?.network || 'viettel'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1427,6 +1455,7 @@ const AdminDashboard = () => {
                             <option value="vietnamobile">Vietnamobile</option>
                           </select>
                           <select
+                            name="sim_type"
                             defaultValue={editingItem?.sim_type || 'prepaid'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1435,6 +1464,7 @@ const AdminDashboard = () => {
                           </select>
                           <input
                             type="number"
+                            name="price"
                             placeholder="Giá (VNĐ)"
                             defaultValue={editingItem?.price || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1444,6 +1474,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center space-x-4">
                           <input
                             type="checkbox"
+                            name="is_vip"
                             defaultChecked={editingItem?.is_vip || false}
                             className="mr-2"
                             id="is_vip"
@@ -1451,6 +1482,7 @@ const AdminDashboard = () => {
                           <label htmlFor="is_vip" className="text-sm text-gray-700">Sim VIP</label>
                         </div>
                         <textarea
+                          name="description"
                           placeholder="Mô tả và đặc điểm của SIM"
                           defaultValue={editingItem?.description || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
