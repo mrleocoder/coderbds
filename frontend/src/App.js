@@ -127,19 +127,35 @@ const Header = () => {
               
               {showTypeDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <Link to="/loai-hinh-bat-dong-san/apartment" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/apartment" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-building text-emerald-600 mr-2"></i>
                     Căn hộ chung cư
                   </Link>
-                  <Link to="/loai-hinh-bat-dong-san/house" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/house" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-home text-emerald-600 mr-2"></i>
                     Nhà riêng
                   </Link>
-                  <Link to="/loai-hinh-bat-dong-san/villa" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/villa" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-crown text-emerald-600 mr-2"></i>
                     Biệt thự, liền kề
                   </Link>
-                  <Link to="/loai-hinh-bat-dong-san/shophouse" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/loai-hinh-bat-dong-san/shophouse" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-store text-emerald-600 mr-2"></i>
                     Nhà mặt phố
                   </Link>
