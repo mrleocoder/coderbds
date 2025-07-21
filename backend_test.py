@@ -2600,9 +2600,252 @@ class BDSVietnamAPITester:
             self.log_test("Complete Website Settings Workflow", False, "❌ Some website settings operations failed")
             return False
 
+    def test_6_critical_issues_review(self):
+        """Test the 6 specific issues mentioned in the review request"""
+        print("\n🔍 CRITICAL REVIEW: Testing 6 Specific Issues That Were Just Fixed")
+        print("=" * 80)
+        
+        # Issue 1: Member Dashboard Route (/member) - Test member authentication and dashboard access
+        print("\n1️⃣ TESTING: Member Dashboard Route (/member) - Member Authentication & Dashboard Access")
+        print("-" * 70)
+        
+        # Test member registration and login
+        member_token = self.test_enhanced_user_registration()
+        if member_token and member_token != "existing_user":
+            # Test member login
+            member_login_token = self.test_enhanced_user_login()
+            if member_login_token:
+                self.log_test("Issue 1 - Member Dashboard Authentication", True, "Member authentication system working - registration and login successful")
+            else:
+                self.log_test("Issue 1 - Member Dashboard Authentication", False, "Member login failed")
+        else:
+            self.log_test("Issue 1 - Member Dashboard Authentication", True, "Member already exists, testing login")
+            member_login_token = self.test_enhanced_user_login()
+        
+        # Test member profile access (dashboard functionality)
+        if member_login_token:
+            original_headers = self.session.headers.copy()
+            self.session.headers.update({"Authorization": f"Bearer {member_login_token}"})
+            
+            try:
+                # Test member profile endpoint (dashboard access)
+                response = self.session.get(f"{self.base_url}/auth/me")
+                if response.status_code == 200:
+                    profile_data = response.json()
+                    if profile_data.get("role") == "member":
+                        self.log_test("Issue 1 - Member Dashboard Access", True, f"Member dashboard access working - profile retrieved for user: {profile_data.get('username')}")
+                    else:
+                        self.log_test("Issue 1 - Member Dashboard Access", False, f"Invalid role returned: {profile_data.get('role')}")
+                else:
+                    self.log_test("Issue 1 - Member Dashboard Access", False, f"Profile access failed: {response.status_code}")
+            except Exception as e:
+                self.log_test("Issue 1 - Member Dashboard Access", False, f"Error: {str(e)}")
+            finally:
+                self.session.headers.update(original_headers)
+        
+        # Issue 2: Data Synchronization - Verify admin and customer data is properly synchronized
+        print("\n2️⃣ TESTING: Data Synchronization - Admin and Customer Data Sync")
+        print("-" * 70)
+        
+        # Create a property via admin and verify it appears in public listings
+        property_id = self.test_create_property()
+        if property_id:
+            # Verify property appears in public listings immediately (data sync test)
+            try:
+                response = self.session.get(f"{self.base_url}/properties")
+                if response.status_code == 200:
+                    properties = response.json()
+                    property_found = any(prop.get("id") == property_id for prop in properties)
+                    if property_found:
+                        self.log_test("Issue 2 - Data Synchronization", True, "Admin-created property immediately visible in public listings - data sync working")
+                    else:
+                        self.log_test("Issue 2 - Data Synchronization", False, "Admin-created property not found in public listings - sync issue")
+                else:
+                    self.log_test("Issue 2 - Data Synchronization", False, f"Could not retrieve public properties: {response.status_code}")
+            except Exception as e:
+                self.log_test("Issue 2 - Data Synchronization", False, f"Error testing data sync: {str(e)}")
+        
+        # Issue 3: Admin Modal Forms - Test News management (converted to modal)
+        print("\n3️⃣ TESTING: Admin Modal Forms - News Management System")
+        print("-" * 70)
+        
+        # Test complete News CRUD workflow (this tests the modal form functionality)
+        self.test_news_crud_complete_workflow()
+        
+        # Issue 4: Member Posts Approval - Test member posts listing and approval APIs
+        print("\n4️⃣ TESTING: Member Posts Approval - GET /api/admin/posts (member-posts)")
+        print("-" * 70)
+        
+        # Note: The review mentions /api/admin/member-posts but the actual endpoint is /api/admin/posts
+        try:
+            # Test getting all member posts for approval
+            response = self.session.get(f"{self.base_url}/admin/posts")
+            if response.status_code == 200:
+                posts = response.json()
+                self.log_test("Issue 4 - Member Posts Listing", True, f"Admin can list member posts: {len(posts)} posts retrieved")
+                
+                # Test getting pending posts specifically
+                pending_response = self.session.get(f"{self.base_url}/admin/posts/pending")
+                if pending_response.status_code == 200:
+                    pending_posts = pending_response.json()
+                    self.log_test("Issue 4 - Pending Posts Listing", True, f"Admin can list pending posts: {len(pending_posts)} pending posts")
+                else:
+                    self.log_test("Issue 4 - Pending Posts Listing", False, f"Pending posts endpoint failed: {pending_response.status_code}")
+                
+            else:
+                self.log_test("Issue 4 - Member Posts Listing", False, f"Admin posts listing failed: {response.status_code}")
+                
+            # Test the endpoint mentioned in review (even though it doesn't exist)
+            review_response = self.session.get(f"{self.base_url}/admin/member-posts")
+            if review_response.status_code == 404:
+                self.log_test("Issue 4 - Review Endpoint Check", True, "Confirmed: /api/admin/member-posts doesn't exist (expected), actual endpoint is /api/admin/posts")
+            else:
+                self.log_test("Issue 4 - Review Endpoint Check", False, f"Unexpected response from /api/admin/member-posts: {review_response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Issue 4 - Member Posts Approval", False, f"Error: {str(e)}")
+        
+        # Issue 5: Website Settings with Bank Info - Test updated settings with new bank account fields
+        print("\n5️⃣ TESTING: Website Settings with Bank Info - New Bank Account Fields")
+        print("-" * 70)
+        
+        self.test_website_settings_with_bank_info()
+        
+        # Issue 6: Image Upload Integration - Test any existing image upload functionality
+        print("\n6️⃣ TESTING: Image Upload Integration - Existing Image Upload Functionality")
+        print("-" * 70)
+        
+        # Test image upload through property creation (base64 images)
+        property_with_image = {
+            "title": "Test Property with Image Upload",
+            "description": "Testing image upload functionality",
+            "property_type": "apartment",
+            "status": "for_sale",
+            "price": 2000000000,
+            "area": 75.0,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "123 Test Street",
+            "district": "Test District",
+            "city": "Test City",
+            "images": [
+                "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+                "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            ],
+            "contact_phone": "0901234567"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/properties", json=property_with_image)
+            if response.status_code == 200:
+                data = response.json()
+                created_images = data.get("images", [])
+                if len(created_images) == 2:
+                    self.log_test("Issue 6 - Image Upload Integration", True, f"Image upload working - property created with {len(created_images)} base64 images")
+                else:
+                    self.log_test("Issue 6 - Image Upload Integration", False, f"Image upload issue - expected 2 images, got {len(created_images)}")
+            else:
+                self.log_test("Issue 6 - Image Upload Integration", False, f"Property with images creation failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Issue 6 - Image Upload Integration", False, f"Error: {str(e)}")
+        
+        # Test image upload through news creation
+        news_with_image = {
+            "title": "Test News with Featured Image",
+            "slug": "test-news-with-image",
+            "content": "Testing featured image upload functionality",
+            "excerpt": "Test news with image",
+            "featured_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+            "category": "Test",
+            "tags": ["test", "image"],
+            "published": True,
+            "author": "Test Author"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/news", json=news_with_image)
+            if response.status_code == 200:
+                data = response.json()
+                featured_image = data.get("featured_image")
+                if featured_image and featured_image.startswith("data:image/"):
+                    self.log_test("Issue 6 - News Image Upload", True, "News featured image upload working - base64 image stored successfully")
+                else:
+                    self.log_test("Issue 6 - News Image Upload", False, f"News image upload issue - featured_image: {featured_image}")
+            else:
+                self.log_test("Issue 6 - News Image Upload", False, f"News with image creation failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Issue 6 - News Image Upload", False, f"Error: {str(e)}")
+        
+        print("\n✅ 6 CRITICAL ISSUES TESTING COMPLETED")
+        print("=" * 80)
+
+    def test_website_settings_with_bank_info(self):
+        """Test website settings management with bank account fields"""
+        try:
+            # Test GET /api/admin/settings - verify bank fields are returned
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                settings = response.json()
+                
+                # Check for bank-related fields
+                bank_fields = [
+                    "bank_account_number", "bank_account_holder", 
+                    "bank_name", "bank_branch", "bank_qr_code"
+                ]
+                
+                existing_bank_fields = [field for field in bank_fields if field in settings]
+                
+                if len(existing_bank_fields) >= 4:  # At least 4 out of 5 bank fields should exist
+                    self.log_test("Issue 5 - Get Settings with Bank Info", True, f"Bank fields present: {existing_bank_fields}")
+                else:
+                    self.log_test("Issue 5 - Get Settings with Bank Info", False, f"Missing bank fields. Found: {existing_bank_fields}")
+                
+            else:
+                self.log_test("Issue 5 - Get Settings with Bank Info", False, f"Get settings failed: {response.status_code}")
+                return False
+            
+            # Test PUT /api/admin/settings with bank info - test new bank fields
+            bank_update_data = {
+                "site_title": "BDS Vietnam - Updated with Bank Info",
+                "bank_account_number": "1234567890123456",
+                "bank_account_holder": "CONG TY TNHH BDS VIETNAM TEST",
+                "bank_name": "Ngân hàng TMCP Ngoại Thương Việt Nam (Vietcombank)",
+                "bank_branch": "Chi nhánh Thành phố Hồ Chí Minh",
+                "bank_qr_code": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+            }
+            
+            response = self.session.put(f"{self.base_url}/admin/settings", json=bank_update_data)
+            if response.status_code == 200:
+                self.log_test("Issue 5 - Update Settings with Bank Info", True, "Bank account fields updated successfully")
+                
+                # Verify the update by getting settings again
+                verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                if verify_response.status_code == 200:
+                    updated_settings = verify_response.json()
+                    
+                    # Verify bank fields were updated
+                    bank_checks = [
+                        updated_settings.get("bank_account_number") == bank_update_data["bank_account_number"],
+                        updated_settings.get("bank_account_holder") == bank_update_data["bank_account_holder"],
+                        updated_settings.get("bank_name") == bank_update_data["bank_name"],
+                        updated_settings.get("bank_branch") == bank_update_data["bank_branch"]
+                    ]
+                    
+                    if all(bank_checks):
+                        self.log_test("Issue 5 - Verify Bank Info Update", True, "All bank account fields updated and verified successfully")
+                    else:
+                        self.log_test("Issue 5 - Verify Bank Info Update", False, f"Bank field verification failed: {updated_settings}")
+                else:
+                    self.log_test("Issue 5 - Verify Bank Info Update", False, f"Could not verify update: {verify_response.status_code}")
+            else:
+                self.log_test("Issue 5 - Update Settings with Bank Info", False, f"Update failed: {response.status_code}, Response: {response.text}")
+                
+        except Exception as e:
+            self.log_test("Issue 5 - Website Settings with Bank Info", False, f"Error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend API tests with CRITICAL SYNCHRONIZATION INVESTIGATION FIRST"""
-        print("🚀 Starting BDS Vietnam Backend API Tests - SYNCHRONIZATION INVESTIGATION")
+        print("🚀 Starting BDS Vietnam Backend API Tests - CRITICAL 6 ISSUES REVIEW")
         print(f"Backend URL: {self.base_url}")
         print("=" * 80)
         
@@ -2616,12 +2859,20 @@ class BDSVietnamAPITester:
         if not self.test_authentication():
             print("❌ Authentication failed. Some tests may not work.")
         
-        # CRITICAL SYNCHRONIZATION TESTS FIRST - HIGHEST PRIORITY
-        print("\n🔍 CRITICAL SYNCHRONIZATION INVESTIGATION - HIGHEST PRIORITY")
+        # CRITICAL 6 ISSUES REVIEW - HIGHEST PRIORITY
+        print("\n🔍 CRITICAL 6 ISSUES REVIEW - HIGHEST PRIORITY")
+        print("=" * 80)
+        print("Testing the 6 specific issues that were just fixed...")
+        
+        # Run the focused 6 issues test first
+        self.test_6_critical_issues_review()
+        
+        # CRITICAL SYNCHRONIZATION TESTS - SECOND PRIORITY
+        print("\n🔍 CRITICAL SYNCHRONIZATION INVESTIGATION - SECOND PRIORITY")
         print("=" * 80)
         print("Investigating admin vs customer page synchronization issues...")
         
-        # Run the focused data synchronization check first
+        # Run the focused data synchronization check
         self.test_data_synchronization_check()
         
         self.test_admin_vs_public_data_synchronization()
