@@ -19,6 +19,59 @@ const ContactForm = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
+  // If user is not logged in, show auth modal first
+  if (!user && !showAuth) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+              <i className="fas fa-user-lock text-blue-600 text-lg"></i>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Yêu cầu đăng nhập
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Bạn cần đăng nhập hoặc đăng ký tài khoản để gửi liên hệ với chúng tôi.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowAuth(true)}
+                className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+              >
+                <i className="fas fa-sign-in-alt mr-2"></i>
+                Đăng nhập / Đăng ký
+              </button>
+              <button
+                onClick={onClose}
+                className="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <i className="fas fa-times mr-2"></i>
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth modal if user clicked login
+  if (!user && showAuth) {
+    return (
+      <MemberAuth 
+        onClose={() => {
+          setShowAuth(false);
+          onClose();
+        }} 
+        onSuccess={() => {
+          setShowAuth(false);
+          // Don't close the contact form, let user use it
+        }}
+      />
+    );
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
