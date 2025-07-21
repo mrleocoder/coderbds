@@ -392,6 +392,22 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`${API}/admin/settings`, siteSettings, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Cập nhật cài đặt website thành công!');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast.error('Có lỗi xảy ra khi lưu cài đặt');
+    }
+  };
+
   const handleApproveMemberPost = async (postId, action) => {
     try {
       const token = localStorage.getItem('token');
