@@ -369,23 +369,19 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApproveDeposit = async (depositId, action, amount = null) => {
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const data = { status: action };
-      if (action === 'approved' && amount) {
-        data.amount = amount;
-      }
-      
-      await axios.put(`${API}/admin/deposits/${depositId}/approve`, data, {
+      await axios.put(`${API}/admin/settings`, siteSettings, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      toast.success(action === 'approved' ? 'Duyệt nạp tiền thành công!' : 'Từ chối yêu cầu thành công!');
+      toast.success('Cập nhật cài đặt website thành công!');
       fetchAdminData();
     } catch (error) {
-      console.error('Error processing deposit:', error);
-      toast.error('Có lỗi xảy ra khi xử lý yêu cầu nạp tiền');
+      console.error('Error saving settings:', error);
+      toast.error('Có lỗi xảy ra khi lưu cài đặt');
     }
   };
 
