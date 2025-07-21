@@ -112,21 +112,59 @@ const MemberDashboard = () => {
     }
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error('Vui lòng chọn file ảnh (jpg, png, gif)');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDepositForm(prev => ({
+          ...prev,
+          transfer_bill: reader.result,
+          transfer_bill_preview: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleDeposit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API}/wallet/deposit`, depositForm, {
+      
+      const depositData = {
+        ...depositForm,
+        amount: parseFloat(depositForm.amount),
+        transfer_content: `${user.username} ${depositForm.amount}`
+      };
+      
+      await axios.post(`${API}/wallet/deposit`, depositData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      alert('Yêu cầu nạp tiền đã được gửi! Chờ admin duyệt.');
+      toast.success('Yêu cầu nạp tiền đã được gửi thành công! Vui lòng chờ admin duyệt.');
       setShowDepositForm(false);
-      setDepositForm({ amount: '', description: 'Nạp tiền vào tài khoản' });
+      setDepositStep(1);
+      setDepositForm({ 
+        amount: '', 
+        description: 'Nạp tiền vào tài khoản',
+        transfer_bill: null,
+        transfer_bill_preview: null
+      });
       fetchMemberData();
     } catch (error) {
       console.error('Error requesting deposit:', error);
-      alert('Có lỗi xảy ra khi gửi yêu cầu nạp tiền');
+      toast.error('Có lỗi xảy ra khi gửi yêu cầu nạp tiền');
     }
   };
 
