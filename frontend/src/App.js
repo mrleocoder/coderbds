@@ -1830,7 +1830,6 @@ const FAQSection = () => {
   // Tạo unique key cho mỗi FAQ item
   const handleFaqToggle = (index) => {
     const uniqueKey = `${activeCategory}-${index}`;
-    console.log('FAQ Toggle:', { index, activeCategory, uniqueKey, currentOpenIndex: openIndex });
     setOpenIndex(openIndex === uniqueKey ? null : uniqueKey);
   };
 
