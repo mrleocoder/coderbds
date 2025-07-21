@@ -140,10 +140,10 @@ const AdminDashboard = () => {
       console.log('Fetching admin data with token:', !!token);
       
       const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, membersRes, depositsRes, memberPostsRes, settingsRes, statsRes] = await Promise.all([
-        axios.get(`${API}/properties?limit=50`),
-        axios.get(`${API}/news?limit=50`),
-        axios.get(`${API}/sims?limit=50`),
-        axios.get(`${API}/lands?limit=50`),
+        axios.get(`${API}/properties?limit=50`, { headers }),
+        axios.get(`${API}/news?limit=50`, { headers }),
+        axios.get(`${API}/sims?limit=50`, { headers }),
+        axios.get(`${API}/lands?limit=50`, { headers }),
         axios.get(`${API}/tickets?limit=50`, { headers }),
         axios.get(`${API}/admin/members?limit=50`, { headers }),
         axios.get(`${API}/admin/deposits?limit=50`, { headers }),
@@ -160,6 +160,7 @@ const AdminDashboard = () => {
         tickets: ticketsRes.data?.length,
         members: membersRes.data?.length,
         deposits: depositsRes.data?.length,
+        memberPosts: memberPostsRes.data?.length,
         settings: settingsRes.data ? 'loaded' : 'empty',
         stats: statsRes.data
       });
@@ -181,7 +182,12 @@ const AdminDashboard = () => {
         contact_address: '123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh',
         logo_url: '',
         favicon_url: '',
-        banner_image: ''
+        banner_image: '',
+        bank_account_number: '1234567890',
+        bank_account_holder: 'CONG TY TNHH BDS VIET NAM',
+        bank_name: 'Ngân hàng Vietcombank',
+        bank_branch: 'Chi nhánh TP.HCM',
+        bank_qr_code: ''
       });
       setStats(statsRes.data || {});
       
