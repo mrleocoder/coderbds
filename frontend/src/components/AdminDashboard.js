@@ -443,7 +443,7 @@ const AdminDashboard = () => {
       console.error('Error in modal submit:', error);
       toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
     }
-  };
+  const handleSubmitLand = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
@@ -451,8 +451,10 @@ const AdminDashboard = () => {
       
       if (editingItem) {
         await axios.put(`${API}/lands/${editingItem.id}`, landForm, { headers });
+        toast.success('Cập nhật đất thành công!');
       } else {
         await axios.post(`${API}/lands`, landForm, { headers });
+        toast.success('Thêm đất mới thành công!');
       }
       fetchAdminData();
       setShowModal(false);
@@ -460,7 +462,7 @@ const AdminDashboard = () => {
       resetLandForm();
     } catch (error) {
       console.error('Error submitting land:', error);
-      alert('Có lỗi xảy ra khi lưu đất');
+      toast.error('Có lỗi xảy ra khi lưu đất. Vui lòng thử lại.');
     }
   };
 
