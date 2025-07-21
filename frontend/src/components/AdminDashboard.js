@@ -2009,6 +2009,125 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Deposits Tab */}
+            {activeTab === 'deposits' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Duyệt nạp tiền</h2>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <span>Chờ duyệt ({deposits.filter(d => d.status === 'pending').length})</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Đã duyệt ({deposits.filter(d => d.status === 'approved').length})</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span>Từ chối ({deposits.filter(d => d.status === 'rejected').length})</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {deposits.length > 0 ? deposits
+                    .sort((a, b) => {
+                      // Sort by status (pending first) and then by date
+                      if (a.status !== b.status) {
+                        if (a.status === 'pending') return -1;
+                        if (b.status === 'pending') return 1;
+                        return 0;
+                      }
+                      return new Date(b.created_at) - new Date(a.created_at);
+                    })
+                    .map((deposit) => (
+                    <div key={deposit.id} className={`border rounded-lg p-6 transition-colors ${
+                      deposit.status === 'pending' ? 'border-yellow-200 bg-yellow-50' :
+                      deposit.status === 'approved' ? 'border-green-200 bg-green-50' :
+                      'border-red-200 bg-red-50'
+                    }`}>
+                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <h3 className="font-semibold text-lg">
+                              {deposit.user?.username || 'N/A'} - {deposit.amount?.toLocaleString()} VNĐ
+                            </h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              deposit.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              deposit.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {deposit.status === 'pending' ? 'Chờ duyệt' : 
+                               deposit.status === 'approved' ? 'Đã duyệt' : 'Từ chối'}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+                            <div>
+                              <p><strong>Email:</strong> {deposit.user?.email || 'N/A'}</p>
+                              <p><strong>Nội dung CK:</strong> <span className="font-mono">{deposit.transfer_content || 'N/A'}</span></p>
+                              <p><strong>Mô tả:</strong> {deposit.description || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <p><strong>Thời gian:</strong> {new Date(deposit.created_at).toLocaleString('vi-VN')}</p>
+                              {deposit.processed_at && (
+                                <p><strong>Xử lý lúc:</strong> {new Date(deposit.processed_at).toLocaleString('vi-VN')}</p>
+                              )}
+                              {deposit.admin_notes && (
+                                <p><strong>Ghi chú admin:</strong> {deposit.admin_notes}</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {deposit.transfer_bill && (
+                            <div className="mb-4">
+                              <p className="font-medium text-sm text-gray-700 mb-2">Bill chuyển tiền:</p>
+                              <img 
+                                src={deposit.transfer_bill} 
+                                alt="Transfer bill" 
+                                className="max-w-xs max-h-48 border border-gray-200 rounded-lg shadow-sm cursor-pointer"
+                                onClick={() => window.open(deposit.transfer_bill, '_blank')}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {deposit.status === 'pending' && (
+                          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                            <button
+                              onClick={() => handleApproveDeposit(deposit.id, 'approved', deposit.amount)}
+                              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                            >
+                              <i className="fas fa-check mr-2"></i>
+                              Duyệt
+                            </button>
+                            <button
+                              onClick={() => {
+                                const reason = window.prompt('Lý do từ chối:');
+                                if (reason) {
+                                  handleApproveDeposit(deposit.id, 'rejected');
+                                }
+                              }}
+                              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                            >
+                              <i className="fas fa-times mr-2"></i>
+                              Từ chối
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-12">
+                      <i className="fas fa-coins text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có yêu cầu nạp tiền nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
               <div className="space-y-6">
