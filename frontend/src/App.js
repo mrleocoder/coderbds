@@ -2097,40 +2097,42 @@ const Footer = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<><Header /><HomePage /><Footer /></>} />
-            <Route path="/page/:id" element={<><Header /><PropertyDetailPage /><Footer /></>} />
-            <Route path="/post/:id" element={<><Header /><NewsDetailPage /><Footer /></>} />
-            <Route path="/tin-tuc" element={<><Header /><NewsListPage /><Footer /></>} />
-            <Route path="/tim-kiem" element={<><Header /><SearchResultsPage /><Footer /></>} />
-            <Route path="/bds/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
-            <Route path="/loai-hinh/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
-            <Route path="/dat/:filterType" element={<><Header /><LandFilterPage /><Footer /></>} />
-            <Route path="/land/:id" element={<><Header /><LandDetailPage /><Footer /></>} />
-            <Route path="/kho-sim" element={<><Header /><SimStorePage /><Footer /></>} />
-            <Route path="/lien-he" element={<><Header /><ContactPage /><Footer /></>} />
+      <ToastProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<><Header /><HomePage /><Footer /></>} />
+              <Route path="/page/:id" element={<><Header /><PropertyDetailPage /><Footer /></>} />
+              <Route path="/post/:id" element={<><Header /><NewsDetailPage /><Footer /></>} />
+              <Route path="/tin-tuc" element={<><Header /><NewsListPage /><Footer /></>} />
+              <Route path="/tim-kiem" element={<><Header /><SearchResultsPage /><Footer /></>} />
+              <Route path="/bds/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+              <Route path="/loai-hinh/:filterType" element={<><Header /><PropertyFilterPage /><Footer /></>} />
+              <Route path="/dat/:filterType" element={<><Header /><LandFilterPage /><Footer /></>} />
+              <Route path="/land/:id" element={<><Header /><LandDetailPage /><Footer /></>} />
+              <Route path="/kho-sim" element={<><Header /><SimStorePage /><Footer /></>} />
+              <Route path="/lien-he" element={<><Header /><ContactPage /><Footer /></>} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<LoginPage />} />
+              <Route path="/admin" element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/member" element={
+                <ProtectedRoute memberOnly={true}>
+                  <MemberDashboard />
+                </ProtectedRoute>
+              } />
+            </Routes>
             
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<LoginPage />} />
-            <Route path="/admin" element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/member" element={
-              <ProtectedRoute memberOnly={true}>
-                <MemberDashboard />
-              </ProtectedRoute>
-            } />
-          </Routes>
-          
-          {/* FontAwesome CDN */}
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-        </div>
-      </Router>
+            {/* FontAwesome CDN */}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+          </div>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
