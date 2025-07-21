@@ -272,7 +272,7 @@ const AdminDashboard = () => {
         await axios.post(`${API}/news`, formWithSlug, { headers });
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetNewsForm();
     } catch (error) {
