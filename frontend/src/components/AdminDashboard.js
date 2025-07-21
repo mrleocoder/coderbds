@@ -524,12 +524,60 @@ const AdminDashboard = () => {
                       <i className="fas fa-chart-pie text-emerald-600 mr-2"></i>
                       Phân bố loại BDS
                     </h3>
-                    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                      <div className="text-center">
-                        <i className="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
-                        <p className="text-gray-500">Biểu đồ phân bố BDS</p>
-                        <p className="text-sm text-gray-400">Coming soon...</p>
-                      </div>
+                    <div className="h-64">
+                      {properties.length > 0 ? (
+                        <Bar
+                          data={{
+                            labels: ['Căn hộ', 'Nhà phố', 'Biệt thự', 'Shophouse'],
+                            datasets: [{
+                              label: 'Số lượng',
+                              data: [
+                                properties.filter(p => p.property_type === 'apartment').length,
+                                properties.filter(p => p.property_type === 'house').length,
+                                properties.filter(p => p.property_type === 'villa').length,
+                                properties.filter(p => p.property_type === 'shophouse').length
+                              ],
+                              backgroundColor: [
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                              ],
+                              borderColor: [
+                                'rgb(16, 185, 129)',
+                                'rgb(59, 130, 246)',
+                                'rgb(245, 158, 11)',
+                                'rgb(239, 68, 68)'
+                              ],
+                              borderWidth: 1
+                            }]
+                          }}
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                display: false
+                              }
+                            },
+                            scales: {
+                              y: {
+                                beginAtZero: true,
+                                ticks: {
+                                  stepSize: 1
+                                }
+                              }
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                          <div className="text-center">
+                            <i className="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
+                            <p className="text-gray-500">Chưa có dữ liệu BDS</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
