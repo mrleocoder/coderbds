@@ -49,6 +49,7 @@ const AdminDashboard = () => {
   const [trafficData, setTrafficData] = useState([]);
   const [popularPages, setPopularPages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const { user, logout } = useAuth();
   const toast = useToast();
 
