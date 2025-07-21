@@ -924,9 +924,9 @@ const AdminDashboard = () => {
                         <div className="flex space-x-2">
                           <button
                             onClick={() => openModal('ticket', ticket)}
-                            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
                           >
-                            <i className="fas fa-check"></i>
+                            <i className="fas fa-edit"></i> Chỉnh sửa
                           </button>
                         </div>
                       </div>
