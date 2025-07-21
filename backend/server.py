@@ -1401,6 +1401,20 @@ async def get_admin_dashboard_stats(current_admin: User = Depends(get_current_ad
         "top_cities": top_cities
     }
 
+# Public Settings API (không cần authentication)
+@api_router.get("/settings", response_model=dict)
+async def get_public_site_settings():
+    """Get site settings for public use"""
+    settings = await db.site_settings.find_one()
+    if not settings:
+        # Return default settings if none exist
+        default_settings = SiteSettings()
+        return default_settings.dict()
+    
+    # Remove sensitive fields for public access
+    public_settings = {k: v for k, v in settings.items() if not k.startswith('_')}
+    return public_settings
+
 # Admin Settings Routes
 @api_router.get("/admin/settings")
 async def get_site_settings(current_admin: User = Depends(get_current_admin)):
