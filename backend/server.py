@@ -2059,8 +2059,8 @@ async def mark_message_read(message_id: str, current_user: User = Depends(get_cu
 
 @api_router.get("/admin/messages/unread", response_model=dict)
 async def get_unread_messages_count(current_admin: User = Depends(get_current_admin)):
-    count = db.messages.count_documents({
-        "to_user_id": current_admin["id"],
+    count = await db.messages.count_documents({
+        "to_user_id": current_admin.id,
         "read": False
     })
     
