@@ -181,11 +181,19 @@ const Header = () => {
               
               {showLandDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <Link to="/dat/for_sale" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/dat/for_sale" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-tag text-emerald-600 mr-2"></i>
                     Đất bán
                   </Link>
-                  <Link to="/dat/for_rent" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/dat/for_rent" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-handshake text-emerald-600 mr-2"></i>
                     Đất thuê
                   </Link>
