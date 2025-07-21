@@ -22,6 +22,7 @@ const Header = () => {
   const [showPropertyDropdown, setShowPropertyDropdown] = useState(false);
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
   const [showLandDropdown, setShowLandDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [showMemberAuth, setShowMemberAuth] = useState(false);
@@ -30,6 +31,7 @@ const Header = () => {
   const [showMobilePropertyDropdown, setShowMobilePropertyDropdown] = useState(false);
   const [showMobileTypeDropdown, setShowMobileTypeDropdown] = useState(false);
   const [showMobileLandDropdown, setShowMobileLandDropdown] = useState(false);
+  const [showMobileCategoryDropdown, setShowMobileCategoryDropdown] = useState(false);
   
   const { user, isAuthenticated, logout } = useAuth();
 
