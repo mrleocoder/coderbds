@@ -269,6 +269,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ WEBSITE SETTINGS ENDPOINTS FULLY WORKING: Comprehensive testing completed with 7/7 tests passing (100% success rate). TESTING RESULTS: ✅ GET /api/admin/settings - Settings retrieval working perfectly with all required fields (site_title, site_description, contact_email, contact_phone, contact_address, updated_at). Returns default settings when none exist: 'BDS Việt Nam', 'Premium Real Estate Platform', 'info@bdsvietnam.com', '1900 123 456'. ✅ PUT /api/admin/settings - Settings update working correctly with test data: site_title='TEST - BDS Việt Nam Updated', site_description='Updated description for testing', contact_email='test@updated.com', contact_phone='1900 999 888'. ✅ ADMIN AUTHENTICATION: Properly enforced - unauthorized access blocked with 403 Forbidden for both GET and PUT endpoints. ✅ DATA PERSISTENCE: Settings updates are immediately retrievable and persist correctly. ✅ PROPER RESPONSE FORMAT: Returns success message 'Cập nhật cài đặt thành công' and proper JSON structure. All requirements met: admin authentication required, default settings returned when none exist, settings update working correctly, proper response format."
+      - working: true
+        agent: "testing"
+        comment: "✅ FINAL VERIFICATION - ISSUE 5 RESOLVED: Website settings with bank info fully working. All bank fields present (bank_account_number, bank_account_holder, bank_name, bank_branch), bank fields update working correctly. GET /api/admin/settings returns all required bank fields, PUT /api/admin/settings successfully updates bank information with proper verification."
 
 frontend:
   - task: "Professional header with navigation"
