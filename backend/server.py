@@ -2047,8 +2047,8 @@ async def get_messages(
 
 @api_router.put("/messages/{message_id}/read", response_model=dict)
 async def mark_message_read(message_id: str, current_user: User = Depends(get_current_user)):
-    result = db.messages.update_one(
-        {"id": message_id, "to_user_id": current_user["id"]},
+    result = await db.messages.update_one(
+        {"id": message_id, "to_user_id": current_user.id},
         {"$set": {"read": True, "updated_at": datetime.utcnow()}}
     )
     
