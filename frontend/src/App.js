@@ -37,6 +37,21 @@ const Header = () => {
   
   const { user, isAuthenticated, logout } = useAuth();
 
+  // Helper functions để đóng tất cả dropdowns
+  const closeAllDropdowns = () => {
+    setShowPropertyDropdown(false);
+    setShowTypeDropdown(false);
+    setShowLandDropdown(false);
+    setShowCategoryDropdown(false);
+  };
+
+  const closeAllMobileDropdowns = () => {
+    setShowMobilePropertyDropdown(false);
+    setShowMobileTypeDropdown(false);
+    setShowMobileLandDropdown(false);
+    setShowMobileCategoryDropdown(false);
+  };
+
   return (
     <>
     <header className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
