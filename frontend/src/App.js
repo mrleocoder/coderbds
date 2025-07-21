@@ -349,35 +349,45 @@ const Header = () => {
                 </div>
               )}
             </div>
-            
-            <Link 
-              to="/kho-sim" 
-              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <i className="fas fa-sim-card"></i>
-              <span>Kho Sim</span>
-            </Link>
-            
-            <Link 
-              to="/tin-tuc" 
-              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2"
-              onClick={() => setShowMobileMenu(false)}
-            >
-              <i className="fas fa-newspaper"></i>
-              <span>Tin tức</span>
-            </Link>
-            
-            <button 
-              onClick={() => {
-                setShowContactForm(true);
-                setShowMobileMenu(false);
-              }}
-              className="block py-2 text-white hover:text-emerald-200 transition-colors flex items-center space-x-2 w-full text-left"
-            >
-              <i className="fas fa-envelope"></i>
-              <span>Liên hệ</span>
-            </button>
+
+            {/* Category Accordion Mobile (Danh mục) */}
+            <div className="py-1">
+              <button
+                onClick={() => setShowMobileCategoryDropdown(!showMobileCategoryDropdown)}
+                className="w-full text-left py-2 text-emerald-200 text-sm font-medium flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <i className="fas fa-th-list mr-2"></i>
+                  Danh mục
+                </div>
+                <i className={`fas fa-chevron-${showMobileCategoryDropdown ? 'up' : 'down'} text-xs`}></i>
+              </button>
+              {showMobileCategoryDropdown && (
+                <div className="pl-6 space-y-1 mt-1">
+                  <Link 
+                    to="/kho-sim" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Kho Sim
+                  </Link>
+                  <Link 
+                    to="/tin-tuc" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Tin tức
+                  </Link>
+                  <Link 
+                    to="/lien-he" 
+                    className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    • Liên hệ
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {/* User Authentication Mobile */}
             <div className="border-t border-emerald-600 pt-2 mt-2">
