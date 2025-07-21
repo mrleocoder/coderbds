@@ -335,22 +335,23 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLockUnlockMember = async (memberId, currentStatus) => {
-    const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
-    const action = currentStatus === 'active' ? 'khóa' : 'mở khóa';
-    
-    if (window.confirm(`Bạn có chắc chắn muốn ${action} tài khoản này?`)) {
-      try {
-        const token = localStorage.getItem('token');
-        await axios.put(`${API}/admin/users/${memberId}/status`, 
-          { status: newStatus },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        fetchAdminData();
-      } catch (error) {
-        console.error('Error updating member status:', error);
-        alert(`Có lỗi xảy ra khi ${action} tài khoản`);
+  const handleApproveDeposit = async (depositId, action, amount = null) => {
+    try {
+      const token = localStorage.getItem('token');
+      const data = { status: action };
+      if (action === 'approved' && amount) {
+        data.amount = amount;
       }
+      
+      await axios.put(`${API}/admin/deposits/${depositId}/approve`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success(action === 'approved' ? 'Duyệt nạp tiền thành công!' : 'Từ chối yêu cầu thành công!');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Error processing deposit:', error);
+      toast.error('Có lỗi xảy ra khi xử lý yêu cầu nạp tiền');
     }
   };
 
