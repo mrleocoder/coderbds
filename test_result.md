@@ -255,6 +255,21 @@ backend:
         agent: "testing"
         comment: "✅ ADMIN LANDS CRUD AUTHORIZATION FIX VERIFIED: Tested admin lands CRUD operations after authorization fix. All operations working perfectly with admin authentication (get_current_admin): CREATE (POST) ✅, UPDATE (PUT) ✅, DELETE ✅. No 403 Forbidden errors found. Authorization fix successful."
 
+  - task: "Website Settings Management API endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Need to implement website settings management endpoints for admin to configure site title, description, contact info, etc."
+      - working: true
+        agent: "testing"
+        comment: "✅ WEBSITE SETTINGS ENDPOINTS FULLY WORKING: Comprehensive testing completed with 7/7 tests passing (100% success rate). TESTING RESULTS: ✅ GET /api/admin/settings - Settings retrieval working perfectly with all required fields (site_title, site_description, contact_email, contact_phone, contact_address, updated_at). Returns default settings when none exist: 'BDS Việt Nam', 'Premium Real Estate Platform', 'info@bdsvietnam.com', '1900 123 456'. ✅ PUT /api/admin/settings - Settings update working correctly with test data: site_title='TEST - BDS Việt Nam Updated', site_description='Updated description for testing', contact_email='test@updated.com', contact_phone='1900 999 888'. ✅ ADMIN AUTHENTICATION: Properly enforced - unauthorized access blocked with 403 Forbidden for both GET and PUT endpoints. ✅ DATA PERSISTENCE: Settings updates are immediately retrievable and persist correctly. ✅ PROPER RESPONSE FORMAT: Returns success message 'Cập nhật cài đặt thành công' and proper JSON structure. All requirements met: admin authentication required, default settings returned when none exist, settings update working correctly, proper response format."
+
 frontend:
   - task: "Professional header with navigation"
     implemented: true
