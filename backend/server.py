@@ -2013,8 +2013,8 @@ async def delete_ticket(ticket_id: str, current_user: User = Depends(get_current
 @api_router.post("/messages", response_model=dict)
 async def create_message(message: MessageCreate, current_user: User = Depends(get_current_user)):
     message_data = message.dict()
-    message_data["from_user_id"] = current_user["id"]
-    message_data["from_type"] = current_user["role"]
+    message_data["from_user_id"] = current_user.id
+    message_data["from_type"] = current_user.role
     
     # Insert into database
     result = db.messages.insert_one(Message(**message_data).dict())
