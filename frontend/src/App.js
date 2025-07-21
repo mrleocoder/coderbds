@@ -2222,8 +2222,8 @@ const Footer = () => {
             <div className="flex items-center space-x-2 mb-4">
               <i className="fas fa-home text-2xl text-emerald-400"></i>
               <div>
-                <h3 className="text-xl font-bold">BDS Việt Nam</h3>
-                <p className="text-sm text-gray-300">Premium Real Estate</p>
+                <h3 className="text-xl font-bold">{siteSettings.site_title || 'BDS Việt Nam'}</h3>
+                <p className="text-sm text-gray-300">{siteSettings.company_name || 'Premium Real Estate'}</p>
               </div>
             </div>
             <p className="text-gray-300 leading-relaxed mb-4">
