@@ -1741,6 +1741,18 @@ const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null);
   const [activeCategory, setActiveCategory] = useState('real-estate');
 
+  // Reset openIndex khi chuyển category
+  const handleCategoryChange = (newCategory) => {
+    setActiveCategory(newCategory);
+    setOpenIndex(null); // Reset để không có câu hỏi nào mở
+  };
+
+  // Tạo unique key cho mỗi FAQ item
+  const handleFaqToggle = (index) => {
+    const uniqueKey = `${activeCategory}-${index}`;
+    setOpenIndex(openIndex === uniqueKey ? null : uniqueKey);
+  };
+
   const faqCategories = {
     'real-estate': {
       title: 'Bất động sản',
