@@ -527,6 +527,17 @@ const AdminDashboard = () => {
                           value={siteSettings.site_title || ''}
                           onChange={(e) => setSiteSettings({...siteSettings, site_title: e.target.value})}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="BDS Việt Nam"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Tên công ty</label>
+                        <input
+                          type="text"
+                          value={siteSettings.company_name || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, company_name: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="Công ty TNHH BDS Việt Nam"
                         />
                       </div>
                       <div>
@@ -536,7 +547,88 @@ const AdminDashboard = () => {
                           value={siteSettings.contact_email || ''}
                           onChange={(e) => setSiteSettings({...siteSettings, contact_email: e.target.value})}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="contact@bds-vietnam.com"
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                        <input
+                          type="tel"
+                          value={siteSettings.contact_phone || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, contact_phone: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="0901234567"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Địa chỉ công ty</label>
+                        <textarea
+                          value={siteSettings.company_address || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, company_address: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="2"
+                          placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP.HCM"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả website</label>
+                        <textarea
+                          value={siteSettings.site_description || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, site_description: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          rows="3"
+                          placeholder="Website chuyên về bất động sản tại Việt Nam..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Bank Information Section */}
+                    <div className="border-t pt-6">
+                      <h3 className="text-lg font-medium text-gray-800 mb-4">Thông tin ngân hàng</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Tên ngân hàng</label>
+                          <input
+                            type="text"
+                            value={siteSettings.bank_name || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, bank_name: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="Vietcombank"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Số tài khoản</label>
+                          <input
+                            type="text"
+                            value={siteSettings.bank_account_number || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, bank_account_number: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="1234567890123"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Tên chủ tài khoản</label>
+                          <input
+                            type="text"
+                            value={siteSettings.bank_account_name || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, bank_account_name: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="NGUYEN VAN A"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Chi nhánh</label>
+                          <input
+                            type="text"
+                            value={siteSettings.bank_branch || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, bank_branch: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="Chi nhánh TP.HCM"
+                          />
+                        </div>
                       </div>
                     </div>
                     
