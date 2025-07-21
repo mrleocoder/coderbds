@@ -314,7 +314,7 @@ const AdminDashboard = () => {
         await axios.post(`${API}/lands`, landForm, { headers });
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetLandForm();
     } catch (error) {
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
         });
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetTicketForm();
     } catch (error) {
@@ -352,7 +352,7 @@ const AdminDashboard = () => {
         });
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetMemberForm();
     } catch (error) {
@@ -516,7 +516,7 @@ const AdminDashboard = () => {
         email_verified: item.email_verified || false
       });
     }
-    setShowForm(true);
+    setShowModal(true);
   };
 
   const resetPropertyForm = () => {
@@ -705,7 +705,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('overview');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -718,7 +718,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('properties');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -731,7 +731,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('news');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -744,7 +744,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('sims');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -757,7 +757,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('lands');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -770,7 +770,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('deposits');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -783,7 +783,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('member-posts');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -796,7 +796,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('members');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -809,7 +809,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('tickets');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -822,7 +822,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('settings');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -835,7 +835,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('analytics');
-                  setShowForm(false);
+                  setShowModal(false);
                   setShowMobileMenu(false);
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
@@ -856,7 +856,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('overview');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'overview'
@@ -870,7 +870,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('properties');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'properties'
@@ -884,7 +884,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('news');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'news'
@@ -898,7 +898,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('sims');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'sims'
@@ -912,7 +912,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('lands');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'lands'
@@ -926,7 +926,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('deposits');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'deposits'
@@ -940,7 +940,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('members');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'members'
@@ -954,7 +954,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('tickets');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'tickets'
@@ -968,7 +968,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('member-posts');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'member-posts'
@@ -982,7 +982,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('settings');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'settings'
@@ -996,7 +996,7 @@ const AdminDashboard = () => {
               <button
                 onClick={() => {
                   setActiveTab('analytics');
-                  setShowForm(false);
+                  setShowModal(false);
                 }}
                 className={`py-4 border-b-2 font-medium text-sm ${
                   activeTab === 'analytics'
@@ -1190,7 +1190,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Bất động sản</h2>
                   <button
                     onClick={() => {
-                      setShowForm(true);
+                      setShowModal(true);
                       setEditingItem(null);
                       resetPropertyForm();
                     }}
@@ -1205,7 +1205,7 @@ const AdminDashboard = () => {
                   <Modal 
                     isOpen={showForm}
                     onClose={() => {
-                      setShowForm(false);
+                      setShowModal(false);
                       setEditingItem(null);
                     }}
                     title={editingItem ? 'Sửa bất động sản' : 'Thêm bất động sản mới'}
@@ -1341,7 +1341,7 @@ const AdminDashboard = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowForm(false);
+                            setShowModal(false);
                             setEditingItem(null);
                           }}
                           className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -1422,7 +1422,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Tin tức</h2>
                   <button
                     onClick={() => {
-                      setShowForm(true);
+                      setShowModal(true);
                       setEditingItem(null);
                       resetNewsForm();
                     }}
@@ -1437,7 +1437,7 @@ const AdminDashboard = () => {
                   <Modal 
                     isOpen={showForm}
                     onClose={() => {
-                      setShowForm(false);
+                      setShowModal(false);
                       setEditingItem(null);
                     }}
                     title={editingItem ? 'Sửa tin tức' : 'Thêm tin tức mới'}
@@ -1501,7 +1501,7 @@ const AdminDashboard = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            setShowForm(false);
+                            setShowModal(false);
                             setEditingItem(null);
                           }}
                           className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -1578,7 +1578,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Sim</h2>
                   <button
                     onClick={() => {
-                      setShowForm(true);
+                      setShowModal(true);
                       setEditingItem(null);
                       resetSimForm();
                     }}
@@ -1661,7 +1661,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          setShowModal(false);
                           setEditingItem(null);
                         }}
                         className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
@@ -1738,7 +1738,7 @@ const AdminDashboard = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quản lý Đất</h2>
                   <button
                     onClick={() => {
-                      setShowForm(true);
+                      setShowModal(true);
                       setEditingItem(null);
                       resetLandForm();
                     }}
@@ -1917,7 +1917,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          setShowModal(false);
                           setEditingItem(null);
                         }}
                         className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
@@ -2040,7 +2040,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          setShowModal(false);
                           setEditingItem(null);
                         }}
                         className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
@@ -2194,7 +2194,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          setShowModal(false);
                           setEditingItem(null);
                         }}
                         className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
