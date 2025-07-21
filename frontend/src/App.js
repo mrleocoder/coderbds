@@ -52,6 +52,12 @@ const Header = () => {
     setShowMobileCategoryDropdown(false);
   };
 
+  // Đóng mobile menu và mobile dropdowns khi click link
+  const closeMobileMenuAndDropdowns = () => {
+    setShowMobileMenu(false);
+    closeAllMobileDropdowns();
+  };
+
   return (
     <>
     <header className="bg-emerald-600 text-white shadow-lg sticky top-0 z-50">
