@@ -676,6 +676,157 @@ const AdminDashboard = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mobile Navigation Menu */}
+        {showMobileMenu && (
+          <div className="md:hidden mb-6 bg-white rounded-lg shadow-lg border border-gray-200">
+            <div className="p-4 space-y-2">
+              <button
+                onClick={() => {
+                  setActiveTab('overview');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'overview' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-chart-pie mr-3"></i>
+                Tổng quan
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('properties');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'properties' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-home mr-3"></i>
+                Quản lý BDS ({properties.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('news');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'news' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-newspaper mr-3"></i>
+                Quản lý Tin tức ({news.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('sims');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'sims' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-sim-card mr-3"></i>
+                Quản lý Sim ({sims.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('lands');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'lands' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-map mr-3"></i>
+                Quản lý Đất ({lands.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('deposits');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'deposits' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-coins mr-3"></i>
+                Duyệt nạp tiền ({deposits.filter(d => d.status === 'pending').length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('member-posts');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'member-posts' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-user-edit mr-3"></i>
+                Duyệt tin Member ({memberPosts.filter(p => p.status === 'pending').length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('members');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'members' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-users mr-3"></i>
+                Quản lý Thành viên ({members.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('tickets');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'tickets' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-ticket-alt mr-3"></i>
+                Support Tickets ({tickets.length})
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('settings');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'settings' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-cog mr-3"></i>
+                Cài đặt Website
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('analytics');
+                  setShowForm(false);
+                  setShowMobileMenu(false);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                  activeTab === 'analytics' ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <i className="fas fa-chart-bar mr-3"></i>
+                Phân tích
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="border-b border-gray-200">
