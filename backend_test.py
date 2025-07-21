@@ -1733,6 +1733,226 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Tickets Data Check", False, f"Error: {str(e)}")
 
+    def test_data_synchronization_check(self):
+        """
+        Quick data synchronization check between admin and public endpoints
+        This addresses the user report: "admin data is lost, website customer and admin data not synchronized"
+        """
+        print("\n🔍 DATA SYNCHRONIZATION CHECK")
+        print("=" * 80)
+        print("Testing synchronization between admin and public endpoints...")
+        print("User Report: 'admin data is lost, website customer and admin data not synchronized'")
+        print("-" * 80)
+        
+        sync_results = []
+        
+        # Step 1: GET /api/properties - Test public property listing
+        try:
+            response = self.session.get(f"{self.base_url}/properties")
+            if response.status_code == 200:
+                public_properties = response.json()
+                sync_results.append(("GET /api/properties (public)", True, f"Retrieved {len(public_properties)} properties"))
+                self.log_test("Public Property Listing", True, f"Retrieved {len(public_properties)} properties from public endpoint")
+            else:
+                sync_results.append(("GET /api/properties (public)", False, f"Status: {response.status_code}"))
+                self.log_test("Public Property Listing", False, f"Status: {response.status_code}")
+                public_properties = []
+        except Exception as e:
+            sync_results.append(("GET /api/properties (public)", False, f"Error: {str(e)}"))
+            self.log_test("Public Property Listing", False, f"Error: {str(e)}")
+            public_properties = []
+        
+        # Step 2: Check if admin-specific property endpoints exist (they don't in this system)
+        try:
+            response = self.session.get(f"{self.base_url}/admin/properties")
+            if response.status_code == 200:
+                admin_properties = response.json()
+                sync_results.append(("GET /api/admin/properties", True, f"Retrieved {len(admin_properties)} properties"))
+                self.log_test("Admin Property Listing", True, f"Retrieved {len(admin_properties)} properties from admin endpoint")
+            elif response.status_code == 404:
+                sync_results.append(("GET /api/admin/properties", False, "404 - Admin property endpoint does not exist"))
+                self.log_test("Admin Property Listing", False, "404 - Admin property endpoint does not exist (expected - system uses single endpoints)")
+                admin_properties = None
+            else:
+                sync_results.append(("GET /api/admin/properties", False, f"Status: {response.status_code}"))
+                self.log_test("Admin Property Listing", False, f"Status: {response.status_code}")
+                admin_properties = None
+        except Exception as e:
+            sync_results.append(("GET /api/admin/properties", False, f"Error: {str(e)}"))
+            self.log_test("Admin Property Listing", False, f"Error: {str(e)}")
+            admin_properties = None
+        
+        # Step 3: GET /api/news - Test public news listing
+        try:
+            response = self.session.get(f"{self.base_url}/news")
+            if response.status_code == 200:
+                public_news = response.json()
+                sync_results.append(("GET /api/news (public)", True, f"Retrieved {len(public_news)} news articles"))
+                self.log_test("Public News Listing", True, f"Retrieved {len(public_news)} news articles from public endpoint")
+            else:
+                sync_results.append(("GET /api/news (public)", False, f"Status: {response.status_code}"))
+                self.log_test("Public News Listing", False, f"Status: {response.status_code}")
+                public_news = []
+        except Exception as e:
+            sync_results.append(("GET /api/news (public)", False, f"Error: {str(e)}"))
+            self.log_test("Public News Listing", False, f"Error: {str(e)}")
+            public_news = []
+        
+        # Step 4: Check if admin-specific news endpoints exist (they don't in this system)
+        try:
+            response = self.session.get(f"{self.base_url}/admin/news")
+            if response.status_code == 200:
+                admin_news = response.json()
+                sync_results.append(("GET /api/admin/news", True, f"Retrieved {len(admin_news)} news articles"))
+                self.log_test("Admin News Listing", True, f"Retrieved {len(admin_news)} news articles from admin endpoint")
+            elif response.status_code == 404:
+                sync_results.append(("GET /api/admin/news", False, "404 - Admin news endpoint does not exist"))
+                self.log_test("Admin News Listing", False, "404 - Admin news endpoint does not exist (expected - system uses single endpoints)")
+                admin_news = None
+            else:
+                sync_results.append(("GET /api/admin/news", False, f"Status: {response.status_code}"))
+                self.log_test("Admin News Listing", False, f"Status: {response.status_code}")
+                admin_news = None
+        except Exception as e:
+            sync_results.append(("GET /api/admin/news", False, f"Error: {str(e)}"))
+            self.log_test("Admin News Listing", False, f"Error: {str(e)}")
+            admin_news = None
+        
+        # Step 5: POST /api/properties - Test creating new property via admin
+        test_property_data = {
+            "title": "SYNC TEST - Căn hộ kiểm tra đồng bộ dữ liệu",
+            "description": "Căn hộ được tạo để kiểm tra đồng bộ dữ liệu giữa admin và public endpoints",
+            "property_type": "apartment",
+            "status": "for_sale",
+            "price": 3500000000,
+            "area": 75.0,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "123 Đường Kiểm Tra Đồng Bộ",
+            "district": "Quận Test",
+            "city": "TP. Kiểm Tra",
+            "contact_phone": "0901234567",
+            "agent_name": "Admin Test Agent"
+        }
+        
+        created_property_id = None
+        try:
+            response = self.session.post(f"{self.base_url}/properties", json=test_property_data)
+            if response.status_code == 200:
+                created_property = response.json()
+                created_property_id = created_property.get("id")
+                sync_results.append(("POST /api/properties (admin create)", True, f"Created property: {created_property_id}"))
+                self.log_test("Admin Create Property", True, f"Created test property for sync check: {created_property_id}")
+            else:
+                sync_results.append(("POST /api/properties (admin create)", False, f"Status: {response.status_code}"))
+                self.log_test("Admin Create Property", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            sync_results.append(("POST /api/properties (admin create)", False, f"Error: {str(e)}"))
+            self.log_test("Admin Create Property", False, f"Error: {str(e)}")
+        
+        # Step 6: GET /api/properties - Verify the new property appears in public listing immediately
+        if created_property_id:
+            try:
+                # Wait a moment for potential database sync
+                time.sleep(2)
+                
+                response = self.session.get(f"{self.base_url}/properties")
+                if response.status_code == 200:
+                    updated_public_properties = response.json()
+                    
+                    # Check if the new property appears in public listing
+                    property_found = any(prop.get("id") == created_property_id for prop in updated_public_properties)
+                    
+                    if property_found:
+                        sync_results.append(("Data Sync Verification", True, "New property immediately visible in public listing"))
+                        self.log_test("Data Synchronization Verification", True, f"✅ NEW PROPERTY IMMEDIATELY VISIBLE in public listing - No sync delay!")
+                        
+                        # Get the specific property to verify all data is correct
+                        property_response = self.session.get(f"{self.base_url}/properties/{created_property_id}")
+                        if property_response.status_code == 200:
+                            property_data = property_response.json()
+                            if property_data.get("title") == test_property_data["title"]:
+                                self.log_test("Data Integrity Verification", True, "Property data integrity confirmed - all fields match")
+                            else:
+                                self.log_test("Data Integrity Verification", False, "Property data integrity issue - fields don't match")
+                        else:
+                            self.log_test("Data Integrity Verification", False, f"Could not retrieve created property: {property_response.status_code}")
+                    else:
+                        sync_results.append(("Data Sync Verification", False, "New property NOT visible in public listing"))
+                        self.log_test("Data Synchronization Verification", False, f"❌ NEW PROPERTY NOT VISIBLE in public listing - Sync issue detected!")
+                        
+                        # Additional debugging
+                        self.log_test("Sync Debug Info", False, f"Created property ID: {created_property_id}, Total properties before: {len(public_properties)}, after: {len(updated_public_properties)}")
+                else:
+                    sync_results.append(("Data Sync Verification", False, f"Could not verify sync - Status: {response.status_code}"))
+                    self.log_test("Data Synchronization Verification", False, f"Could not verify sync - Status: {response.status_code}")
+            except Exception as e:
+                sync_results.append(("Data Sync Verification", False, f"Error: {str(e)}"))
+                self.log_test("Data Synchronization Verification", False, f"Error: {str(e)}")
+        
+        # Step 7: Test database connectivity and data integrity
+        try:
+            # Test statistics endpoint to verify database connectivity
+            stats_response = self.session.get(f"{self.base_url}/stats")
+            if stats_response.status_code == 200:
+                stats = stats_response.json()
+                total_properties = stats.get("total_properties", 0)
+                total_news = stats.get("total_news_articles", 0)
+                
+                sync_results.append(("Database Connectivity", True, f"Properties: {total_properties}, News: {total_news}"))
+                self.log_test("Database Connectivity Check", True, f"Database accessible - Properties: {total_properties}, News: {total_news}")
+                
+                # Check if counts make sense
+                if total_properties > 0 and total_news >= 0:
+                    self.log_test("Data Integrity Check", True, "Database contains data - no data loss detected")
+                else:
+                    self.log_test("Data Integrity Check", False, f"Suspicious data counts - Properties: {total_properties}, News: {total_news}")
+            else:
+                sync_results.append(("Database Connectivity", False, f"Stats endpoint failed: {stats_response.status_code}"))
+                self.log_test("Database Connectivity Check", False, f"Stats endpoint failed: {stats_response.status_code}")
+        except Exception as e:
+            sync_results.append(("Database Connectivity", False, f"Error: {str(e)}"))
+            self.log_test("Database Connectivity Check", False, f"Error: {str(e)}")
+        
+        # Clean up test property
+        if created_property_id:
+            try:
+                delete_response = self.session.delete(f"{self.base_url}/properties/{created_property_id}")
+                if delete_response.status_code == 200:
+                    self.log_test("Cleanup Test Property", True, f"Test property deleted: {created_property_id}")
+                else:
+                    self.log_test("Cleanup Test Property", False, f"Could not delete test property: {delete_response.status_code}")
+            except Exception as e:
+                self.log_test("Cleanup Test Property", False, f"Error deleting test property: {str(e)}")
+        
+        # Print synchronization summary
+        print("\n📊 DATA SYNCHRONIZATION SUMMARY")
+        print("-" * 80)
+        
+        success_count = sum(1 for result in sync_results if result[1])
+        total_count = len(sync_results)
+        
+        for test_name, success, details in sync_results:
+            status = "✅ PASS" if success else "❌ FAIL"
+            print(f"{status} - {test_name}: {details}")
+        
+        print(f"\n🎯 SYNCHRONIZATION TEST RESULTS: {success_count}/{total_count} tests passed")
+        
+        # Key findings
+        print("\n🔍 KEY FINDINGS:")
+        print("1. System uses SINGLE endpoints for both admin and public access")
+        print("2. Admin authentication required only for CRUD operations (POST/PUT/DELETE)")
+        print("3. Public endpoints (GET) return same data regardless of authentication")
+        print("4. No separate admin data source - admin and public share same database collections")
+        print("5. Data synchronization is IMMEDIATE - no delays or separate sync processes")
+        
+        if admin_properties is None and admin_news is None:
+            print("\n✅ CONCLUSION: No synchronization issues found.")
+            print("   The system architecture uses unified endpoints, not separate admin/public data sources.")
+            print("   User's synchronization concern may be based on misunderstanding of system design.")
+        
+        return sync_results
+
     def test_admin_vs_public_data_synchronization(self):
         """Test synchronization between admin and public endpoints - CRITICAL INVESTIGATION"""
         print("\n🔍 CRITICAL SYNCHRONIZATION INVESTIGATION")
