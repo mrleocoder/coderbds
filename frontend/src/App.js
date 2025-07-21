@@ -2004,29 +2004,29 @@ const Footer = () => {
 
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <i className="fas fa-link text-emerald-400"></i>
-              <h4 className="font-semibold">Liên kết nhanh</h4>
+              <i className="fas fa-question-circle text-emerald-400"></i>
+              <h4 className="font-semibold">Hướng dẫn</h4>
             </div>
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-300 hover:text-emerald-400 transition-colors">Trang chủ</Link></li>
               <li><Link to="/tin-tuc" className="text-gray-300 hover:text-emerald-400 transition-colors">Tin tức</Link></li>
               <li><Link to="/lien-he" className="text-gray-300 hover:text-emerald-400 transition-colors">Liên hệ</Link></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Điều khoản sử dung</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách bảo mật</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Hướng dẫn đăng tin</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Hướng dẫn tìm kiếm</a></li>
             </ul>
           </div>
 
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <i className="fas fa-building text-emerald-400"></i>
-              <h4 className="font-semibold">Loại hình BDS</h4>
+              <i className="fas fa-gavel text-emerald-400"></i>
+              <h4 className="font-semibold">Quy định</h4>
             </div>
             <ul className="space-y-2">
-              <li><Link to="/loai-hinh/can-ho" className="text-gray-300 hover:text-emerald-400 transition-colors">Căn hộ chung cư</Link></li>
-              <li><Link to="/loai-hinh/biet-thu" className="text-gray-300 hover:text-emerald-400 transition-colors">Biệt thự</Link></li>
-              <li><Link to="/loai-hinh/nha-pho" className="text-gray-300 hover:text-emerald-400 transition-colors">Nhà phố</Link></li>
-              <li><Link to="/loai-hinh/shophouse" className="text-gray-300 hover:text-emerald-400 transition-colors">Shophouse</Link></li>
-              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Đất nền</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Điều khoản sử dụng</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách bảo mật</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Quy định đăng tin</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Chính sách hoàn tiền</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-emerald-400 transition-colors">Báo cáo vi phạm</a></li>
             </ul>
           </div>
 
