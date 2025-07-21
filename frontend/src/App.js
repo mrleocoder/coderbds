@@ -219,15 +219,27 @@ const Header = () => {
               
               {showCategoryDropdown && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <Link to="/kho-sim" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/kho-sim" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-sim-card text-emerald-600 mr-2"></i>
                     Kho Sim
                   </Link>
-                  <Link to="/tin-tuc" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/tin-tuc" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-newspaper text-emerald-600 mr-2"></i>
                     Tin tức
                   </Link>
-                  <Link to="/lien-he" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                  <Link 
+                    to="/lien-he" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-emerald-50"
+                    onClick={closeAllDropdowns}
+                  >
                     <i className="fas fa-envelope text-emerald-600 mr-2"></i>
                     Liên hệ
                   </Link>
