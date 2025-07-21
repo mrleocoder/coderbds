@@ -25,17 +25,17 @@ const MemberDashboard = () => {
     accountHolder: 'CONG TY TNHH BDS VIET NAM',
     bankName: 'Ngân hàng Vietcombank',
     branch: 'Chi nhánh TP.HCM',
-    qrCode: `data:image/svg+xml;base64,${btoa(`
+    qrCode: `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(`
       <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
         <rect width="200" height="200" fill="#f3f4f6"/>
         <text x="100" y="100" font-family="Arial" font-size="12" text-anchor="middle" fill="#374151">
           QR Code
         </text>
         <text x="100" y="120" font-family="Arial" font-size="10" text-anchor="middle" fill="#6b7280">
-          Quét để chuyển tiền
+          Quet de chuyen tien
         </text>
       </svg>
-    `)}`
+    `)))}`
   };
 
   const [depositForm, setDepositForm] = useState({
