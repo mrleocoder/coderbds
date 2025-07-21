@@ -1509,21 +1509,56 @@ const AdminDashboard = () => {
 
                     {/* Land Form */}
                     {modalType === 'land' && (
-                      <form onSubmit={(e) => {
+                      <form onSubmit={async (e) => {
                         e.preventDefault();
-                        toast.success('Cập nhật dự án đất thành công!');
-                        closeModal();
-                        fetchAdminData();
+                        const formData = new FormData(e.target);
+                        try {
+                          const token = localStorage.getItem('token');
+                          const landData = {
+                            title: formData.get('title'),
+                            land_type: formData.get('land_type'),
+                            price: parseFloat(formData.get('price')),
+                            area: parseFloat(formData.get('area')),
+                            width: parseFloat(formData.get('width')) || null,
+                            length: parseFloat(formData.get('length')) || null,
+                            address: formData.get('address'),
+                            legal_status: formData.get('legal_status'),
+                            contact_phone: formData.get('contact_phone'),
+                            orientation: formData.get('orientation'),
+                            description: formData.get('description'),
+                            featured: formData.get('featured') === 'on',
+                            images: []
+                          };
+
+                          if (editingItem) {
+                            await axios.put(`${API}/admin/lands/${editingItem.id}`, landData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Cập nhật dự án đất thành công!');
+                          } else {
+                            await axios.post(`${API}/admin/lands`, landData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Thêm dự án đất thành công!');
+                          }
+                          closeModal();
+                          fetchAdminData();
+                        } catch (error) {
+                          console.error('Error saving land:', error);
+                          toast.error('Có lỗi xảy ra khi lưu dự án đất!');
+                        }
                       }} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <input
                             type="text"
+                            name="title"
                             placeholder="Tiêu đề dự án"
                             defaultValue={editingItem?.title || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <select
+                            name="land_type"
                             defaultValue={editingItem?.land_type || 'residential'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1534,6 +1569,7 @@ const AdminDashboard = () => {
                           </select>
                           <input
                             type="number"
+                            name="price"
                             placeholder="Giá (VNĐ)"
                             defaultValue={editingItem?.price || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1541,6 +1577,7 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="number"
+                            name="area"
                             placeholder="Diện tích (m²)"
                             defaultValue={editingItem?.area || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1548,24 +1585,28 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="number"
+                            name="width"
                             placeholder="Chiều rộng (m)"
                             defaultValue={editingItem?.width || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           />
                           <input
                             type="number"
+                            name="length"
                             placeholder="Chiều dài (m)"
                             defaultValue={editingItem?.length || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           />
                           <input
                             type="text"
+                            name="address"
                             placeholder="Địa chỉ"
                             defaultValue={editingItem?.address || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <select
+                            name="legal_status"
                             defaultValue={editingItem?.legal_status || 'Sổ đỏ'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1575,12 +1616,14 @@ const AdminDashboard = () => {
                           </select>
                           <input
                             type="tel"
+                            name="contact_phone"
                             placeholder="Số điện thoại"
                             defaultValue={editingItem?.contact_phone || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
                           <select
+                            name="orientation"
                             defaultValue={editingItem?.orientation || 'Đông'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -1595,6 +1638,7 @@ const AdminDashboard = () => {
                           </select>
                         </div>
                         <textarea
+                          name="description"
                           placeholder="Mô tả chi tiết dự án"
                           defaultValue={editingItem?.description || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1611,13 +1655,25 @@ const AdminDashboard = () => {
                                   <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
                                 </p>
                               </div>
-                              <input type="file" className="hidden" multiple accept="image/*" />
+                              <input 
+                                type="file" 
+                                name="images" 
+                                className="hidden" 
+                                multiple 
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  // Handle multiple file upload
+                                  const files = Array.from(e.target.files);
+                                  console.log('Selected files:', files);
+                                }}
+                              />
                             </label>
                           </div>
                         </div>
                         <div className="flex items-center">
                           <input
                             type="checkbox"
+                            name="featured"
                             defaultChecked={editingItem?.featured || false}
                             className="mr-2"
                             id="featured_land"
