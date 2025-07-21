@@ -1761,6 +1761,23 @@ const AdminDashboard = () => {
                         const formData = new FormData(e.target);
                         try {
                           const token = localStorage.getItem('token');
+                          
+                          // Process image uploads
+                          const imageFiles = e.target.querySelector('input[name="images"]').files;
+                          const images = [];
+                          
+                          if (imageFiles && imageFiles.length > 0) {
+                            // Convert all images to base64
+                            for (let i = 0; i < imageFiles.length; i++) {
+                              const base64 = await new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.readAsDataURL(imageFiles[i]);
+                              });
+                              images.push(base64);
+                            }
+                          }
+
                           const landData = {
                             title: formData.get('title'),
                             land_type: formData.get('land_type'),
@@ -1774,7 +1791,7 @@ const AdminDashboard = () => {
                             orientation: formData.get('orientation'),
                             description: formData.get('description'),
                             featured: formData.get('featured') === 'on',
-                            images: []
+                            images: images.length > 0 ? images : (editingItem?.images || [])
                           };
 
                           if (editingItem) {
