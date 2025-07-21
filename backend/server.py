@@ -157,6 +157,7 @@ class TransactionStatus(str, Enum):
 class SiteSettings(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     site_title: str = "BDS Việt Nam"
+    company_name: str = "Công ty TNHH BDS Việt Nam"
     site_description: str = "Premium Real Estate Platform"
     site_keywords: str = "bất động sản, nhà đất, căn hộ, biệt thự"
     contact_email: str = "info@bdsvietnam.com"
