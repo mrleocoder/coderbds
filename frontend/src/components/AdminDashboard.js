@@ -1596,27 +1596,6 @@ const AdminDashboard = () => {
                         </div>
                       </form>
                     )}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            rows="3"
-                          />
-                        </div>
-                        <div className="flex justify-end space-x-4 border-t pt-4">
-                          <button
-                            type="button"
-                            onClick={closeModal}
-                            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                          >
-                            <i className="fas fa-times mr-2"></i>Hủy
-                          </button>
-                          <button
-                            type="submit"
-                            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                          >
-                            <i className="fas fa-save mr-2"></i>Cập nhật
-                          </button>
-                        </div>
-                      </form>
-                    )}
                   </>
                 )}
               </Modal>
