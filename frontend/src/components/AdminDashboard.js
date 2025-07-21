@@ -873,156 +873,163 @@ const AdminDashboard = () => {
                 </div>
 
                 {showForm && (
-                  <form onSubmit={handleSubmitProperty} className="mb-8 p-6 bg-gray-50 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4">
-                      {editingItem ? 'Sửa bất động sản' : 'Thêm bất động sản mới'}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <input
-                        type="text"
-                        placeholder="Tiêu đề"
-                        value={propertyForm.title}
-                        onChange={(e) => setPropertyForm({...propertyForm, title: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <select
-                        value={propertyForm.property_type}
-                        onChange={(e) => setPropertyForm({...propertyForm, property_type: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="apartment">Căn hộ</option>
-                        <option value="house">Nhà phố</option>
-                        <option value="villa">Biệt thự</option>
-                        <option value="shophouse">Shophouse</option>
-                      </select>
-                      <select
-                        value={propertyForm.status}
-                        onChange={(e) => setPropertyForm({...propertyForm, status: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      >
-                        <option value="for_sale">Đang bán</option>
-                        <option value="for_rent">Cho thuê</option>
-                      </select>
-                      <input
-                        type="number"
-                        placeholder="Giá (VNĐ)"
-                        value={propertyForm.price}
-                        onChange={(e) => setPropertyForm({...propertyForm, price: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="number"
-                        placeholder="Diện tích (m²)"
-                        value={propertyForm.area}
-                        onChange={(e) => setPropertyForm({...propertyForm, area: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="number"
-                        placeholder="Số phòng ngủ"
-                        value={propertyForm.bedrooms}
-                        onChange={(e) => setPropertyForm({...propertyForm, bedrooms: parseInt(e.target.value)})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="number"
-                        placeholder="Số phòng tắm"
-                        value={propertyForm.bathrooms}
-                        onChange={(e) => setPropertyForm({...propertyForm, bathrooms: parseInt(e.target.value)})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Địa chỉ"
-                        value={propertyForm.address}
-                        onChange={(e) => setPropertyForm({...propertyForm, address: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Quận/Huyện"
-                        value={propertyForm.district}
-                        onChange={(e) => setPropertyForm({...propertyForm, district: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Thành phố"
-                        value={propertyForm.city}
-                        onChange={(e) => setPropertyForm({...propertyForm, city: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Số điện thoại"
-                        value={propertyForm.contact_phone}
-                        onChange={(e) => setPropertyForm({...propertyForm, contact_phone: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email (tùy chọn)"
-                        value={propertyForm.contact_email}
-                        onChange={(e) => setPropertyForm({...propertyForm, contact_email: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Tên môi giới (tùy chọn)"
-                        value={propertyForm.agent_name}
-                        onChange={(e) => setPropertyForm({...propertyForm, agent_name: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-                    <textarea
-                      placeholder="Mô tả chi tiết"
-                      value={propertyForm.description}
-                      onChange={(e) => setPropertyForm({...propertyForm, description: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="4"
-                      required
-                    />
-                    <div className="flex items-center space-x-4 mb-4">
-                      <label className="flex items-center space-x-2">
+                  <Modal 
+                    isOpen={showForm}
+                    onClose={() => {
+                      setShowForm(false);
+                      setEditingItem(null);
+                    }}
+                    title={editingItem ? 'Sửa bất động sản' : 'Thêm bất động sản mới'}
+                    size="xl"
+                  >
+                    <form onSubmit={handleSubmitProperty} className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <input
-                          type="checkbox"
-                          checked={propertyForm.featured}
-                          onChange={(e) => setPropertyForm({...propertyForm, featured: e.target.checked})}
-                          className="rounded text-emerald-600"
+                          type="text"
+                          placeholder="Tiêu đề"
+                          value={propertyForm.title}
+                          onChange={(e) => setPropertyForm({...propertyForm, title: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
                         />
-                        <span>Bất động sản nổi bật</span>
-                      </label>
-                    </div>
-                    <div className="flex space-x-4">
-                      <button
-                        type="submit"
-                        className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowForm(false);
-                          setEditingItem(null);
-                        }}
-                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>
-                        Hủy
-                      </button>
-                    </div>
-                  </form>
+                        <select
+                          value={propertyForm.property_type}
+                          onChange={(e) => setPropertyForm({...propertyForm, property_type: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                          <option value="apartment">Căn hộ</option>
+                          <option value="house">Nhà phố</option>
+                          <option value="villa">Biệt thự</option>
+                          <option value="shophouse">Shophouse</option>
+                        </select>
+                        <select
+                          value={propertyForm.status}
+                          onChange={(e) => setPropertyForm({...propertyForm, status: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        >
+                          <option value="for_sale">Đang bán</option>
+                          <option value="for_rent">Cho thuê</option>
+                        </select>
+                        <input
+                          type="number"
+                          placeholder="Giá (VNĐ)"
+                          value={propertyForm.price}
+                          onChange={(e) => setPropertyForm({...propertyForm, price: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="number"
+                          placeholder="Diện tích (m²)"
+                          value={propertyForm.area}
+                          onChange={(e) => setPropertyForm({...propertyForm, area: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="number"
+                          placeholder="Số phòng ngủ"
+                          value={propertyForm.bedrooms}
+                          onChange={(e) => setPropertyForm({...propertyForm, bedrooms: parseInt(e.target.value)})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="number"
+                          placeholder="Số phòng tắm"
+                          value={propertyForm.bathrooms}
+                          onChange={(e) => setPropertyForm({...propertyForm, bathrooms: parseInt(e.target.value)})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Địa chỉ"
+                          value={propertyForm.address}
+                          onChange={(e) => setPropertyForm({...propertyForm, address: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Quận/Huyện"
+                          value={propertyForm.district}
+                          onChange={(e) => setPropertyForm({...propertyForm, district: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Thành phố"
+                          value={propertyForm.city}
+                          onChange={(e) => setPropertyForm({...propertyForm, city: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Số điện thoại"
+                          value={propertyForm.contact_phone}
+                          onChange={(e) => setPropertyForm({...propertyForm, contact_phone: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="email"
+                          placeholder="Email (tùy chọn)"
+                          value={propertyForm.contact_email}
+                          onChange={(e) => setPropertyForm({...propertyForm, contact_email: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Tên môi giới (tùy chọn)"
+                          value={propertyForm.agent_name}
+                          onChange={(e) => setPropertyForm({...propertyForm, agent_name: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        />
+                      </div>
+                      <textarea
+                        placeholder="Mô tả chi tiết"
+                        value={propertyForm.description}
+                        onChange={(e) => setPropertyForm({...propertyForm, description: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
+                        rows="4"
+                        required
+                      />
+                      <div className="flex items-center space-x-4 mb-6">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={propertyForm.featured}
+                            onChange={(e) => setPropertyForm({...propertyForm, featured: e.target.checked})}
+                            className="rounded text-emerald-600"
+                          />
+                          <span>Bất động sản nổi bật</span>
+                        </label>
+                      </div>
+                      <div className="flex justify-end space-x-4 border-t pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowForm(false);
+                            setEditingItem(null);
+                          }}
+                          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <i className="fas fa-times mr-2"></i>
+                          Hủy
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                        >
+                          <i className="fas fa-save mr-2"></i>
+                          {editingItem ? 'Cập nhật' : 'Thêm mới'}
+                        </button>
+                      </div>
+                    </form>
+                  </Modal>
                 )}
 
                 <div className="space-y-4">
