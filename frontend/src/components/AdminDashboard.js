@@ -677,6 +677,20 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => {
+                  setActiveTab('deposits');
+                  setShowForm(false);
+                }}
+                className={`py-4 border-b-2 font-medium text-sm ${
+                  activeTab === 'deposits'
+                    ? 'border-emerald-600 text-emerald-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <i className="fas fa-coins mr-2"></i>
+                Duyệt nạp tiền ({deposits.filter(d => d.status === 'pending').length})
+              </button>
+              <button
+                onClick={() => {
                   setActiveTab('members');
                   setShowForm(false);
                 }}
