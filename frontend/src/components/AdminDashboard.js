@@ -2546,6 +2546,9 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Settings Tab */}
+            {activeTab === 'settings' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">Cài đặt Website</h2>
