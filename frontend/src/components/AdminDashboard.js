@@ -293,7 +293,7 @@ const AdminDashboard = () => {
         await axios.post(`${API}/sims`, simForm, { headers });
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetSimForm();
     } catch (error) {
