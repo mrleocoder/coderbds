@@ -2870,6 +2870,92 @@ const AdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* Bank Account Information */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <i className="fas fa-university text-emerald-600 mr-2"></i>
+                      Thông tin ngân hàng (Nạp tiền)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Số tài khoản <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.bank_account_number || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, bank_account_number: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="1234567890"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Chủ tài khoản <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.bank_account_holder || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, bank_account_holder: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="CONG TY TNHH BDS VIET NAM"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Tên ngân hàng <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.bank_name || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, bank_name: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="Ngân hàng Vietcombank"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Chi nhánh
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.bank_branch || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, bank_branch: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="Chi nhánh TP.HCM"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          QR Code thanh toán URL <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="url"
+                          value={siteSettings.bank_qr_code || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, bank_qr_code: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="https://example.com/qr-code.png"
+                          required
+                        />
+                        {siteSettings.bank_qr_code && (
+                          <div className="mt-2 flex justify-center">
+                            <img 
+                              src={siteSettings.bank_qr_code} 
+                              alt="QR Code preview" 
+                              className="w-32 h-32 border border-gray-300 rounded-lg object-contain"
+                            />
+                          </div>
+                        )}
+                        <p className="text-xs text-gray-500 mt-1">
+                          QR code này sẽ được hiển thị trong trang nạp tiền của member
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Save Button */}
                   <div className="flex justify-end">
                     <button
