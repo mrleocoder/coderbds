@@ -3587,6 +3587,562 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Contact Form Integration", False, f"Error: {str(e)}")
 
+    def test_admin_dashboard_improvements_review(self):
+        """Test admin dashboard improvements as requested in the review"""
+        print("\n🔍 ADMIN DASHBOARD IMPROVEMENTS TESTING - REVIEW REQUEST")
+        print("=" * 80)
+        print("Testing admin dashboard improvements with new contact button fields and CRUD operations")
+        print()
+        
+        # Test 1: SiteSettings API with new contact button fields
+        print("1️⃣ Testing SiteSettings API with new contact button fields")
+        print("-" * 70)
+        
+        # Test GET /api/admin/settings - check for 3 new contact_button fields
+        try:
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                settings = response.json()
+                
+                # Check for the 3 new contact button fields
+                contact_button_fields = [
+                    "contact_button_1_text", "contact_button_1_link",
+                    "contact_button_2_text", "contact_button_2_link", 
+                    "contact_button_3_text", "contact_button_3_link"
+                ]
+                
+                existing_contact_fields = [field for field in contact_button_fields if field in settings]
+                
+                if len(existing_contact_fields) == 6:
+                    self.log_test("SiteSettings GET - Contact Button Fields", True, 
+                                f"✅ All 6 contact button fields present: {existing_contact_fields}")
+                    
+                    # Display current values
+                    print(f"   Contact Button 1: {settings.get('contact_button_1_text', 'N/A')} -> {settings.get('contact_button_1_link', 'N/A')}")
+                    print(f"   Contact Button 2: {settings.get('contact_button_2_text', 'N/A')} -> {settings.get('contact_button_2_link', 'N/A')}")
+                    print(f"   Contact Button 3: {settings.get('contact_button_3_text', 'N/A')} -> {settings.get('contact_button_3_link', 'N/A')}")
+                else:
+                    self.log_test("SiteSettings GET - Contact Button Fields", False, 
+                                f"Missing contact button fields. Found: {existing_contact_fields}")
+                    
+            elif response.status_code == 403:
+                self.log_test("SiteSettings GET - Contact Button Fields", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("SiteSettings GET - Contact Button Fields", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                
+        except Exception as e:
+            self.log_test("SiteSettings GET - Contact Button Fields", False, f"Error: {str(e)}")
+        
+        # Test PUT /api/admin/settings - test updating contact button fields
+        try:
+            contact_button_update = {
+                "contact_button_1_text": "Zalo Test",
+                "contact_button_1_link": "https://zalo.me/test123456",
+                "contact_button_2_text": "Telegram Test", 
+                "contact_button_2_link": "https://t.me/testbdsvietnam",
+                "contact_button_3_text": "WhatsApp Test",
+                "contact_button_3_link": "https://wa.me/test1234567890"
+            }
+            
+            response = self.session.put(f"{self.base_url}/admin/settings", json=contact_button_update)
+            if response.status_code == 200:
+                self.log_test("SiteSettings PUT - Contact Button Fields", True, 
+                            "✅ Contact button fields updated successfully")
+                
+                # Verify the update
+                verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                if verify_response.status_code == 200:
+                    updated_settings = verify_response.json()
+                    
+                    # Check if all contact button fields were updated
+                    contact_checks = [
+                        updated_settings.get("contact_button_1_text") == contact_button_update["contact_button_1_text"],
+                        updated_settings.get("contact_button_1_link") == contact_button_update["contact_button_1_link"],
+                        updated_settings.get("contact_button_2_text") == contact_button_update["contact_button_2_text"],
+                        updated_settings.get("contact_button_2_link") == contact_button_update["contact_button_2_link"],
+                        updated_settings.get("contact_button_3_text") == contact_button_update["contact_button_3_text"],
+                        updated_settings.get("contact_button_3_link") == contact_button_update["contact_button_3_link"]
+                    ]
+                    
+                    if all(contact_checks):
+                        self.log_test("SiteSettings PUT - Verify Contact Button Update", True, 
+                                    "✅ All contact button fields updated and verified successfully")
+                    else:
+                        self.log_test("SiteSettings PUT - Verify Contact Button Update", False, 
+                                    f"Contact button field verification failed")
+                else:
+                    self.log_test("SiteSettings PUT - Verify Contact Button Update", False, 
+                                f"Could not verify update: {verify_response.status_code}")
+            else:
+                self.log_test("SiteSettings PUT - Contact Button Fields", False, 
+                            f"Update failed: {response.status_code}, Response: {response.text}")
+                
+        except Exception as e:
+            self.log_test("SiteSettings PUT - Contact Button Fields", False, f"Error: {str(e)}")
+        
+        # Test 2: Main CRUD API endpoints with images field verification
+        print("\n2️⃣ Testing Main CRUD API endpoints with images field")
+        print("-" * 70)
+        
+        # Test Properties CRUD with images field
+        self.test_properties_crud_with_images()
+        
+        # Test News CRUD with images field
+        self.test_news_crud_with_images()
+        
+        # Test Sims CRUD
+        self.test_sims_crud_basic()
+        
+        # Test Lands CRUD with images field
+        self.test_lands_crud_with_images()
+        
+        # Test Admin deposits/transactions CRUD
+        self.test_admin_transactions_crud()
+        
+        # Test Admin members CRUD
+        self.test_admin_members_crud()
+        
+        # Test Admin tickets CRUD
+        self.test_admin_tickets_crud()
+        
+        # Test Admin member-posts CRUD
+        self.test_admin_member_posts_crud()
+        
+        # Test 3: Admin Dashboard Stats API
+        print("\n3️⃣ Testing Admin Dashboard Stats API")
+        print("-" * 70)
+        
+        try:
+            response = self.session.get(f"{self.base_url}/admin/dashboard/stats")
+            if response.status_code == 200:
+                stats = response.json()
+                
+                # Check for key dashboard statistics fields
+                required_stats_fields = [
+                    "total_users", "active_users", "total_properties", "properties_for_sale", 
+                    "properties_for_rent", "total_news_articles", "total_sims", "total_lands",
+                    "total_tickets", "pending_posts", "total_transactions", "total_pageviews"
+                ]
+                
+                missing_stats_fields = [field for field in required_stats_fields if field not in stats]
+                
+                if not missing_stats_fields:
+                    self.log_test("Admin Dashboard Stats API", True, 
+                                f"✅ All required dashboard stats fields present ({len(required_stats_fields)} fields)")
+                    
+                    # Display key statistics
+                    print(f"   Total Users: {stats.get('total_users', 0)}")
+                    print(f"   Total Properties: {stats.get('total_properties', 0)}")
+                    print(f"   Total News: {stats.get('total_news_articles', 0)}")
+                    print(f"   Total Sims: {stats.get('total_sims', 0)}")
+                    print(f"   Total Lands: {stats.get('total_lands', 0)}")
+                    print(f"   Total Tickets: {stats.get('total_tickets', 0)}")
+                    print(f"   Total Pageviews: {stats.get('total_pageviews', 0)}")
+                else:
+                    self.log_test("Admin Dashboard Stats API", False, 
+                                f"Missing dashboard stats fields: {missing_stats_fields}")
+                    
+            elif response.status_code == 403:
+                self.log_test("Admin Dashboard Stats API", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("Admin Dashboard Stats API", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                
+        except Exception as e:
+            self.log_test("Admin Dashboard Stats API", False, f"Error: {str(e)}")
+        
+        print("\n✅ ADMIN DASHBOARD IMPROVEMENTS TESTING COMPLETED")
+        print("=" * 80)
+
+    def test_properties_crud_with_images(self):
+        """Test Properties CRUD with images field verification"""
+        try:
+            # Test CREATE with images
+            property_data = {
+                "title": "Test Property with Images - Admin Dashboard Review",
+                "description": "Test property for admin dashboard improvements review",
+                "property_type": "apartment",
+                "status": "for_sale",
+                "price": 3500000000,
+                "area": 85.0,
+                "bedrooms": 2,
+                "bathrooms": 2,
+                "address": "123 Test Street",
+                "district": "Test District",
+                "city": "Test City",
+                "contact_phone": "0901234567",
+                "images": [
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                ]
+            }
+            
+            response = self.session.post(f"{self.base_url}/properties", json=property_data)
+            if response.status_code == 200:
+                created_property = response.json()
+                property_id = created_property.get("id")
+                created_images = created_property.get("images", [])
+                
+                if len(created_images) == 2:
+                    self.log_test("Properties CRUD - CREATE with images", True, 
+                                f"✅ Property created with {len(created_images)} images")
+                    
+                    # Test READ
+                    read_response = self.session.get(f"{self.base_url}/properties/{property_id}")
+                    if read_response.status_code == 200:
+                        read_property = read_response.json()
+                        read_images = read_property.get("images", [])
+                        if len(read_images) == 2:
+                            self.log_test("Properties CRUD - READ with images", True, 
+                                        f"✅ Property retrieved with {len(read_images)} images")
+                        else:
+                            self.log_test("Properties CRUD - READ with images", False, 
+                                        f"Images field issue - expected 2, got {len(read_images)}")
+                    
+                    # Test UPDATE
+                    update_data = {
+                        "title": "Updated Property with Images",
+                        "images": [
+                            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                        ]
+                    }
+                    
+                    update_response = self.session.put(f"{self.base_url}/properties/{property_id}", json=update_data)
+                    if update_response.status_code == 200:
+                        updated_property = update_response.json()
+                        updated_images = updated_property.get("images", [])
+                        if len(updated_images) == 1 and updated_property.get("title") == update_data["title"]:
+                            self.log_test("Properties CRUD - UPDATE with images", True, 
+                                        f"✅ Property updated with {len(updated_images)} image")
+                        else:
+                            self.log_test("Properties CRUD - UPDATE with images", False, 
+                                        f"Update failed - images: {len(updated_images)}, title: {updated_property.get('title')}")
+                    
+                    # Test DELETE
+                    delete_response = self.session.delete(f"{self.base_url}/properties/{property_id}")
+                    if delete_response.status_code == 200:
+                        self.log_test("Properties CRUD - DELETE", True, "✅ Property deleted successfully")
+                    else:
+                        self.log_test("Properties CRUD - DELETE", False, f"Delete failed: {delete_response.status_code}")
+                        
+                else:
+                    self.log_test("Properties CRUD - CREATE with images", False, 
+                                f"Images field issue - expected 2, got {len(created_images)}")
+            else:
+                self.log_test("Properties CRUD - CREATE with images", False, 
+                            f"Create failed: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Properties CRUD with images", False, f"Error: {str(e)}")
+
+    def test_news_crud_with_images(self):
+        """Test News CRUD with images field verification"""
+        try:
+            # Test CREATE with featured image
+            news_data = {
+                "title": "Test News with Image - Admin Dashboard Review",
+                "slug": "test-news-image-admin-dashboard-review",
+                "content": "Test news article for admin dashboard improvements review",
+                "excerpt": "Test news with featured image",
+                "featured_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=",
+                "category": "Test Category",
+                "tags": ["test", "admin", "dashboard"],
+                "published": True,
+                "author": "Test Author"
+            }
+            
+            response = self.session.post(f"{self.base_url}/news", json=news_data)
+            if response.status_code == 200:
+                created_news = response.json()
+                news_id = created_news.get("id")
+                featured_image = created_news.get("featured_image")
+                
+                if featured_image and featured_image.startswith("data:image/"):
+                    self.log_test("News CRUD - CREATE with featured image", True, 
+                                "✅ News created with featured image")
+                    
+                    # Test READ
+                    read_response = self.session.get(f"{self.base_url}/news/{news_id}")
+                    if read_response.status_code == 200:
+                        read_news = read_response.json()
+                        read_image = read_news.get("featured_image")
+                        if read_image and read_image.startswith("data:image/"):
+                            self.log_test("News CRUD - READ with featured image", True, 
+                                        "✅ News retrieved with featured image")
+                        else:
+                            self.log_test("News CRUD - READ with featured image", False, 
+                                        "Featured image field issue on read")
+                    
+                    # Test UPDATE
+                    update_data = {
+                        "title": "Updated News with Image",
+                        "featured_image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    }
+                    
+                    update_response = self.session.put(f"{self.base_url}/news/{news_id}", json=update_data)
+                    if update_response.status_code == 200:
+                        updated_news = update_response.json()
+                        updated_image = updated_news.get("featured_image")
+                        if updated_image and updated_news.get("title") == update_data["title"]:
+                            self.log_test("News CRUD - UPDATE with featured image", True, 
+                                        "✅ News updated with featured image")
+                        else:
+                            self.log_test("News CRUD - UPDATE with featured image", False, 
+                                        "Update failed - image or title not updated")
+                    
+                    # Test DELETE
+                    delete_response = self.session.delete(f"{self.base_url}/news/{news_id}")
+                    if delete_response.status_code == 200:
+                        self.log_test("News CRUD - DELETE", True, "✅ News deleted successfully")
+                    else:
+                        self.log_test("News CRUD - DELETE", False, f"Delete failed: {delete_response.status_code}")
+                        
+                else:
+                    self.log_test("News CRUD - CREATE with featured image", False, 
+                                "Featured image field issue on create")
+            else:
+                self.log_test("News CRUD - CREATE with featured image", False, 
+                            f"Create failed: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("News CRUD with images", False, f"Error: {str(e)}")
+
+    def test_sims_crud_basic(self):
+        """Test Sims CRUD operations"""
+        try:
+            # Test CREATE
+            sim_data = {
+                "phone_number": "0987654321",
+                "network": "viettel",
+                "sim_type": "prepaid",
+                "price": 500000,
+                "is_vip": True,
+                "features": ["Số đẹp", "Phong thủy"],
+                "description": "Test sim for admin dashboard review"
+            }
+            
+            response = self.session.post(f"{self.base_url}/sims", json=sim_data)
+            if response.status_code == 200:
+                created_sim = response.json()
+                sim_id = created_sim.get("id")
+                
+                self.log_test("Sims CRUD - CREATE", True, f"✅ Sim created: {sim_data['phone_number']}")
+                
+                # Test READ
+                read_response = self.session.get(f"{self.base_url}/sims/{sim_id}")
+                if read_response.status_code == 200:
+                    self.log_test("Sims CRUD - READ", True, "✅ Sim retrieved successfully")
+                
+                # Test UPDATE
+                update_data = {"price": 600000, "description": "Updated sim description"}
+                update_response = self.session.put(f"{self.base_url}/sims/{sim_id}", json=update_data)
+                if update_response.status_code == 200:
+                    self.log_test("Sims CRUD - UPDATE", True, "✅ Sim updated successfully")
+                
+                # Test DELETE
+                delete_response = self.session.delete(f"{self.base_url}/sims/{sim_id}")
+                if delete_response.status_code == 200:
+                    self.log_test("Sims CRUD - DELETE", True, "✅ Sim deleted successfully")
+                else:
+                    self.log_test("Sims CRUD - DELETE", False, f"Delete failed: {delete_response.status_code}")
+                    
+            else:
+                self.log_test("Sims CRUD - CREATE", False, f"Create failed: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Sims CRUD", False, f"Error: {str(e)}")
+
+    def test_lands_crud_with_images(self):
+        """Test Lands CRUD with images field verification"""
+        try:
+            # Test CREATE with images
+            land_data = {
+                "title": "Test Land with Images - Admin Dashboard Review",
+                "description": "Test land for admin dashboard improvements review",
+                "land_type": "residential",
+                "status": "for_sale",
+                "price": 2500000000,
+                "area": 120.0,
+                "width": 8.0,
+                "length": 15.0,
+                "address": "Test Land Address",
+                "district": "Test District",
+                "city": "Test City",
+                "legal_status": "Sổ đỏ",
+                "contact_phone": "0901234567",
+                "images": [
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                ]
+            }
+            
+            response = self.session.post(f"{self.base_url}/lands", json=land_data)
+            if response.status_code == 200:
+                created_land = response.json()
+                land_id = created_land.get("id")
+                created_images = created_land.get("images", [])
+                
+                if len(created_images) == 1:
+                    self.log_test("Lands CRUD - CREATE with images", True, 
+                                f"✅ Land created with {len(created_images)} image")
+                    
+                    # Test READ
+                    read_response = self.session.get(f"{self.base_url}/lands/{land_id}")
+                    if read_response.status_code == 200:
+                        read_land = read_response.json()
+                        read_images = read_land.get("images", [])
+                        if len(read_images) == 1:
+                            self.log_test("Lands CRUD - READ with images", True, 
+                                        f"✅ Land retrieved with {len(read_images)} image")
+                        else:
+                            self.log_test("Lands CRUD - READ with images", False, 
+                                        f"Images field issue - expected 1, got {len(read_images)}")
+                    
+                    # Test UPDATE
+                    update_data = {
+                        "title": "Updated Land with Images",
+                        "price": 2800000000
+                    }
+                    
+                    update_response = self.session.put(f"{self.base_url}/lands/{land_id}", json=update_data)
+                    if update_response.status_code == 200:
+                        updated_land = update_response.json()
+                        if updated_land.get("title") == update_data["title"]:
+                            self.log_test("Lands CRUD - UPDATE", True, "✅ Land updated successfully")
+                        else:
+                            self.log_test("Lands CRUD - UPDATE", False, "Update failed - title not updated")
+                    
+                    # Test DELETE
+                    delete_response = self.session.delete(f"{self.base_url}/lands/{land_id}")
+                    if delete_response.status_code == 200:
+                        self.log_test("Lands CRUD - DELETE", True, "✅ Land deleted successfully")
+                    else:
+                        self.log_test("Lands CRUD - DELETE", False, f"Delete failed: {delete_response.status_code}")
+                        
+                else:
+                    self.log_test("Lands CRUD - CREATE with images", False, 
+                                f"Images field issue - expected 1, got {len(created_images)}")
+            else:
+                self.log_test("Lands CRUD - CREATE with images", False, 
+                            f"Create failed: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Lands CRUD with images", False, f"Error: {str(e)}")
+
+    def test_admin_transactions_crud(self):
+        """Test Admin deposits/transactions CRUD"""
+        try:
+            # Test GET /api/admin/transactions
+            response = self.session.get(f"{self.base_url}/admin/transactions")
+            if response.status_code == 200:
+                transactions = response.json()
+                self.log_test("Admin Transactions CRUD - GET", True, 
+                            f"✅ Retrieved {len(transactions)} transactions")
+                
+                # Test with filters
+                filter_response = self.session.get(f"{self.base_url}/admin/transactions", 
+                                                 params={"status": "pending"})
+                if filter_response.status_code == 200:
+                    pending_transactions = filter_response.json()
+                    self.log_test("Admin Transactions CRUD - GET with filter", True, 
+                                f"✅ Retrieved {len(pending_transactions)} pending transactions")
+                
+            elif response.status_code == 403:
+                self.log_test("Admin Transactions CRUD - GET", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("Admin Transactions CRUD - GET", False, 
+                            f"Status: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Admin Transactions CRUD", False, f"Error: {str(e)}")
+
+    def test_admin_members_crud(self):
+        """Test Admin members CRUD"""
+        try:
+            # Test GET /api/admin/users (actual endpoint for members)
+            response = self.session.get(f"{self.base_url}/admin/users")
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test("Admin Members CRUD - GET", True, 
+                            f"✅ Retrieved {len(users)} users/members")
+                
+                # Test with role filter
+                filter_response = self.session.get(f"{self.base_url}/admin/users", 
+                                                 params={"role": "member"})
+                if filter_response.status_code == 200:
+                    members = filter_response.json()
+                    self.log_test("Admin Members CRUD - GET with role filter", True, 
+                                f"✅ Retrieved {len(members)} members")
+                
+            elif response.status_code == 403:
+                self.log_test("Admin Members CRUD - GET", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("Admin Members CRUD - GET", False, 
+                            f"Status: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Admin Members CRUD", False, f"Error: {str(e)}")
+
+    def test_admin_tickets_crud(self):
+        """Test Admin tickets CRUD"""
+        try:
+            # Test GET /api/tickets (admin access)
+            response = self.session.get(f"{self.base_url}/tickets")
+            if response.status_code == 200:
+                tickets = response.json()
+                self.log_test("Admin Tickets CRUD - GET", True, 
+                            f"✅ Retrieved {len(tickets)} tickets")
+                
+                # Test with status filter
+                filter_response = self.session.get(f"{self.base_url}/tickets", 
+                                                 params={"status": "open"})
+                if filter_response.status_code == 200:
+                    open_tickets = filter_response.json()
+                    self.log_test("Admin Tickets CRUD - GET with filter", True, 
+                                f"✅ Retrieved {len(open_tickets)} open tickets")
+                
+            elif response.status_code == 403:
+                self.log_test("Admin Tickets CRUD - GET", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("Admin Tickets CRUD - GET", False, 
+                            f"Status: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Admin Tickets CRUD", False, f"Error: {str(e)}")
+
+    def test_admin_member_posts_crud(self):
+        """Test Admin member-posts CRUD"""
+        try:
+            # Test GET /api/admin/posts (actual endpoint for member posts)
+            response = self.session.get(f"{self.base_url}/admin/posts")
+            if response.status_code == 200:
+                posts = response.json()
+                self.log_test("Admin Member Posts CRUD - GET", True, 
+                            f"✅ Retrieved {len(posts)} member posts")
+                
+                # Test with status filter
+                filter_response = self.session.get(f"{self.base_url}/admin/posts", 
+                                                 params={"status": "pending"})
+                if filter_response.status_code == 200:
+                    pending_posts = filter_response.json()
+                    self.log_test("Admin Member Posts CRUD - GET with filter", True, 
+                                f"✅ Retrieved {len(pending_posts)} pending member posts")
+                
+            elif response.status_code == 403:
+                self.log_test("Admin Member Posts CRUD - GET", False, 
+                            "Admin access denied (403) - authentication issue")
+            else:
+                self.log_test("Admin Member Posts CRUD - GET", False, 
+                            f"Status: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Admin Member Posts CRUD", False, f"Error: {str(e)}")
+
     def print_final_verification_summary(self):
         """Print final verification results summary"""
         print("\n" + "=" * 80)
