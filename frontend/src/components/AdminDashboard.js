@@ -1605,16 +1605,6 @@ const AdminDashboard = () => {
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onChange={async (e) => {
-                                  if (e.target.files[0]) {
-                                    const file = e.target.files[0];
-                                    const reader = new FileReader();
-                                    reader.onload = () => {
-                                      e.target.setAttribute('data-image', reader.result);
-                                    };
-                                    reader.readAsDataURL(file);
-                                  }
-                                }}
                               />
                             </label>
                           </div>
