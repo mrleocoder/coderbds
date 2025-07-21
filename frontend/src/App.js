@@ -449,6 +449,7 @@ const Header = () => {
 const HeroSection = () => {
   const navigate = useNavigate();
   const [searchForm, setSearchForm] = useState({
+    searchType: 'property', // 'property' or 'land'
     city: '',
     propertyType: '',
     minPrice: '',
@@ -463,6 +464,12 @@ const HeroSection = () => {
     { value: 'villa', label: 'Biệt thự' },
     { value: 'shophouse', label: 'Shophouse' }
   ];
+  const landTypes = [
+    { value: 'residential', label: 'Đất ở' },
+    { value: 'commercial', label: 'Đất thương mại' },
+    { value: 'industrial', label: 'Đất công nghiệp' },
+    { value: 'agricultural', label: 'Đất nông nghiệp' }
+  ];
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -472,7 +479,17 @@ const HeroSection = () => {
     if (searchForm.maxPrice) params.append('max_price', searchForm.maxPrice);
     if (searchForm.bedrooms) params.append('bedrooms', searchForm.bedrooms);
     
-    navigate(`/tim-kiem?${params.toString()}`);
+    const basePath = searchForm.searchType === 'property' ? '/tim-kiem' : '/dat/tim-kiem';
+    navigate(`${basePath}?${params.toString()}`);
+  };
+
+  const handleSearchTypeChange = (type) => {
+    setSearchForm({
+      ...searchForm, 
+      searchType: type,
+      propertyType: '', // Reset property type when switching
+      bedrooms: '' // Reset bedrooms when switching to land
+    });
   };
 
   return (
