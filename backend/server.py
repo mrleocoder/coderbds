@@ -153,6 +153,31 @@ class TransactionStatus(str, Enum):
     failed = "failed"
     cancelled = "cancelled"
 
+# Site Settings Model
+class SiteSettings(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    site_title: str = "BDS Việt Nam"
+    site_description: str = "Premium Real Estate Platform"
+    site_keywords: str = "bất động sản, nhà đất, căn hộ, biệt thự"
+    contact_email: str = "info@bdsvietnam.com"
+    contact_phone: str = "1900 123 456"
+    contact_address: str = "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh"
+    logo_url: Optional[str] = None
+    favicon_url: Optional[str] = None
+    banner_image: Optional[str] = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SiteSettingsUpdate(BaseModel):
+    site_title: Optional[str] = None
+    site_description: Optional[str] = None
+    site_keywords: Optional[str] = None
+    contact_email: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_address: Optional[str] = None
+    logo_url: Optional[str] = None
+    favicon_url: Optional[str] = None
+    banner_image: Optional[str] = None
+
 # Pydantic Models
 class Property(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
