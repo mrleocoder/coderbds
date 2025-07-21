@@ -4143,6 +4143,84 @@ class BDSVietnamAPITester:
         except Exception as e:
             self.log_test("Admin Member Posts CRUD", False, f"Error: {str(e)}")
 
+    def run_admin_dashboard_improvements_testing(self):
+        """Run admin dashboard improvements testing as requested in the review"""
+        print("🚀 Starting Admin Dashboard Improvements Testing - Review Request")
+        print(f"Backend URL: {self.base_url}")
+        print("=" * 80)
+        
+        # Test API connectivity
+        if not self.test_api_root():
+            print("❌ API not accessible, stopping tests")
+            return
+        
+        # Create demo admin user and authenticate
+        self.test_create_demo_admin_user()
+        if not self.test_authentication():
+            print("❌ Authentication failed. Cannot test admin endpoints.")
+            return
+        
+        # Run the admin dashboard improvements testing
+        self.test_admin_dashboard_improvements_review()
+        
+        # Print summary
+        self.print_admin_dashboard_summary()
+
+    def print_admin_dashboard_summary(self):
+        """Print admin dashboard improvements test summary"""
+        print("\n" + "=" * 80)
+        print("📊 ADMIN DASHBOARD IMPROVEMENTS TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t["success"]])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        # Categorize results
+        sitesettings_tests = [t for t in self.test_results if "SiteSettings" in t["test"]]
+        crud_tests = [t for t in self.test_results if "CRUD" in t["test"]]
+        dashboard_tests = [t for t in self.test_results if "Dashboard Stats" in t["test"]]
+        
+        print(f"\n📋 TEST CATEGORIES:")
+        print(f"   SiteSettings API: {len([t for t in sitesettings_tests if t['success']])}/{len(sitesettings_tests)} passed")
+        print(f"   CRUD Operations: {len([t for t in crud_tests if t['success']])}/{len(crud_tests)} passed")
+        print(f"   Dashboard Stats: {len([t for t in dashboard_tests if t['success']])}/{len(dashboard_tests)} passed")
+        
+        if failed_tests > 0:
+            print("\n❌ FAILED TESTS:")
+            for test in self.test_results:
+                if not test["success"]:
+                    print(f"  - {test['test']}: {test['details']}")
+        
+        print("\n🎯 KEY FINDINGS:")
+        
+        # Check for contact button fields
+        contact_button_success = any("Contact Button Fields" in t["test"] and t["success"] for t in self.test_results)
+        if contact_button_success:
+            print("  ✅ Contact button fields (3 new fields) are working correctly")
+        else:
+            print("  ❌ Contact button fields have issues")
+        
+        # Check for images field support
+        images_tests = [t for t in self.test_results if "images" in t["test"].lower()]
+        images_success = len([t for t in images_tests if t["success"]]) > 0
+        if images_success:
+            print("  ✅ Images field support is working in CRUD operations")
+        else:
+            print("  ❌ Images field support has issues")
+        
+        # Check admin authentication
+        auth_issues = [t for t in self.test_results if not t["success"] and "403" in t["details"]]
+        if auth_issues:
+            print(f"  ⚠️  Admin authentication issues found in {len(auth_issues)} tests")
+        else:
+            print("  ✅ Admin authentication working correctly")
+
     def print_final_verification_summary(self):
         """Print final verification results summary"""
         print("\n" + "=" * 80)
