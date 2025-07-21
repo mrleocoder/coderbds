@@ -163,6 +163,7 @@ class SiteSettings(BaseModel):
     contact_email: str = "info@bdsvietnam.com"
     contact_phone: str = "1900 123 456"
     contact_address: str = "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh"
+    company_address: str = "123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh"
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     banner_image: Optional[str] = None
