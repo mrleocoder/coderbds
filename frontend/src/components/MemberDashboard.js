@@ -13,13 +13,17 @@ const MemberDashboard = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [showDepositForm, setShowDepositForm] = useState(false);
+  const [depositStep, setDepositStep] = useState(1); // 1: amount, 2: bank details & upload, 3: confirmation
   const [showCreatePostForm, setShowCreatePostForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, logout, updateUser } = useAuth();
+  const toast = useToast();
 
   const [depositForm, setDepositForm] = useState({
     amount: '',
-    description: 'Nạp tiền vào tài khoản'
+    description: 'Nạp tiền vào tài khoản',
+    transfer_bill: null,
+    transfer_bill_preview: null
   });
 
   const [createPostForm, setCreatePostForm] = useState({
