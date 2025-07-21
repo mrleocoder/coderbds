@@ -2029,8 +2029,8 @@ async def get_messages(
     current_user: User = Depends(get_current_user)
 ):
     query = {"$or": [
-        {"from_user_id": current_user["id"]},
-        {"to_user_id": current_user["id"]}
+        {"from_user_id": current_user.id},
+        {"to_user_id": current_user.id}
     ]}
     
     if ticket_id:
