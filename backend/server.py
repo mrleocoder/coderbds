@@ -2180,6 +2180,142 @@ async def get_popular_pages(
     popular_pages = await db.pageviews.aggregate(pipeline).to_list(limit)
     return popular_pages
 
+# Admin CRUD APIs for Properties, News, SIMs, Lands
+@api_router.post("/admin/properties", response_model=dict)
+async def admin_create_property(property_data: PropertyCreate, current_user: User = Depends(get_current_admin)):
+    """Create property - Admin only"""
+    property_dict = property_data.dict()
+    property_dict["id"] = str(uuid.uuid4())
+    property_dict["created_at"] = datetime.utcnow()
+    property_dict["updated_at"] = datetime.utcnow()
+    property_dict["views"] = 0
+    
+    await db.properties.insert_one(property_dict)
+    return {"message": "Property created successfully", "id": property_dict["id"]}
+
+@api_router.put("/admin/properties/{property_id}", response_model=dict)
+async def admin_update_property(property_id: str, property_data: PropertyUpdate, current_user: User = Depends(get_current_admin)):
+    """Update property - Admin only"""
+    update_dict = property_data.dict(exclude_unset=True)
+    update_dict["updated_at"] = datetime.utcnow()
+    
+    result = await db.properties.update_one({"id": property_id}, {"$set": update_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    return {"message": "Property updated successfully"}
+
+@api_router.delete("/admin/properties/{property_id}")
+async def admin_delete_property(property_id: str, current_user: User = Depends(get_current_admin)):
+    """Delete property - Admin only"""
+    result = await db.properties.delete_one({"id": property_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    return {"message": "Property deleted successfully"}
+
+@api_router.post("/admin/news", response_model=dict)
+async def admin_create_news(news_data: NewsCreate, current_user: User = Depends(get_current_admin)):
+    """Create news - Admin only"""
+    news_dict = news_data.dict()
+    news_dict["id"] = str(uuid.uuid4())
+    news_dict["slug"] = news_dict["title"].lower().replace(" ", "-")
+    news_dict["created_at"] = datetime.utcnow()
+    news_dict["updated_at"] = datetime.utcnow()
+    news_dict["views"] = 0
+    
+    await db.news_articles.insert_one(news_dict)
+    return {"message": "News created successfully", "id": news_dict["id"]}
+
+@api_router.put("/admin/news/{news_id}", response_model=dict)
+async def admin_update_news(news_id: str, news_data: NewsUpdate, current_user: User = Depends(get_current_admin)):
+    """Update news - Admin only"""
+    update_dict = news_data.dict(exclude_unset=True)
+    update_dict["updated_at"] = datetime.utcnow()
+    
+    result = await db.news_articles.update_one({"id": news_id}, {"$set": update_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="News not found")
+    
+    return {"message": "News updated successfully"}
+
+@api_router.delete("/admin/news/{news_id}")
+async def admin_delete_news(news_id: str, current_user: User = Depends(get_current_admin)):
+    """Delete news - Admin only"""
+    result = await db.news_articles.delete_one({"id": news_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="News not found")
+    
+    return {"message": "News deleted successfully"}
+
+@api_router.post("/admin/sims", response_model=dict)
+async def admin_create_sim(sim_data: SimCreate, current_user: User = Depends(get_current_admin)):
+    """Create SIM - Admin only"""
+    sim_dict = sim_data.dict()
+    sim_dict["id"] = str(uuid.uuid4())
+    sim_dict["created_at"] = datetime.utcnow()
+    sim_dict["updated_at"] = datetime.utcnow()
+    sim_dict["views"] = 0
+    sim_dict["status"] = "available"
+    
+    await db.sims.insert_one(sim_dict)
+    return {"message": "SIM created successfully", "id": sim_dict["id"]}
+
+@api_router.put("/admin/sims/{sim_id}", response_model=dict)
+async def admin_update_sim(sim_id: str, sim_data: SimUpdate, current_user: User = Depends(get_current_admin)):
+    """Update SIM - Admin only"""
+    update_dict = sim_data.dict(exclude_unset=True)
+    update_dict["updated_at"] = datetime.utcnow()
+    
+    result = await db.sims.update_one({"id": sim_id}, {"$set": update_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="SIM not found")
+    
+    return {"message": "SIM updated successfully"}
+
+@api_router.delete("/admin/sims/{sim_id}")
+async def admin_delete_sim(sim_id: str, current_user: User = Depends(get_current_admin)):
+    """Delete SIM - Admin only"""
+    result = await db.sims.delete_one({"id": sim_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="SIM not found")
+    
+    return {"message": "SIM deleted successfully"}
+
+@api_router.post("/admin/lands", response_model=dict)
+async def admin_create_land(land_data: LandCreate, current_user: User = Depends(get_current_admin)):
+    """Create land - Admin only"""
+    land_dict = land_data.dict()
+    land_dict["id"] = str(uuid.uuid4())
+    land_dict["created_at"] = datetime.utcnow()
+    land_dict["updated_at"] = datetime.utcnow()
+    land_dict["views"] = 0
+    land_dict["status"] = "for_sale"
+    
+    await db.lands.insert_one(land_dict)
+    return {"message": "Land created successfully", "id": land_dict["id"]}
+
+@api_router.put("/admin/lands/{land_id}", response_model=dict)
+async def admin_update_land(land_id: str, land_data: LandUpdate, current_user: User = Depends(get_current_admin)):
+    """Update land - Admin only"""
+    update_dict = land_data.dict(exclude_unset=True)
+    update_dict["updated_at"] = datetime.utcnow()
+    
+    result = await db.lands.update_one({"id": land_id}, {"$set": update_dict})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Land not found")
+    
+    return {"message": "Land updated successfully"}
+
+@api_router.delete("/admin/lands/{land_id}")
+async def admin_delete_land(land_id: str, current_user: User = Depends(get_current_admin)):
+    """Delete land - Admin only"""
+    result = await db.lands.delete_one({"id": land_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Land not found")
+    
+    return {"message": "Land deleted successfully"}
+
 # Member Management APIs for Admin
 @api_router.get("/admin/members", response_model=List[UserProfile])
 async def get_all_members(
