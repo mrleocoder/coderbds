@@ -181,6 +181,7 @@ class SiteSettings(BaseModel):
 
 class SiteSettingsUpdate(BaseModel):
     site_title: Optional[str] = None
+    company_name: Optional[str] = None
     site_description: Optional[str] = None
     site_keywords: Optional[str] = None
     contact_email: Optional[str] = None
