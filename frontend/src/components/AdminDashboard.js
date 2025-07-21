@@ -481,14 +481,41 @@ const AdminDashboard = () => {
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <h3 className="text-lg font-semibold mb-4 flex items-center">
                       <i className="fas fa-chart-line text-emerald-600 mr-2"></i>
-                      Traffic 7 ngày qua
+                      Traffic 30 ngày qua
                     </h3>
-                    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                      <div className="text-center">
-                        <i className="fas fa-chart-line text-4xl text-gray-400 mb-2"></i>
-                        <p className="text-gray-500">Biểu đồ traffic sẽ hiển thị ở đây</p>
-                        <p className="text-sm text-gray-400">Coming soon...</p>
-                      </div>
+                    <div className="h-64">
+                      {trafficData ? (
+                        <Line 
+                          data={trafficData} 
+                          options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'top',
+                              },
+                              title: {
+                                display: false,
+                              },
+                            },
+                            scales: {
+                              y: {
+                                beginAtZero: true,
+                                ticks: {
+                                  stepSize: 50
+                                }
+                              },
+                            },
+                          }} 
+                        />
+                      ) : (
+                        <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                          <div className="text-center">
+                            <i className="fas fa-spinner fa-spin text-2xl text-gray-400 mb-2"></i>
+                            <p className="text-gray-500">Đang tải dữ liệu traffic...</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   
