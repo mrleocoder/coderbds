@@ -2172,6 +2172,185 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Settings Tab */}
+            {activeTab === 'settings' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Cài đặt Website</h2>
+                </div>
+
+                <form onSubmit={handleSaveSettings} className="space-y-8">
+                  {/* Basic Information */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <i className="fas fa-info-circle text-emerald-600 mr-2"></i>
+                      Thông tin cơ bản
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Tiêu đề website <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.site_title || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, site_title: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="VD: BDS Việt Nam"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Keywords SEO
+                        </label>
+                        <input
+                          type="text"
+                          value={siteSettings.site_keywords || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, site_keywords: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="bất động sản, nhà đất, căn hộ"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Mô tả website
+                        </label>
+                        <textarea
+                          value={siteSettings.site_description || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, site_description: e.target.value})}
+                          rows="3"
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="Mô tả ngắn gọn về website của bạn"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <i className="fas fa-phone text-emerald-600 mr-2"></i>
+                      Thông tin liên hệ
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email liên hệ <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={siteSettings.contact_email || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, contact_email: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="info@example.com"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Hotline <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          value={siteSettings.contact_phone || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, contact_phone: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="1900 123 456"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Địa chỉ công ty <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={siteSettings.contact_address || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, contact_address: e.target.value})}
+                          rows="2"
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Visual Assets */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <i className="fas fa-image text-emerald-600 mr-2"></i>
+                      Hình ảnh & Logo
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Logo URL
+                        </label>
+                        <input
+                          type="url"
+                          value={siteSettings.logo_url || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, logo_url: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="https://example.com/logo.png"
+                        />
+                        {siteSettings.logo_url && (
+                          <div className="mt-2">
+                            <img src={siteSettings.logo_url} alt="Logo preview" className="h-12 object-contain" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Favicon URL
+                        </label>
+                        <input
+                          type="url"
+                          value={siteSettings.favicon_url || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, favicon_url: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="https://example.com/favicon.ico"
+                        />
+                        {siteSettings.favicon_url && (
+                          <div className="mt-2">
+                            <img src={siteSettings.favicon_url} alt="Favicon preview" className="h-8 w-8 object-contain" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Banner chính URL
+                        </label>
+                        <input
+                          type="url"
+                          value={siteSettings.banner_image || ''}
+                          onChange={(e) => setSiteSettings({...siteSettings, banner_image: e.target.value})}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          placeholder="https://example.com/banner.jpg"
+                        />
+                        {siteSettings.banner_image && (
+                          <div className="mt-2">
+                            <img src={siteSettings.banner_image} alt="Banner preview" className="h-32 w-full object-cover rounded-lg" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="bg-emerald-600 text-white px-8 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium flex items-center"
+                    >
+                      <i className="fas fa-save mr-2"></i>
+                      Lưu cài đặt
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
             {/* Analytics Tab */}
             {activeTab === 'analytics' && (
               <div className="space-y-6">
