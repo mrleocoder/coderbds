@@ -555,6 +555,31 @@ class PostBase(BaseModel):
     expires_at: Optional[datetime] = None
     views: int = 0
 
+class Message(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    ticket_id: Optional[str] = None
+    deposit_id: Optional[str] = None
+    from_user_id: str  # admin hoặc member ID
+    to_user_id: str    # admin hoặc member ID
+    from_type: str     # "admin" hoặc "member"
+    to_type: str       # "admin" hoặc "member"
+    message: str
+    message_type: str = "text"  # "text", "image", "system"
+    read: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class MessageCreate(BaseModel):
+    ticket_id: Optional[str] = None
+    deposit_id: Optional[str] = None
+    to_user_id: str
+    to_type: str
+    message: str
+    message_type: str = "text"
+
+class MessageUpdate(BaseModel):
+    read: Optional[bool] = None
+
 class MemberPost(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
