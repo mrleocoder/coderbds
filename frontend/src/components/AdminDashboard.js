@@ -1412,84 +1412,91 @@ const AdminDashboard = () => {
                 </div>
 
                 {showForm && (
-                  <form onSubmit={handleSubmitNews} className="mb-8 p-6 bg-gray-50 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4">
-                      {editingItem ? 'Sửa tin tức' : 'Thêm tin tức mới'}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <input
-                        type="text"
-                        placeholder="Tiêu đề"
-                        value={newsForm.title}
-                        onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Danh mục"
-                        value={newsForm.category}
-                        onChange={(e) => setNewsForm({...newsForm, category: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Tác giả"
-                        value={newsForm.author}
-                        onChange={(e) => setNewsForm({...newsForm, author: e.target.value})}
-                        className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        required
-                      />
-                    </div>
-                    <textarea
-                      placeholder="Mô tả ngắn"
-                      value={newsForm.excerpt}
-                      onChange={(e) => setNewsForm({...newsForm, excerpt: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="2"
-                      required
-                    />
-                    <textarea
-                      placeholder="Nội dung chi tiết"
-                      value={newsForm.content}
-                      onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
-                      rows="8"
-                      required
-                    />
-                    <div className="flex items-center space-x-4 mb-4">
-                      <label className="flex items-center space-x-2">
+                  <Modal 
+                    isOpen={showForm}
+                    onClose={() => {
+                      setShowForm(false);
+                      setEditingItem(null);
+                    }}
+                    title={editingItem ? 'Sửa tin tức' : 'Thêm tin tức mới'}
+                    size="xl"
+                  >
+                    <form onSubmit={handleSubmitNews} className="p-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <input
-                          type="checkbox"
-                          checked={newsForm.published}
-                          onChange={(e) => setNewsForm({...newsForm, published: e.target.checked})}
-                          className="rounded text-emerald-600"
+                          type="text"
+                          placeholder="Tiêu đề"
+                          value={newsForm.title}
+                          onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
                         />
-                        <span>Xuất bản ngay</span>
-                      </label>
-                    </div>
-                    <div className="flex space-x-4">
-                      <button
-                        type="submit"
-                        className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-save mr-2"></i>
-                        {editingItem ? 'Cập nhật' : 'Thêm mới'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowForm(false);
-                          setEditingItem(null);
-                        }}
-                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>
-                        Hủy
-                      </button>
-                    </div>
-                  </form>
+                        <input
+                          type="text"
+                          placeholder="Danh mục"
+                          value={newsForm.category}
+                          onChange={(e) => setNewsForm({...newsForm, category: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Tác giả"
+                          value={newsForm.author}
+                          onChange={(e) => setNewsForm({...newsForm, author: e.target.value})}
+                          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                          required
+                        />
+                      </div>
+                      <textarea
+                        placeholder="Mô tả ngắn"
+                        value={newsForm.excerpt}
+                        onChange={(e) => setNewsForm({...newsForm, excerpt: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
+                        rows="2"
+                        required
+                      />
+                      <textarea
+                        placeholder="Nội dung chi tiết"
+                        value={newsForm.content}
+                        onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-emerald-500 focus:border-emerald-500"
+                        rows="8"
+                        required
+                      />
+                      <div className="flex items-center space-x-4 mb-6">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={newsForm.published}
+                            onChange={(e) => setNewsForm({...newsForm, published: e.target.checked})}
+                            className="rounded text-emerald-600"
+                          />
+                          <span>Xuất bản ngay</span>
+                        </label>
+                      </div>
+                      <div className="flex justify-end space-x-4 border-t pt-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowForm(false);
+                            setEditingItem(null);
+                          }}
+                          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          <i className="fas fa-times mr-2"></i>
+                          Hủy
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                        >
+                          <i className="fas fa-save mr-2"></i>
+                          {editingItem ? 'Cập nhật' : 'Thêm mới'}
+                        </button>
+                      </div>
+                    </form>
+                  </Modal>
                 )}
 
                 <div className="space-y-4">
