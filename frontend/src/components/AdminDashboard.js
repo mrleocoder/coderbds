@@ -47,6 +47,7 @@ const AdminDashboard = () => {
   const [popularPages, setPopularPages] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, logout } = useAuth();
+  const toast = useToast();
 
   const [propertyForm, setPropertyForm] = useState({
     title: '',
