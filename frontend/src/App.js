@@ -2293,6 +2293,7 @@ function App() {
     <AuthProvider>
       <ToastProvider>
         <Router>
+          <ScrollToTop />
           <div className="App">
             <Routes>
               {/* Public Routes */}
