@@ -1268,15 +1268,43 @@ const AdminDashboard = () => {
 
                     {/* News Form */}
                     {modalType === 'news' && (
-                      <form onSubmit={(e) => {
+                      <form onSubmit={async (e) => {
                         e.preventDefault();
-                        toast.success('Cập nhật tin tức thành công!');
-                        closeModal();
-                        fetchAdminData();
+                        const formData = new FormData(e.target);
+                        try {
+                          const token = localStorage.getItem('token');
+                          const newsData = {
+                            title: formData.get('title'),
+                            category: formData.get('category'),
+                            author: formData.get('author'),
+                            excerpt: formData.get('excerpt'),
+                            content: formData.get('content'),
+                            published: formData.get('published') === 'on',
+                            featured_image: formData.get('featured_image') || null
+                          };
+
+                          if (editingItem) {
+                            await axios.put(`${API}/admin/news/${editingItem.id}`, newsData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Cập nhật tin tức thành công!');
+                          } else {
+                            await axios.post(`${API}/admin/news`, newsData, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            toast.success('Thêm tin tức thành công!');
+                          }
+                          closeModal();
+                          fetchAdminData();
+                        } catch (error) {
+                          console.error('Error saving news:', error);
+                          toast.error('Có lỗi xảy ra khi lưu tin tức!');
+                        }
                       }} className="space-y-4">
                         <div className="grid grid-cols-1 gap-4">
                           <input
                             type="text"
+                            name="title"
                             placeholder="Tiêu đề tin tức"
                             defaultValue={editingItem?.title || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1284,6 +1312,7 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="text"
+                            name="category"
                             placeholder="Danh mục"
                             defaultValue={editingItem?.category || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1291,6 +1320,7 @@ const AdminDashboard = () => {
                           />
                           <input
                             type="text"
+                            name="author"
                             placeholder="Tác giả"
                             defaultValue={editingItem?.author || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1298,6 +1328,7 @@ const AdminDashboard = () => {
                           />
                         </div>
                         <textarea
+                          name="excerpt"
                           placeholder="Tóm tắt tin tức"
                           defaultValue={editingItem?.excerpt || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1305,6 +1336,7 @@ const AdminDashboard = () => {
                           required
                         />
                         <textarea
+                          name="content"
                           placeholder="Nội dung chi tiết"
                           defaultValue={editingItem?.content || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
@@ -1321,13 +1353,29 @@ const AdminDashboard = () => {
                                   <span className="font-semibold">Click để upload</span> ảnh đại diện
                                 </p>
                               </div>
-                              <input type="file" className="hidden" accept="image/*" />
+                              <input 
+                                type="file" 
+                                name="featured_image" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  if (e.target.files[0]) {
+                                    const file = e.target.files[0];
+                                    const reader = new FileReader();
+                                    reader.onload = () => {
+                                      e.target.setAttribute('data-image', reader.result);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
                             </label>
                           </div>
                         </div>
                         <div className="flex items-center">
                           <input
                             type="checkbox"
+                            name="published"
                             defaultChecked={editingItem?.published !== false}
                             className="mr-2"
                             id="published"
