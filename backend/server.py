@@ -165,6 +165,11 @@ class SiteSettings(BaseModel):
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     banner_image: Optional[str] = None
+    bank_account_number: str = "1234567890"
+    bank_account_holder: str = "CONG TY TNHH BDS VIET NAM"
+    bank_name: str = "Ngân hàng Vietcombank"
+    bank_branch: Optional[str] = "Chi nhánh TP.HCM"
+    bank_qr_code: Optional[str] = None
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SiteSettingsUpdate(BaseModel):
@@ -177,6 +182,11 @@ class SiteSettingsUpdate(BaseModel):
     logo_url: Optional[str] = None
     favicon_url: Optional[str] = None
     banner_image: Optional[str] = None
+    bank_account_number: Optional[str] = None
+    bank_account_holder: Optional[str] = None
+    bank_name: Optional[str] = None
+    bank_branch: Optional[str] = None
+    bank_qr_code: Optional[str] = None
 
 # Pydantic Models
 class Property(BaseModel):
