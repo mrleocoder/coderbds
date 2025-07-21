@@ -471,11 +471,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin Member Management Tab"
-    - "Admin Sim and Land Management Forms"
-    - "Analytics Dashboard with Charts"
-    - "Contact Form on Website"
-    - "Ticket Management in Admin"
+    - "Messages Component Integration"
+    - "Contact Form Requires Login"
+    - "Data Cleanup and Minimal Sample"
+    - "Admin-Member Real-time Sync Verification"
+    - "Complete System Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
