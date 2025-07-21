@@ -296,6 +296,26 @@ class NewsArticleCreate(BaseModel):
     published: bool = True
     author: str
 
+class NewsCreate(BaseModel):
+    title: str
+    content: str
+    excerpt: str
+    featured_image: Optional[str] = None
+    category: str
+    tags: List[str] = []
+    published: bool = True
+    author: str
+
+class NewsUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    excerpt: Optional[str] = None
+    featured_image: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[List[str]] = None
+    published: Optional[bool] = None
+    author: Optional[str] = None
+
 class SearchFilters(BaseModel):
     property_type: Optional[PropertyType] = None
     status: Optional[PropertyStatus] = None
