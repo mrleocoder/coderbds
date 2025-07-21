@@ -624,6 +624,26 @@ const HeroSection = () => {
                 </select>
               </div>
             )}
+
+            {searchForm.searchType === 'land' && (
+              <div className="space-y-2">
+                <label className="flex items-center space-x-1 text-gray-700">
+                  <i className="fas fa-ruler-combined text-emerald-600"></i>
+                  <span>Diện tích</span>
+                </label>
+                <select 
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  value={searchForm.bedrooms} // reusing bedrooms field for area
+                  onChange={(e) => setSearchForm({...searchForm, bedrooms: e.target.value})}
+                >
+                  <option value="">Tất cả diện tích</option>
+                  <option value="100">Dưới 100m²</option>
+                  <option value="200">100-200m²</option>
+                  <option value="500">200-500m²</option>
+                  <option value="1000">Trên 500m²</option>
+                </select>
+              </div>
+            )}
             
             <div className="flex items-end">
               <button 
