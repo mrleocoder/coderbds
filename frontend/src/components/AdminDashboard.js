@@ -528,6 +528,373 @@ const AdminDashboard = () => {
             )}
 
             {/* Other tabs - basic display with modal buttons */}
+            {activeTab === 'properties' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Quản lý Bất động sản</h2>
+                  <button
+                    onClick={() => openModal('property')}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Thêm BDS mới</span>
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {properties.length > 0 ? properties.map((property) => (
+                    <div key={property.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{property.title}</h3>
+                          <p className="text-gray-600">{property.address}, {property.district}, {property.city}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
+                            <span><i className="fas fa-tag text-emerald-600 mr-1"></i>{property.property_type}</span>
+                            <span><i className="fas fa-dollar-sign text-emerald-600 mr-1"></i>{property.price?.toLocaleString()} VNĐ</span>
+                            <span><i className="fas fa-ruler-combined text-emerald-600 mr-1"></i>{property.area}m²</span>
+                            <span><i className="fas fa-bed text-emerald-600 mr-1"></i>{property.bedrooms} PN</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('property', property)}
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(property.id, 'properties')}
+                            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-home text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có bất động sản nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'news' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Quản lý Tin tức</h2>
+                  <button
+                    onClick={() => openModal('news')}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Thêm tin tức mới</span>
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {news.length > 0 ? news.map((article) => (
+                    <div key={article.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{article.title}</h3>
+                          <p className="text-gray-600">{article.excerpt}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
+                            <span><i className="fas fa-folder text-emerald-600 mr-1"></i>{article.category}</span>
+                            <span><i className="fas fa-user text-emerald-600 mr-1"></i>{article.author}</span>
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(article.created_at).toLocaleDateString('vi-VN')}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('news', article)}
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(article.id, 'news')}
+                            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có tin tức nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'lands' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Quản lý Dự án Đất</h2>
+                  <button
+                    onClick={() => openModal('land')}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Thêm dự án đất mới</span>
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {lands.length > 0 ? lands.map((land) => (
+                    <div key={land.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{land.title}</h3>
+                          <p className="text-gray-600">{land.address}, {land.district}, {land.city}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600 mt-2">
+                            <span><i className="fas fa-tag text-emerald-600 mr-1"></i>{land.land_type}</span>
+                            <span><i className="fas fa-dollar-sign text-emerald-600 mr-1"></i>{land.price?.toLocaleString()} VNĐ</span>
+                            <span><i className="fas fa-ruler-combined text-emerald-600 mr-1"></i>{land.area}m²</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('land', land)}
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(land.id, 'lands')}
+                            className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-map text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có dự án đất nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'deposits' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Duyệt nạp tiền</h2>
+                  <div className="flex space-x-2 text-sm">
+                    <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded">
+                      Chờ duyệt ({deposits.filter(d => d.status === 'pending').length})
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded">
+                      Đã duyệt ({deposits.filter(d => d.status === 'approved').length})
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {deposits.length > 0 ? deposits.map((deposit) => (
+                    <div key={deposit.id} className="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{deposit.user_id} - {deposit.amount?.toLocaleString()} VNĐ</h3>
+                          <p className="text-gray-600 mb-2">
+                            <span className="font-medium">Phương thức:</span> {deposit.method || 'Chuyển khoản'}
+                          </p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(deposit.created_at).toLocaleDateString('vi-VN')}</span>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              deposit.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              deposit.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {deposit.status === 'pending' ? 'Chờ duyệt' : 
+                               deposit.status === 'approved' ? 'Đã duyệt' : 'Từ chối'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('deposit', deposit)}
+                            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-coins text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có giao dịch nạp tiền nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'members' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Quản lý Thành viên</h2>
+                </div>
+                <div className="space-y-4">
+                  {members.length > 0 ? members.map((member) => (
+                    <div key={member.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="font-semibold text-lg">{member.username}</h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              member.status === 'active' ? 'bg-green-100 text-green-800' :
+                              member.status === 'suspended' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {member.status === 'active' ? 'Hoạt động' : 
+                               member.status === 'suspended' ? 'Tạm khóa' : 'Chờ xác nhận'}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><i className="fas fa-envelope text-emerald-600 mr-1"></i>{member.email}</span>
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(member.created_at).toLocaleDateString('vi-VN')}</span>
+                            <span><i className="fas fa-wallet text-emerald-600 mr-1"></i>{member.wallet_balance?.toLocaleString()} VNĐ</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('member', member)}
+                            className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có thành viên nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'tickets' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Support Tickets</h2>
+                  <div className="flex space-x-2 text-sm">
+                    <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded">
+                      Mở ({tickets.filter(t => t.status === 'open').length})
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded">
+                      Đã giải quyết ({tickets.filter(t => t.status === 'resolved').length})
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {tickets.length > 0 ? tickets.map((ticket) => (
+                    <div key={ticket.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="font-semibold text-lg">{ticket.subject}</h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              ticket.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
+                              ticket.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {ticket.status === 'open' ? 'Đang mở' : 
+                               ticket.status === 'resolved' ? 'Đã giải quyết' : 'Đã đóng'}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-2">{ticket.message}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><i className="fas fa-user text-emerald-600 mr-1"></i>{ticket.name}</span>
+                            <span><i className="fas fa-envelope text-emerald-600 mr-1"></i>{ticket.email}</span>
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(ticket.created_at).toLocaleDateString('vi-VN')}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('ticket', ticket)}
+                            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-ticket-alt text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có ticket nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'member-posts' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">Duyệt tin Member</h2>
+                  <div className="flex space-x-2 text-sm">
+                    <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded">
+                      Chờ duyệt ({memberPosts.filter(p => p.status === 'pending').length})
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded">
+                      Đã duyệt ({memberPosts.filter(p => p.status === 'approved').length})
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {memberPosts.length > 0 ? memberPosts.map((post) => (
+                    <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="font-semibold text-lg">{post.title}</h3>
+                            <span className={`px-2 py-1 rounded text-sm font-medium ${
+                              post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              post.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {post.status === 'pending' ? 'Chờ duyệt' : 
+                               post.status === 'approved' ? 'Đã duyệt' : 'Từ chối'}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 mb-2">{post.description}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><i className="fas fa-user text-emerald-600 mr-1"></i>{post.author_name}</span>
+                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => openModal('memberPost', post)}
+                            className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-8">
+                      <i className="fas fa-user-edit text-6xl text-gray-300 mb-4"></i>
+                      <p className="text-gray-500">Chưa có tin member nào</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Other tabs - basic display with modal buttons */}
             {activeTab === 'sims' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
