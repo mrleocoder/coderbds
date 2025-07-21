@@ -16,6 +16,21 @@ import LandDetailPage from './components/LandDetailPage';
 import ContactForm from './components/ContactForm';
 import ContactPage from './components/ContactPage';
 
+// ScrollToTop component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }, [pathname]);
+
+  return null;
+}
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
