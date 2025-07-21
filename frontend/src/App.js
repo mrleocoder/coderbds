@@ -2061,7 +2061,7 @@ const Footer = () => {
             © 2025 BDS Việt Nam. All rights reserved.
           </p>
           <p className="text-sm text-gray-400 mt-2">
-            Made with <i className="fas fa-heart text-emerald-400"></i> in Vietnam
+            Bản quyền bởi <a href="https://toicodedao.com" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">TOICODEDAO.COM</a>
           </p>
         </div>
       </div>
