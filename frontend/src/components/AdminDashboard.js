@@ -830,7 +830,7 @@ const AdminDashboard = () => {
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="hidden md:flex space-x-8 px-6">
               <button
                 onClick={() => {
                   setActiveTab('overview');
