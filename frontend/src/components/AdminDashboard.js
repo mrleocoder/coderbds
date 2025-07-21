@@ -233,6 +233,105 @@ const AdminDashboard = () => {
     }
   };
 
+  // Image upload handler
+  const handleImageUpload = (formType) => (files) => {
+    const promises = Array.from(files).map(file => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(promises).then(images => {
+      if (formType === 'property') {
+        setPropertyForm(prev => ({
+          ...prev,
+          images: [...(prev.images || []), ...images]
+        }));
+      } else if (formType === 'news') {
+        setNewsForm(prev => ({
+          ...prev,
+          images: [...(prev.images || []), ...images]
+        }));
+      } else if (formType === 'land') {
+        setLandForm(prev => ({
+          ...prev,
+          images: [...(prev.images || []), ...images]
+        }));
+      }
+    });
+  };
+
+  // Remove image handler
+  const removeImage = (formType, index) => {
+    if (formType === 'property') {
+      setPropertyForm(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    } else if (formType === 'news') {
+      setNewsForm(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    } else if (formType === 'land') {
+      setLandForm(prev => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  // Modal handlers
+  const openModal = (type, item = null) => {
+    setModalType(type);
+    setEditingItem(item);
+    setShowModal(true);
+    
+    if (item) {
+      if (type === 'sim') {
+        setSimForm({ ...item });
+      } else if (type === 'land') {
+        setLandForm({ ...item });
+      } else if (type === 'deposit') {
+        setDepositForm({
+          status: item.status === 'pending' ? 'approved' : item.status,
+          admin_notes: item.admin_notes || '',
+          processed_date: new Date().toISOString().split('T')[0]
+        });
+      } else if (type === 'member') {
+        setMemberForm({
+          status: item.status,
+          admin_notes: item.admin_notes || '',
+          full_name: item.full_name || '',
+          phone: item.phone || '',
+          address: item.address || '',
+          email_verified: item.email_verified || false
+        });
+      } else if (type === 'ticket') {
+        setTicketForm({
+          status: item.status === 'open' ? 'resolved' : item.status,
+          priority: item.priority || 'medium',
+          admin_notes: item.admin_notes || '',
+          assigned_to: item.assigned_to || ''
+        });
+      } else if (type === 'memberPost') {
+        setMemberPostForm({
+          status: item.status === 'pending' ? 'approved' : item.status,
+          admin_notes: item.admin_notes || '',
+          reviewed_date: new Date().toISOString().split('T')[0]
+        });
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalType('');
+    setEditingItem(null);
+  };
+
   const handleSubmitProperty = async (e) => {
     e.preventDefault();
     try {
