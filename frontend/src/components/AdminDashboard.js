@@ -392,19 +392,37 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSaveSettings = async (e) => {
-    e.preventDefault();
+  const handleApproveMemberPost = async (postId, action) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${API}/admin/settings`, siteSettings, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`${API}/admin/member-posts/${postId}/approve`, 
+        { status: action },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       
-      toast.success('Cập nhật cài đặt website thành công!');
+      toast.success(action === 'approved' ? 'Duyệt bài đăng thành công!' : 
+                   action === 'rejected' ? 'Từ chối bài đăng thành công!' : 'Cập nhật trạng thái thành công!');
       fetchAdminData();
     } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error('Có lỗi xảy ra khi lưu cài đặt');
+      console.error('Error processing member post:', error);
+      toast.error('Có lỗi xảy ra khi xử lý bài đăng');
+    }
+  };
+
+  const handleDeleteMemberPost = async (postId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa bài đăng này?')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`${API}/admin/member-posts/${postId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        toast.success('Xóa bài đăng thành công!');
+        fetchAdminData();
+      } catch (error) {
+        console.error('Error deleting member post:', error);
+        toast.error('Có lỗi xảy ra khi xóa bài đăng');
+      }
     }
   };
 
