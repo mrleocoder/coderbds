@@ -2009,7 +2009,62 @@ async def delete_ticket(ticket_id: str, current_user: User = Depends(get_current
         raise HTTPException(status_code=404, detail="Ticket not found")
     return {"message": "Ticket deleted successfully"}
 
-# Analytics Routes
+# Messaging endpoints
+@api_router.post("/messages", response_model=dict)
+async def create_message(message: MessageCreate, current_user: User = Depends(get_current_user)):
+    message_data = message.dict()
+    message_data["from_user_id"] = current_user["id"]
+    message_data["from_type"] = current_user["role"]
+    
+    # Insert into database
+    result = db.messages.insert_one(Message(**message_data).dict())
+    
+    return {"message": "Tin nhắn đã được gửi", "id": str(result.inserted_id)}
+
+@api_router.get("/messages", response_model=List[dict])
+async def get_messages(
+    ticket_id: Optional[str] = None,
+    deposit_id: Optional[str] = None,
+    limit: int = 50,
+    current_user: User = Depends(get_current_user)
+):
+    query = {"$or": [
+        {"from_user_id": current_user["id"]},
+        {"to_user_id": current_user["id"]}
+    ]}
+    
+    if ticket_id:
+        query["ticket_id"] = ticket_id
+    if deposit_id:
+        query["deposit_id"] = deposit_id
+    
+    messages = list(db.messages.find(query).sort("created_at", 1).limit(limit))
+    
+    for message in messages:
+        message["_id"] = str(message["_id"])
+    
+    return messages
+
+@api_router.put("/messages/{message_id}/read", response_model=dict)
+async def mark_message_read(message_id: str, current_user: User = Depends(get_current_user)):
+    result = db.messages.update_one(
+        {"id": message_id, "to_user_id": current_user["id"]},
+        {"$set": {"read": True, "updated_at": datetime.utcnow()}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Tin nhắn không tồn tại")
+    
+    return {"message": "Đã đánh dấu đã đọc"}
+
+@api_router.get("/admin/messages/unread", response_model=dict)
+async def get_unread_messages_count(current_admin: User = Depends(get_current_admin)):
+    count = db.messages.count_documents({
+        "to_user_id": current_admin["id"],
+        "read": False
+    })
+    
+    return {"unread_count": count}
 @api_router.post("/analytics/pageview")
 async def track_page_view(analytics_data: AnalyticsCreate):
     """Track page view (public endpoint)"""
