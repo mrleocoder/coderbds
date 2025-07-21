@@ -486,51 +486,250 @@ const MemberDashboard = () => {
                 </div>
 
                 {showDepositForm && (
-                  <form onSubmit={handleDeposit} className="mb-6 p-4 bg-emerald-50 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-4">Yêu cầu nạp tiền</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Số tiền (VNĐ) <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="Nhập số tiền cần nạp"
-                          value={depositForm.amount}
-                          onChange={(e) => setDepositForm({...depositForm, amount: e.target.value})}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-                        <input
-                          type="text"
-                          placeholder="Mô tả giao dịch"
-                          value={depositForm.description}
-                          onChange={(e) => setDepositForm({...depositForm, description: e.target.value})}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex space-x-4 mt-4">
-                      <button
-                        type="submit"
-                        className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
-                      >
-                        <i className="fas fa-paper-plane mr-2"></i>
-                        Gửi yêu cầu
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowDepositForm(false)}
-                        className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                      >
-                        <i className="fas fa-times mr-2"></i>
-                        Hủy
-                      </button>
-                    </div>
-                  </form>
+                  <Modal 
+                    isOpen={showDepositForm}
+                    onClose={() => {
+                      setShowDepositForm(false);
+                      setDepositStep(1);
+                      setDepositForm({ 
+                        amount: '', 
+                        description: 'Nạp tiền vào tài khoản',
+                        transfer_bill: null,
+                        transfer_bill_preview: null
+                      });
+                    }}
+                    title="Nạp tiền vào tài khoản"
+                    size="lg"
+                  >
+                    <form onSubmit={handleDeposit} className="p-6">
+                      {/* Step 1: Amount Input */}
+                      {depositStep === 1 && (
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4">Bước 1: Nhập số tiền cần nạp</h3>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Số tiền (VNĐ) <span className="text-red-500">*</span>
+                              </label>
+                              <input
+                                type="number"
+                                placeholder="Nhập số tiền cần nạp"
+                                value={depositForm.amount}
+                                onChange={(e) => setDepositForm({...depositForm, amount: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-emerald-500 focus:border-emerald-500"
+                                required
+                                min="10000"
+                                step="1000"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">Số tiền tối thiểu: 10,000 VNĐ</p>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+                              <input
+                                type="text"
+                                placeholder="Mô tả giao dịch"
+                                value={depositForm.description}
+                                onChange={(e) => setDepositForm({...depositForm, description: e.target.value})}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-emerald-500 focus:border-emerald-500"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-4 mt-6 pt-4 border-t">
+                            <button
+                              type="button"
+                              onClick={() => setShowDepositForm(false)}
+                              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              Hủy
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDepositStep(2)}
+                              disabled={!depositForm.amount || parseFloat(depositForm.amount) < 10000}
+                              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Tiếp tục
+                              <i className="fas fa-arrow-right ml-2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 2: Bank Details & Upload */}
+                      {depositStep === 2 && (
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4">Bước 2: Thông tin chuyển tiền</h3>
+                          
+                          {/* Bank Details */}
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <h4 className="font-semibold text-blue-900 mb-3">Thông tin tài khoản ngân hàng</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <div className="space-y-2 text-sm">
+                                  <div><strong>Số tài khoản:</strong> {bankDetails.accountNumber}</div>
+                                  <div><strong>Chủ tài khoản:</strong> {bankDetails.accountHolder}</div>
+                                  <div><strong>Ngân hàng:</strong> {bankDetails.bankName}</div>
+                                  <div><strong>Chi nhánh:</strong> {bankDetails.branch}</div>
+                                </div>
+                              </div>
+                              <div className="flex justify-center">
+                                <div className="text-center">
+                                  <img 
+                                    src={bankDetails.qrCode} 
+                                    alt="QR Code" 
+                                    className="w-32 h-32 border border-gray-300 rounded-lg"
+                                  />
+                                  <p className="text-xs text-gray-600 mt-2">Quét QR để chuyển tiền</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Transfer Content */}
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <h4 className="font-semibold text-yellow-900 mb-2">Nội dung chuyển tiền</h4>
+                            <div className="bg-white border border-yellow-300 rounded px-3 py-2 font-mono text-sm">
+                              {user.username} {depositForm.amount}
+                            </div>
+                            <p className="text-xs text-yellow-700 mt-1">Vui lòng ghi chính xác nội dung này khi chuyển tiền</p>
+                          </div>
+
+                          {/* Upload Bill */}
+                          <div className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Upload ảnh bill chuyển tiền <span className="text-red-500">*</span>
+                              </label>
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                {depositForm.transfer_bill_preview ? (
+                                  <div className="space-y-4">
+                                    <img 
+                                      src={depositForm.transfer_bill_preview} 
+                                      alt="Bill preview" 
+                                      className="max-w-full max-h-48 mx-auto rounded-lg shadow-sm"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => setDepositForm(prev => ({...prev, transfer_bill: null, transfer_bill_preview: null}))}
+                                      className="text-red-600 hover:text-red-700 text-sm"
+                                    >
+                                      <i className="fas fa-times mr-1"></i>
+                                      Xóa ảnh
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p className="text-gray-600 mb-2">Kéo thả ảnh vào đây hoặc</p>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={handleFileUpload}
+                                      className="hidden"
+                                      id="bill-upload"
+                                    />
+                                    <label
+                                      htmlFor="bill-upload"
+                                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors cursor-pointer"
+                                    >
+                                      Chọn ảnh
+                                    </label>
+                                    <p className="text-xs text-gray-500 mt-2">Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between space-x-4 mt-6 pt-4 border-t">
+                            <button
+                              type="button"
+                              onClick={() => setDepositStep(1)}
+                              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <i className="fas fa-arrow-left mr-2"></i>
+                              Quay lại
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDepositStep(3)}
+                              disabled={!depositForm.transfer_bill}
+                              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Xác nhận chuyển tiền
+                              <i className="fas fa-arrow-right ml-2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Confirmation */}
+                      {depositStep === 3 && (
+                        <div>
+                          <h3 className="text-lg font-semibold mb-4">Bước 3: Xác nhận gửi yêu cầu</h3>
+                          
+                          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                            <h4 className="font-semibold mb-3">Tóm tắt thông tin nạp tiền</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Số tiền:</span>
+                                <span className="font-semibold text-emerald-600">
+                                  {parseInt(depositForm.amount).toLocaleString()} VNĐ
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Nội dung CK:</span>
+                                <span className="font-mono">{user.username} {depositForm.amount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Mô tả:</span>
+                                <span>{depositForm.description}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span>Bill chuyển tiền:</span>
+                                <span className="text-green-600">
+                                  <i className="fas fa-check-circle mr-1"></i>
+                                  Đã upload
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div className="flex items-start">
+                              <i className="fas fa-exclamation-triangle text-yellow-600 mr-2 mt-1"></i>
+                              <div className="text-sm text-yellow-800">
+                                <p className="font-medium mb-1">Lưu ý quan trọng:</p>
+                                <ul className="list-disc list-inside space-y-1 text-xs">
+                                  <li>Vui lòng chuyển khoản với chính xác nội dung đã cung cấp</li>
+                                  <li>Yêu cầu sẽ được xử lý trong vòng 24h (ngày làm việc)</li>
+                                  <li>Nếu có sai sót, tiền sẽ được hoàn trả trong 3-5 ngày làm việc</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between space-x-4 mt-6 pt-4 border-t">
+                            <button
+                              type="button"
+                              onClick={() => setDepositStep(2)}
+                              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <i className="fas fa-arrow-left mr-2"></i>
+                              Quay lại
+                            </button>
+                            <button
+                              type="submit"
+                              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              <i className="fas fa-paper-plane mr-2"></i>
+                              Xác nhận gửi yêu cầu
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </form>
+                  </Modal>
                 )}
 
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
