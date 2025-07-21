@@ -1832,10 +1832,7 @@ const FAQSection = () => {
           {Object.entries(faqCategories).map(([key, category]) => (
             <button
               key={key}
-              onClick={() => {
-                setActiveCategory(key);
-                setOpenIndex(null);
-              }}
+              onClick={() => handleCategoryChange(key)}
               className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg ${
                 activeCategory === key
                   ? 'bg-emerald-600 text-white'
