@@ -135,7 +135,7 @@ const ContactForm = ({ onClose }) => {
             <input
               type="text"
               placeholder="Nhập họ và tên"
-              value={contactForm.name}
+              value={contactForm.name || user?.full_name || user?.username || ''}
               onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
               required
@@ -149,7 +149,7 @@ const ContactForm = ({ onClose }) => {
             <input
               type="email"
               placeholder="Nhập địa chỉ email"
-              value={contactForm.email}
+              value={contactForm.email || user?.email || ''}
               onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
               required
