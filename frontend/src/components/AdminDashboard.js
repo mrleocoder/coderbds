@@ -247,7 +247,7 @@ const AdminDashboard = () => {
         toast.success('Thêm bất động sản mới thành công!');
       }
       fetchAdminData();
-      setShowForm(false);
+      setShowModal(false);
       setEditingItem(null);
       resetPropertyForm();
     } catch (error) {
