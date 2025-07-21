@@ -129,6 +129,7 @@ const Header = () => {
                   setShowLandDropdown(!showLandDropdown);
                   setShowPropertyDropdown(false);
                   setShowTypeDropdown(false);
+                  setShowCategoryDropdown(false);
                 }}
                 className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
               >
@@ -151,21 +152,39 @@ const Header = () => {
               )}
             </div>
 
-            <Link to="/kho-sim" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
-              <i className="fas fa-sim-card"></i>
-              <span>Kho Sim</span>
-            </Link>
-            <Link to="/tin-tuc" className="hover:text-emerald-200 transition-colors flex items-center space-x-1">
-              <i className="fas fa-newspaper"></i>
-              <span>Tin tức</span>
-            </Link>
-            <button 
-              onClick={() => setShowContactForm(true)}
-              className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
-            >
-              <i className="fas fa-envelope"></i>
-              <span>Liên hệ</span>
-            </button>
+            {/* Category Dropdown (Kho Sim, Tin tức, Liên hệ) */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowCategoryDropdown(!showCategoryDropdown);
+                  setShowPropertyDropdown(false);
+                  setShowTypeDropdown(false);
+                  setShowLandDropdown(false);
+                }}
+                className="hover:text-emerald-200 transition-colors flex items-center space-x-1"
+              >
+                <i className="fas fa-th-list"></i>
+                <span>Danh mục</span>
+                <i className="fas fa-chevron-down text-xs"></i>
+              </button>
+              
+              {showCategoryDropdown && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <Link to="/kho-sim" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-sim-card text-emerald-600 mr-2"></i>
+                    Kho Sim
+                  </Link>
+                  <Link to="/tin-tuc" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-newspaper text-emerald-600 mr-2"></i>
+                    Tin tức
+                  </Link>
+                  <Link to="/lien-he" className="block px-4 py-2 text-gray-700 hover:bg-emerald-50">
+                    <i className="fas fa-envelope text-emerald-600 mr-2"></i>
+                    Liên hệ
+                  </Link>
+                </div>
+              )}
+            </div>
             
             {/* User Authentication */}
             {isAuthenticated() ? (
