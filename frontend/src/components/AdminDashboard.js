@@ -1429,6 +1429,22 @@ const AdminDashboard = () => {
                             required
                           />
                           <input
+                            type="text"
+                            name="district"
+                            placeholder="Quận/Huyện"
+                            defaultValue={editingItem?.district || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
+                            type="text"
+                            name="city"
+                            placeholder="Thành phố"
+                            defaultValue={editingItem?.city || 'TP. Hồ Chí Minh'}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
                             type="tel"
                             name="contact_phone"
                             placeholder="Số điện thoại"
