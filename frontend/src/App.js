@@ -571,9 +571,14 @@ const HeroSection = () => {
                 onChange={(e) => setSearchForm({...searchForm, propertyType: e.target.value})}
               >
                 <option value="">Tất cả loại hình</option>
-                {propertyTypes.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
+                {searchForm.searchType === 'property' 
+                  ? propertyTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))
+                  : landTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))
+                }
               </select>
             </div>
             
