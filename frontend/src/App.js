@@ -104,8 +104,8 @@ const Header = () => {
           <Link to="/" className="flex items-center space-x-2">
             <i className="fas fa-home text-2xl"></i>
             <div>
-              <h1 className="text-xl font-bold">BDS Việt Nam</h1>
-              <p className="text-xs opacity-90">Premium Real Estate</p>
+              <h1 className="text-xl font-bold">{siteSettings.site_title || 'BDS Việt Nam'}</h1>
+              <p className="text-xs opacity-90">{siteSettings.company_name || 'Premium Real Estate'}</p>
             </div>
           </Link>
 
