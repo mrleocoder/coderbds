@@ -111,14 +111,14 @@ const AdminDashboard = () => {
     contact_phone: '',
     contact_email: '',
     agent_name: '',
+    featured: false,
     images: []
   });
 
-  const [ticketForm, setTicketForm] = useState({
-    status: 'open',
-    priority: 'medium',
+  const [depositForm, setDepositForm] = useState({
+    status: 'approved',
     admin_notes: '',
-    assigned_to: ''
+    processed_date: new Date().toISOString().split('T')[0]
   });
 
   const [memberForm, setMemberForm] = useState({
@@ -128,6 +128,19 @@ const AdminDashboard = () => {
     phone: '',
     address: '',
     email_verified: false
+  });
+
+  const [ticketForm, setTicketForm] = useState({
+    status: 'resolved',
+    priority: 'medium',
+    admin_notes: '',
+    assigned_to: ''
+  });
+
+  const [memberPostForm, setMemberPostForm] = useState({
+    status: 'approved',
+    admin_notes: '',
+    reviewed_date: new Date().toISOString().split('T')[0]
   });
 
   useEffect(() => {
