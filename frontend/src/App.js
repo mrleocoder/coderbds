@@ -356,28 +356,28 @@ const Header = () => {
                   <Link 
                     to="/loai-hinh-bat-dong-san/apartment" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Căn hộ chung cư
                   </Link>
                   <Link 
                     to="/loai-hinh-bat-dong-san/house" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Nhà riêng
                   </Link>
                   <Link 
                     to="/loai-hinh-bat-dong-san/villa" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Biệt thự, liền kề
                   </Link>
                   <Link 
                     to="/loai-hinh-bat-dong-san/shophouse" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Nhà mặt phố
                   </Link>
