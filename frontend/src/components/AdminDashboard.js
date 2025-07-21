@@ -401,7 +401,49 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSubmitLand = async (e) => {
+  const handleSubmitModal = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      if (modalType === 'sim') {
+        if (editingItem) {
+          await axios.put(`${API}/sims/${editingItem.id}`, simForm, { headers });
+          toast.success('Cập nhật SIM thành công!');
+        } else {
+          await axios.post(`${API}/sims`, simForm, { headers });
+          toast.success('Thêm SIM mới thành công!');
+        }
+      } else if (modalType === 'land') {
+        if (editingItem) {
+          await axios.put(`${API}/lands/${editingItem.id}`, landForm, { headers });
+          toast.success('Cập nhật đất thành công!');
+        } else {
+          await axios.post(`${API}/lands`, landForm, { headers });
+          toast.success('Thêm đất mới thành công!');
+        }
+      } else if (modalType === 'deposit') {
+        await axios.put(`${API}/admin/transactions/${editingItem.id}/approve`, depositForm, { headers });
+        toast.success('Duyệt giao dịch thành công!');
+      } else if (modalType === 'member') {
+        await axios.put(`${API}/admin/members/${editingItem.id}`, memberForm, { headers });
+        toast.success('Cập nhật thành viên thành công!');
+      } else if (modalType === 'ticket') {
+        await axios.put(`${API}/tickets/${editingItem.id}`, ticketForm, { headers });
+        toast.success('Cập nhật ticket thành công!');
+      } else if (modalType === 'memberPost') {
+        await axios.put(`${API}/admin/posts/${editingItem.id}/approve`, memberPostForm, { headers });
+        toast.success('Duyệt tin member thành công!');
+      }
+
+      fetchAdminData();
+      closeModal();
+    } catch (error) {
+      console.error('Error in modal submit:', error);
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  };
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
