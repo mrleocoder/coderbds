@@ -652,16 +652,23 @@ const AdminDashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden flex items-center justify-center w-10 h-10 bg-emerald-600 text-white rounded-lg"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+              >
+                <i className="fas fa-bars"></i>
+              </button>
               <div className="flex items-center space-x-2 text-gray-700">
                 <i className="fas fa-user-circle"></i>
-                <span className="font-medium">{user?.username}</span>
+                <span className="font-medium hidden sm:block">{user?.username}</span>
               </div>
               <button
                 onClick={logout}
                 className="text-gray-500 hover:text-gray-700 flex items-center space-x-1"
               >
                 <i className="fas fa-sign-out-alt"></i>
-                <span>Đăng xuất</span>
+                <span className="hidden sm:block">Đăng xuất</span>
               </button>
             </div>
           </div>
