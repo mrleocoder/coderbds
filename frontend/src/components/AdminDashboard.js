@@ -1461,10 +1461,6 @@ const AdminDashboard = () => {
                                 className="hidden" 
                                 multiple 
                                 accept="image/*"
-                                onChange={async (e) => {
-                                  const files = Array.from(e.target.files);
-                                  console.log('Selected files:', files);
-                                }}
                               />
                             </label>
                           </div>
