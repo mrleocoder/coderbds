@@ -324,14 +324,14 @@ const Header = () => {
                   <Link 
                     to="/bat-dong-san/for_sale" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Nhà đất bán
                   </Link>
                   <Link 
                     to="/bat-dong-san/for_rent" 
                     className="block py-1 text-white hover:text-emerald-200 transition-colors text-sm"
-                    onClick={() => setShowMobileMenu(false)}
+                    onClick={closeMobileMenuAndDropdowns}
                   >
                     • Nhà đất cho thuê
                   </Link>
