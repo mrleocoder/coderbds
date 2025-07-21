@@ -1488,6 +1488,21 @@ const AdminDashboard = () => {
                         const formData = new FormData(e.target);
                         try {
                           const token = localStorage.getItem('token');
+                          
+                          // Process image upload
+                          const imageFile = e.target.querySelector('input[name="featured_image"]').files[0];
+                          let featuredImage = null;
+                          
+                          if (imageFile) {
+                            // Convert to base64
+                            const base64 = await new Promise((resolve) => {
+                              const reader = new FileReader();
+                              reader.onload = () => resolve(reader.result);
+                              reader.readAsDataURL(imageFile);
+                            });
+                            featuredImage = base64;
+                          }
+
                           const newsData = {
                             title: formData.get('title'),
                             category: formData.get('category'),
@@ -1495,7 +1510,7 @@ const AdminDashboard = () => {
                             excerpt: formData.get('excerpt'),
                             content: formData.get('content'),
                             published: formData.get('published') === 'on',
-                            featured_image: formData.get('featured_image') || null
+                            featured_image: featuredImage || editingItem?.featured_image
                           };
 
                           if (editingItem) {
