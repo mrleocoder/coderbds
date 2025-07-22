@@ -485,6 +485,68 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleMemberPostApproval = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      
+      // Get form data
+      const status = document.getElementById('approval_status').value;
+      const featured = document.getElementById('featured_post').checked;
+      const adminNotes = document.getElementById('admin_notes').value.trim();
+      
+      // Prepare approval data
+      const approvalData = {
+        status: status,
+        featured: featured,
+        admin_notes: adminNotes || null
+      };
+      
+      // Add rejection reason if status is rejected
+      if (status === 'rejected' && adminNotes) {
+        approvalData.rejection_reason = adminNotes;
+      }
+      
+      console.log('Approving post:', editingItem.id, 'Data:', approvalData);
+      
+      const response = await axios.put(
+        `${API}/admin/posts/${editingItem.id}/approve`, 
+        approvalData, 
+        { headers }
+      );
+      
+      console.log('✅ Post approval response:', response.data);
+      
+      // Close modal
+      closeModal();
+      
+      // Show success message
+      const statusText = status === 'approved' ? 'Đã duyệt' : 'Đã từ chối';
+      toast.success(`${statusText} tin đăng thành công!`);
+      
+      // Refresh admin data to update the posts list
+      await fetchAdminData();
+      
+    } catch (error) {
+      console.error('❌ Error approving post:', error);
+      
+      if (error.response?.status === 404) {
+        toast.error('Không tìm thấy tin đăng này!');
+      } else if (error.response?.status === 403) {
+        toast.error('Không có quyền duyệt tin đăng!');
+      } else if (error.response?.status === 422) {
+        toast.error('Dữ liệu không hợp lệ: ' + (error.response?.data?.detail || 'Kiểm tra lại thông tin'));
+      } else {
+        toast.error('Có lỗi xảy ra khi duyệt tin đăng. Vui lòng thử lại.');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
