@@ -903,6 +903,33 @@ const AdminDashboard = () => {
                       </div>
                     </div>
 
+                    {/* Working Hours Section */}
+                    <div className="border-t pt-6">
+                      <h3 className="text-lg font-medium text-gray-800 mb-4">Thời gian làm việc</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Giờ làm việc</label>
+                          <input
+                            type="text"
+                            value={siteSettings.working_hours || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, working_hours: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="8:00 - 18:00, Thứ 2 - Chủ nhật"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Ngày nghỉ</label>
+                          <input
+                            type="text"
+                            value={siteSettings.holidays || ''}
+                            onChange={(e) => setSiteSettings({...siteSettings, holidays: e.target.value})}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            placeholder="Tết Nguyên Đán, 30/4, 1/5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex justify-end">
                       <button
                         type="submit"
