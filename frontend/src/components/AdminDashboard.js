@@ -401,6 +401,9 @@ const AdminDashboard = () => {
       ) : null;
     }
   };
+
+  // Force refresh member data specifically
+  const refreshMemberData = async () => {
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
