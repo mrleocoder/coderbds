@@ -12,7 +12,7 @@ from typing import Dict, List, Any
 import uuid
 
 # Backend URL from environment
-BACKEND_URL = "https://d58ccc94-f71a-4270-8308-36434653c228.preview.emergentagent.com/api"
+BACKEND_URL = "https://eeb81261-f8c7-4a6f-9a1d-a958f55d4bfb.preview.emergentagent.com/api"
 
 class AdminCRUDTester:
     def __init__(self):

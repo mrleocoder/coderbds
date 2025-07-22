@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BACKEND_URL = "https://d58ccc94-f71a-4270-8308-36434653c228.preview.emergentagent.com/api"
+BACKEND_URL = "https://eeb81261-f8c7-4a6f-9a1d-a958f55d4bfb.preview.emergentagent.com/api"
 
 def test_jwt_authentication():
     print("🔐 TESTING JWT AUTHENTICATION AND TOKEN VALIDITY")
