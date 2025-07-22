@@ -1187,11 +1187,65 @@ const PropertyDetailPage = () => {
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
             <div>
-              <img 
-                src={property.images?.[0] || 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZXN8ZW58MHx8fHwxNzUzMDE5MTAxfDA&ixlib=rb-4.1.0&q=85'}
-                alt={property.title}
-                className="w-full h-96 object-cover rounded-lg"
-              />
+              {/* Image Carousel */}
+              <div className="relative">
+                <div className="relative group">
+                  <img 
+                    src={property.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZXN8ZW58MHx8fHwxNzUzMDE5MTAxfDA&ixlib=rb-4.1.0&q=85'}
+                    alt={property.title}
+                    className="w-full h-96 object-cover rounded-lg cursor-pointer"
+                    onClick={openImageModal}
+                  />
+                  
+                  {/* Navigation arrows */}
+                  {property?.images?.length > 1 && (
+                    <>
+                      <button
+                        onClick={prevImage}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-75"
+                      >
+                        <i className="fas fa-chevron-left"></i>
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-opacity-75"
+                      >
+                        <i className="fas fa-chevron-right"></i>
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Image counter */}
+                  {property?.images?.length > 1 && (
+                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
+                      {currentImageIndex + 1} / {property.images.length}
+                    </div>
+                  )}
+                  
+                  {/* Click to enlarge hint */}
+                  <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                    <i className="fas fa-expand mr-1"></i>
+                    Click để phóng to
+                  </div>
+                </div>
+                
+                {/* Thumbnail strip */}
+                {property?.images?.length > 1 && (
+                  <div className="flex space-x-2 mt-4 overflow-x-auto pb-2">
+                    {property.images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image}
+                        alt={`${property.title} - ${index + 1}`}
+                        className={`w-16 h-16 object-cover rounded cursor-pointer flex-shrink-0 ${
+                          index === currentImageIndex ? 'ring-2 ring-emerald-600' : 'opacity-70'
+                        }`}
+                        onClick={() => setCurrentImageIndex(index)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               
               {property.featured && (
                 <div className="mt-4">
