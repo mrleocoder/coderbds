@@ -153,6 +153,44 @@ const MemberDashboard = () => {
       reader.readAsDataURL(file);
     }
   };
+  // Handle edit post
+  const handleEditPost = (post) => {
+    setCreatePostForm({
+      title: post.title,
+      post_type: post.post_type,
+      description: post.description,
+      price: post.price,
+      area: post.area,
+      bedrooms: post.bedrooms || '',
+      bathrooms: post.bathrooms || '',
+      address: post.address,
+      contact_phone: post.contact_phone
+    });
+    setEditingPost(post);
+    setActiveTab('create');
+  };
+
+  // Handle delete post
+  const handleDeletePost = async (postId) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa tin đăng này?')) {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+        
+        await axios.delete(`${API}/member/posts/${postId}`, { headers });
+        toast.success('Đã xóa tin đăng thành công!');
+        
+        // Refresh posts
+        fetchMemberData();
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        toast.error('Không thể xóa tin đăng. Vui lòng thử lại.');
+      }
+    }
+  };
+
+  // State for editing post
+  const [editingPost, setEditingPost] = useState(null);
 
   const handleDeposit = async (e) => {
     e.preventDefault();
