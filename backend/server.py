@@ -1331,12 +1331,21 @@ async def update_user_profile(
     current_admin: User = Depends(get_current_admin)
 ):
     """Update user profile information - Admin only"""
+    print(f"=== ADMIN USER UPDATE DEBUG START ===")
+    print(f"User ID: {user_id}")
+    print(f"Admin: {current_admin.username} (ID: {current_admin.id})")
+    print(f"Update data received: {user_update.dict()}")
+    
     user = await db.users.find_one({"id": user_id})
     if not user:
+        print(f"❌ User not found: {user_id}")
         raise HTTPException(status_code=404, detail="User not found")
+    
+    print(f"✅ Found user: {user.get('username')} (Role: {user.get('role')})")
     
     # Don't allow modifying other admin users unless it's self-update
     if user["role"] == "admin" and current_admin.id != user_id:
+        print(f"❌ Cannot modify other admin users")
         raise HTTPException(status_code=403, detail="Cannot modify other admin users")
     
     # Prepare update data
@@ -1345,19 +1354,28 @@ async def update_user_profile(
     # Update allowed fields
     if user_update.full_name is not None:
         update_data["full_name"] = user_update.full_name
+        print(f"  - Updating full_name: {user_update.full_name}")
     if user_update.phone is not None:
         update_data["phone"] = user_update.phone
+        print(f"  - Updating phone: {user_update.phone}")
     if user_update.address is not None:
         update_data["address"] = user_update.address
+        print(f"  - Updating address: {user_update.address}")
     if user_update.status is not None:
         update_data["status"] = user_update.status
+        print(f"  - Updating status: {user_update.status}")
     if user_update.admin_notes is not None:
         update_data["admin_notes"] = user_update.admin_notes
+        print(f"  - Updating admin_notes: {user_update.admin_notes}")
+    
+    print(f"Update data prepared: {update_data}")
     
     # Handle wallet balance separately if provided
     if user_update.wallet_balance is not None and user_update.wallet_balance != user.get("wallet_balance", 0):
         current_balance = user.get("wallet_balance", 0)
         adjustment = user_update.wallet_balance - current_balance
+        
+        print(f"  - Wallet balance adjustment: {current_balance} -> {user_update.wallet_balance} (adjustment: {adjustment})")
         
         # Update balance
         update_data["wallet_balance"] = user_update.wallet_balance
@@ -1377,14 +1395,26 @@ async def update_user_profile(
                 "completed_at": datetime.utcnow()
             }
             await db.transactions.insert_one(transaction_dict)
+            print(f"  - Created transaction record: {transaction_dict['id']}")
     
     # Update user document
-    await db.users.update_one(
-        {"id": user_id},
-        {"$set": update_data}
-    )
-    
-    return {"message": "User profile updated successfully"}
+    try:
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": update_data}
+        )
+        print(f"✅ Database update result: matched={result.matched_count}, modified={result.modified_count}")
+        
+        if result.modified_count == 0:
+            print(f"⚠️  No document was modified - this might indicate no changes were made")
+        
+        print(f"=== ADMIN USER UPDATE DEBUG END ===")
+        return {"message": "User profile updated successfully"}
+        
+    except Exception as e:
+        print(f"❌ Database update error: {str(e)}")
+        print(f"=== ADMIN USER UPDATE DEBUG END ===")
+        raise HTTPException(status_code=500, detail=f"Database update failed: {str(e)}")
 
 @api_router.get("/admin/dashboard/stats")
 async def get_admin_dashboard_stats(current_admin: User = Depends(get_current_admin)):
