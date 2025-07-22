@@ -123,64 +123,133 @@ const AdminDashboard = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
+      console.log('=== ADMIN DASHBOARD DEBUG START ===');
+      console.log('Current URL:', window.location.href);
+      console.log('Environment variables:', {
+        REACT_APP_BACKEND_URL: process.env.REACT_APP_BACKEND_URL,
+        NODE_ENV: process.env.NODE_ENV
+      });
+      console.log('Backend URL being used:', API);
+      
       if (!token) {
-        console.error('No auth token found');
+        console.error('❌ No auth token found in localStorage');
+        console.log('Available localStorage keys:', Object.keys(localStorage));
         toast.error('Vui lòng đăng nhập lại');
         return;
       }
 
-      console.log('Fetching admin data with token:', token?.substring(0, 50) + '...');
-      console.log('Backend URL:', API);
+      console.log('✅ Auth token found:', token?.substring(0, 50) + '...');
+      
+      // Test backend connectivity first
+      console.log('Testing backend connectivity...');
+      try {
+        const healthCheck = await axios.get(`${API}/stats`, { timeout: 5000 });
+        console.log('✅ Backend connectivity test successful:', healthCheck.status);
+      } catch (healthError) {
+        console.error('❌ Backend connectivity test failed:', healthError);
+        console.error('Health check error details:', {
+          message: healthError.message,
+          status: healthError.response?.status,
+          data: healthError.response?.data,
+          config: healthError.config
+        });
+        toast.error('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.');
+        return;
+      }
 
       const headers = { Authorization: `Bearer ${token}` };
+      console.log('Authorization header prepared:', headers);
 
       console.log('Making API calls to admin endpoints...');
       
-      const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, membersRes, depositsRes, memberPostsRes, settingsRes, statsRes] = await Promise.all([
-        axios.get(`${API}/properties?limit=50`, { headers }).catch(e => {console.error('Properties API error:', e); return {data: []};}),
-        axios.get(`${API}/news?limit=50`, { headers }).catch(e => {console.error('News API error:', e); return {data: []};}),
-        axios.get(`${API}/sims?limit=50`, { headers }).catch(e => {console.error('Sims API error:', e); return {data: []};}),
-        axios.get(`${API}/lands?limit=50`, { headers }).catch(e => {console.error('Lands API error:', e); return {data: []};}),
-        axios.get(`${API}/tickets?limit=50`, { headers }).catch(e => {console.error('Tickets API error:', e); return {data: []};}),
-        axios.get(`${API}/admin/users`, { headers }).catch(e => {console.error('Members API error:', e); return {data: []};}),
-        axios.get(`${API}/admin/transactions`, { headers }).catch(e => {console.error('Transactions API error:', e); return {data: []};}),
-        axios.get(`${API}/admin/posts`, { headers }).catch(e => {console.error('Member posts API error:', e); return {data: []};}),
-        axios.get(`${API}/admin/settings`, { headers }).catch(e => {console.error('Settings API error:', e); return {data: {}};}),
-        axios.get(`${API}/admin/dashboard/stats`, { headers }).catch(e => {console.error('Stats API error:', e); return {data: {}};})
-      ]);
+      // Make API calls with detailed error logging
+      const apiCalls = [
+        { name: 'properties', url: `${API}/properties?limit=50` },
+        { name: 'news', url: `${API}/news?limit=50` },
+        { name: 'sims', url: `${API}/sims?limit=50` },
+        { name: 'lands', url: `${API}/lands?limit=50` },
+        { name: 'tickets', url: `${API}/tickets?limit=50` },
+        { name: 'members', url: `${API}/admin/users` },
+        { name: 'deposits', url: `${API}/admin/transactions` },
+        { name: 'memberPosts', url: `${API}/admin/posts` },
+        { name: 'settings', url: `${API}/admin/settings` },
+        { name: 'stats', url: `${API}/admin/dashboard/stats` }
+      ];
 
-      console.log('API responses received:', {
-        properties: propertiesRes.data?.length,
-        news: newsRes.data?.length,
-        sims: simsRes.data?.length,
-        lands: landsRes.data?.length,
-        tickets: ticketsRes.data?.length,
-        stats: Object.keys(statsRes.data || {}).length
+      const results = {};
+      
+      for (const call of apiCalls) {
+        try {
+          console.log(`Making ${call.name} API call to:`, call.url);
+          const response = await axios.get(call.url, { headers, timeout: 10000 });
+          results[call.name] = response.data;
+          console.log(`✅ ${call.name} API success:`, {
+            status: response.status,
+            dataLength: Array.isArray(response.data) ? response.data.length : 'Object',
+            sample: Array.isArray(response.data) ? response.data.slice(0, 1) : response.data
+          });
+        } catch (error) {
+          console.error(`❌ ${call.name} API error:`, {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            url: call.url,
+            headers: error.config?.headers
+          });
+          results[call.name] = Array.isArray([]) ? [] : {};
+          
+          // Show specific error messages for critical failures
+          if (error.response?.status === 401) {
+            toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+            logout();
+            return;
+          } else if (error.response?.status === 403) {
+            toast.error('Không có quyền truy cập. Vui lòng kiểm tra quyền admin.');
+            return;
+          } else if (error.response?.status === 500) {
+            toast.error(`Lỗi server tại endpoint ${call.name}. Vui lòng thử lại sau.`);
+          }
+        }
+      }
+
+      console.log('=== API RESULTS SUMMARY ===');
+      Object.entries(results).forEach(([key, value]) => {
+        const length = Array.isArray(value) ? value.length : (typeof value === 'object' ? Object.keys(value).length : 'N/A');
+        console.log(`${key}: ${length} items`);
       });
 
-      // Set data
-      setProperties(propertiesRes.data || []);
-      setNews(newsRes.data || []);
-      setSims(simsRes.data || []);
-      setLands(landsRes.data || []);
-      setTickets(ticketsRes.data || []);
-      setMembers(membersRes.data || []);
-      setDeposits(depositsRes.data || []);
-      setMemberPosts(memberPostsRes.data || []);
-      setSiteSettings(settingsRes.data || {});
-      setStats(statsRes.data || {});
+      // Set data with detailed logging
+      console.log('Setting component state...');
+      setProperties(results.properties || []);
+      setNews(results.news || []);
+      setSims(results.sims || []);
+      setLands(results.lands || []);
+      setTickets(results.tickets || []);
+      setMembers(results.members || []);
+      setDeposits(results.deposits || []);
+      setMemberPosts(results.memberPosts || []);
+      setSiteSettings(results.settings || {});
+      setStats(results.stats || {});
 
-      console.log('Admin data loaded successfully');
+      console.log('✅ Admin data loaded successfully');
+      console.log('=== ADMIN DASHBOARD DEBUG END ===');
+      
+      toast.success('Dữ liệu đã được tải thành công');
       
     } catch (error) {
-      console.error('Critical error in fetchAdminData:', error);
+      console.error('💥 Critical error in fetchAdminData:', error);
       console.error('Error details:', {
+        name: error.name,
         message: error.message,
         status: error.response?.status,
-        data: error.response?.data
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: error.config,
+        stack: error.stack
       });
       
-      toast.error('Không thể tải dữ liệu admin. Vui lòng kiểm tra kết nối.');
+      toast.error('Lỗi nghiêm trọng khi tải dữ liệu admin. Vui lòng làm mới trang và thử lại.');
     } finally {
       setLoading(false);
     }
