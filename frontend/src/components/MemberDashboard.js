@@ -561,12 +561,20 @@ const MemberDashboard = () => {
                         </div>
                         <div className="flex space-x-2">
                           {post.status !== 'approved' && (
-                            <button className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+                            <button 
+                              onClick={() => handleEditPost(post)}
+                              className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm"
+                              title="Chỉnh sửa tin đăng"
+                            >
                               <i className="fas fa-edit"></i>
                             </button>
                           )}
                           {post.status !== 'approved' && (
-                            <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors text-sm">
+                            <button 
+                              onClick={() => handleDeletePost(post.id)}
+                              className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors text-sm"
+                              title="Xóa tin đăng"
+                            >
                               <i className="fas fa-trash"></i>
                             </button>
                           )}
