@@ -1919,7 +1919,8 @@ const AdminDashboard = () => {
                             excerpt: formData.get('excerpt'),
                             content: newsContent || editingItem?.content || '',
                             published: formData.get('published') === 'on',
-                            featured_image: featuredImage || editingItem?.featured_image
+                            featured_image: featuredImage || editingItem?.featured_image,
+                            tags: [] // Add missing tags field
                           };
 
                           if (editingItem) {
