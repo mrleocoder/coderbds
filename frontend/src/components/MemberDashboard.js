@@ -172,8 +172,50 @@ const MemberDashboard = () => {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
+      // Validate required fields
+      if (!createPostForm.title.trim()) {
+        alert('Vui lòng nhập tiêu đề tin đăng');
+        return;
+      }
+      if (!createPostForm.description.trim()) {
+        alert('Vui lòng nhập mô tả');
+        return;
+      }
+      if (!createPostForm.contact_phone.trim()) {
+        alert('Vui lòng nhập số điện thoại liên hệ');
+        return;
+      }
+      if (!createPostForm.price || parseFloat(createPostForm.price) <= 0) {
+        alert('Vui lòng nhập giá hợp lệ');
+        return;
+      }
+
       const token = localStorage.getItem('token');
-      await axios.post(`${API}/member/posts`, createPostForm, {
+      
+      // Format data for API
+      const postData = {
+        title: createPostForm.title.trim(),
+        description: createPostForm.description.trim(),
+        post_type: createPostForm.post_type,
+        price: parseFloat(createPostForm.price),
+        contact_phone: createPostForm.contact_phone.trim(),
+        contact_email: createPostForm.contact_email?.trim() || null,
+        images: createPostForm.images || [],
+        
+        // Property specific fields (only if post_type is property)
+        ...(createPostForm.post_type === 'property' && {
+          property_type: createPostForm.property_type,
+          property_status: createPostForm.property_status,
+          area: createPostForm.area ? parseFloat(createPostForm.area) : null,
+          bedrooms: createPostForm.bedrooms ? parseInt(createPostForm.bedrooms) : null,
+          bathrooms: createPostForm.bathrooms ? parseInt(createPostForm.bathrooms) : null,
+          address: createPostForm.address?.trim() || null
+        })
+      };
+
+      console.log('Sending post data:', postData);
+
+      await axios.post(`${API}/member/posts`, postData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -183,10 +225,20 @@ const MemberDashboard = () => {
       fetchMemberData();
     } catch (error) {
       console.error('Error creating post:', error);
+      console.error('Error response:', error.response?.data);
+      
       if (error.response?.status === 400) {
-        alert(error.response.data.detail);
+        alert(error.response.data.detail || 'Yêu cầu không hợp lệ');
+      } else if (error.response?.status === 422) {
+        const errorDetails = error.response.data.detail;
+        if (Array.isArray(errorDetails)) {
+          const missingFields = errorDetails.map(err => err.loc?.join('.') + ': ' + err.msg).join('\n');
+          alert(`Lỗi validation:\n${missingFields}`);
+        } else {
+          alert('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.');
+        }
       } else {
-        alert('Có lỗi xảy ra khi tạo tin đăng');
+        alert('Có lỗi xảy ra khi tạo tin đăng. Vui lòng thử lại.');
       }
     }
   };
