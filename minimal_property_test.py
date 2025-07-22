@@ -6,7 +6,7 @@ Minimal Property Creation Test - Testing with minimal required fields
 import requests
 import json
 
-BACKEND_URL = "https://eeb81261-f8c7-4a6f-9a1d-a958f55d4bfb.preview.emergentagent.com/api"
+BACKEND_URL = "https://4b79da18-4dc2-4528-afd5-8bd1319c8066.preview.emergentagent.com/api"
 
 def test_minimal_property_creation():
     session = requests.Session()
