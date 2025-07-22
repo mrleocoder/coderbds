@@ -21,13 +21,24 @@ const MemberDashboard = () => {
   const { user, logout, updateUser } = useAuth();
   const toast = useToast();
 
-  // Bank account details (in real app, this would come from admin settings)
+  // Fetch site settings for bank info
+  const fetchSiteSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setSiteSettings(response.data);
+      console.log('Site settings loaded:', response.data);
+    } catch (error) {
+      console.error('Error fetching site settings:', error);
+    }
+  };
+
+  // Bank account details from admin settings
   const bankDetails = {
-    accountNumber: '1234567890',
-    accountHolder: 'CONG TY TNHH BDS VIET NAM',
-    bankName: 'Ngân hàng Vietcombank',
-    branch: 'Chi nhánh TP.HCM',
-    qrCode: `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(`
+    accountNumber: siteSettings.bank_account_number || '1234567890',
+    accountHolder: siteSettings.bank_account_holder || 'CONG TY TNHH BDS VIET NAM',
+    bankName: siteSettings.bank_name || 'Ngân hàng Vietcombank',
+    branch: siteSettings.bank_branch || 'Chi nhánh TP.HCM',
+    qrCode: siteSettings.bank_qr_code || `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(`
       <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
         <rect width="200" height="200" fill="#f3f4f6"/>
         <text x="100" y="100" font-family="Arial" font-size="12" text-anchor="middle" fill="#374151">
