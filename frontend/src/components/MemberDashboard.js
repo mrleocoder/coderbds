@@ -273,7 +273,7 @@ const MemberDashboard = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      alert('Tin đăng đã được tạo! Chờ admin duyệt. Phí đăng tin: 50,000 VNĐ đã được trừ từ tài khoản.');
+      toast.success('Tin đăng đã được tạo! Chờ admin duyệt. Phí đăng tin: 50,000 VNĐ đã được trừ từ tài khoản.');
       setShowCreatePostForm(false);
       resetCreatePostForm();
       fetchMemberData();
@@ -282,17 +282,17 @@ const MemberDashboard = () => {
       console.error('Error response:', error.response?.data);
       
       if (error.response?.status === 400) {
-        alert(error.response.data.detail || 'Yêu cầu không hợp lệ');
+        toast.error(error.response.data.detail || 'Yêu cầu không hợp lệ');
       } else if (error.response?.status === 422) {
         const errorDetails = error.response.data.detail;
         if (Array.isArray(errorDetails)) {
           const missingFields = errorDetails.map(err => err.loc?.join('.') + ': ' + err.msg).join('\n');
-          alert(`Lỗi validation:\n${missingFields}`);
+          toast.error(`Lỗi validation: ${missingFields}`);
         } else {
-          alert('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.');
+          toast.error('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.');
         }
       } else {
-        alert('Có lỗi xảy ra khi tạo tin đăng. Vui lòng thử lại.');
+        toast.error('Có lỗi xảy ra khi tạo tin đăng. Vui lòng thử lại.');
       }
     }
   };
