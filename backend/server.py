@@ -1514,6 +1514,13 @@ async def get_site_settings(current_admin: User = Depends(get_current_admin)):
     # Convert MongoDB _id to id and remove _id
     settings['id'] = str(settings['_id'])
     del settings['_id']
+    
+    # Ensure new fields are present with defaults if missing
+    if 'working_hours' not in settings:
+        settings['working_hours'] = "8:00 - 18:00, Thứ 2 - Chủ nhật"
+    if 'holidays' not in settings:
+        settings['holidays'] = "Tết Nguyên Đán, 30/4, 1/5"
+    
     return settings
 
 @api_router.put("/admin/settings")
