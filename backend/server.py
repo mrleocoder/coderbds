@@ -728,6 +728,8 @@ async def deposit_money(deposit_request: DepositRequest, current_user: User = De
         "transaction_type": "deposit",
         "status": "pending",
         "description": deposit_request.description,
+        "transfer_bill": deposit_request.transfer_bill,
+        "method": "Bank Transfer",
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
     }
