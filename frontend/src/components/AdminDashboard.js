@@ -1861,37 +1861,32 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">
                                   <span className="font-semibold">Click để upload</span> ảnh đại diện
                                 </p>
-                                <p className="text-xs text-gray-400">TEST VERSION - Chỉ được upload 1 ảnh</p>
+                                <p className="text-xs text-red-600 font-bold">TEST VERSION</p>
                               </div>
                               <input 
                                 type="file" 
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onchange="
-                                  alert('🎯 ONCLICK TRIGGERED!'); 
-                                  console.log('File input triggered'); 
-                                  var file = this.files[0]; 
+                                onClick={() => alert('Input clicked!')}
+                                onChange={(e) => {
+                                  alert('🔥 FILE SELECTED!');
+                                  
+                                  const file = e.target.files[0];
                                   if (file) {
-                                    alert('File selected: ' + file.name);
-                                    var reader = new FileReader();
-                                    reader.onload = function(e) {
-                                      alert('FileReader complete!');
-                                      var preview = document.createElement('div');
-                                      preview.innerHTML = '<div style=\"margin-top:10px;padding:10px;border:1px solid #ccc;border-radius:8px;background:#f9f9f9;\"><img src=\"' + e.target.result + '\" style=\"width:100px;height:100px;object-fit:cover;border-radius:4px;\" /><p style=\"margin:5px 0 0 0;font-size:12px;color:#666;\">' + file.name + '</p><button onclick=\"this.parentElement.parentElement.remove()\" style=\"background:red;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-top:5px;font-size:12px;\">Xóa ảnh</button></div>';
-                                      var container = this.closest('.space-y-4');
-                                      container.appendChild(preview.firstChild);
-                                      alert('✅ Preview added successfully!');
-                                    };
-                                    reader.readAsDataURL(file);
-                                  } else {
-                                    alert('No file selected!');
+                                    alert('File: ' + file.name);
+                                    
+                                    // Simple preview without FileReader first
+                                    const container = document.getElementById('simple-preview');
+                                    if (container) {
+                                      container.innerHTML = '<div style="background:#e6f7ff;padding:10px;border-radius:8px;margin-top:10px;"><p style="color:#0066cc;font-weight:bold;">✅ File selected: ' + file.name + '</p></div>';
+                                    }
                                   }
-                                "
+                                }}
                               />
                             </label>
                           </div>
-                          <div id="image-preview-container"></div>
+                          <div id="simple-preview" style={{minHeight: '20px'}}></div>
                         </div>
                         <div className="flex items-center">
                           <input
