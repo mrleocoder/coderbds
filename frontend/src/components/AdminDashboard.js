@@ -366,13 +366,13 @@ const AdminDashboard = () => {
       toast.success('Cập nhật thành viên thành công!');
       
       // Wait a bit and then refresh data
-      console.log('Refreshing admin data...');
+      console.log('Refreshing member data specifically...');
       setTimeout(async () => {
         try {
-          await fetchAdminData();
-          console.log('✅ Admin data refreshed successfully');
+          await refreshMemberData();
+          console.log('✅ Member data refreshed successfully');
         } catch (refreshError) {
-          console.error('❌ Error refreshing data:', refreshError);
+          console.error('❌ Error refreshing member data:', refreshError);
           toast.warning('Dữ liệu đã được cập nhật nhưng có lỗi khi refresh. Hãy reload trang để thấy thay đổi.');
         }
       }, 500);
