@@ -1342,6 +1342,54 @@ const PropertyDetailPage = () => {
             <p className="text-gray-600 leading-relaxed">{property.description}</p>
           </div>
         </div>
+        
+        {/* Image Modal */}
+        {showImageModal && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4" onClick={closeImageModal}>
+            <div className="relative max-w-4xl max-h-full" onClick={(e) => e.stopPropagation()}>
+              <div className="relative">
+                <img 
+                  src={property.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3VzZXN8ZW58MHx8fHwxNzUzMDE5MTAxfDA&ixlib=rb-4.1.0&q=85'}
+                  alt={property.title}
+                  className="max-w-full max-h-full object-contain"
+                />
+                
+                {/* Close button */}
+                <button
+                  onClick={closeImageModal}
+                  className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-opacity"
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+                
+                {/* Navigation in modal */}
+                {property?.images?.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-opacity"
+                    >
+                      <i className="fas fa-chevron-left"></i>
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-75 transition-opacity"
+                    >
+                      <i className="fas fa-chevron-right"></i>
+                    </button>
+                  </>
+                )}
+                
+                {/* Image counter in modal */}
+                {property?.images?.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded">
+                    {currentImageIndex + 1} / {property.images.length}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
