@@ -228,19 +228,19 @@ const MemberDashboard = () => {
     try {
       // Validate required fields
       if (!createPostForm.title.trim()) {
-        alert('Vui lòng nhập tiêu đề tin đăng');
+        toast.error('Vui lòng nhập tiêu đề tin đăng');
         return;
       }
       if (!createPostForm.description.trim()) {
-        alert('Vui lòng nhập mô tả');
+        toast.error('Vui lòng nhập mô tả');
         return;
       }
       if (!createPostForm.contact_phone.trim()) {
-        alert('Vui lòng nhập số điện thoại liên hệ');
+        toast.error('Vui lòng nhập số điện thoại liên hệ');
         return;
       }
       if (!createPostForm.price || parseFloat(createPostForm.price) <= 0) {
-        alert('Vui lòng nhập giá hợp lệ');
+        toast.error('Vui lòng nhập giá hợp lệ');
         return;
       }
 
