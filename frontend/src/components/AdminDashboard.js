@@ -326,6 +326,11 @@ const AdminDashboard = () => {
 
   const handleMemberSubmit = async (e) => {
     e.preventDefault();
+    
+    // Immediate alert to confirm function is called
+    alert('handleMemberSubmit function called!');
+    console.log('🚨 MEMBER SUBMIT FUNCTION CALLED!');
+    
     try {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
