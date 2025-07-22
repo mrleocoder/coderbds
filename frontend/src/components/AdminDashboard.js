@@ -1700,11 +1700,7 @@ const AdminDashboard = () => {
                                 className="hidden" 
                                 multiple 
                                 accept="image/*"
-                                onChange={(e) => {
-                                  if (e.target.files.length > 0) {
-                                    handleImageUpload(e.target.files, 'property');
-                                  }
-                                }}
+                                onChange={handleTestImageUpload}
                               />
                             </label>
                           </div>
