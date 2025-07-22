@@ -2270,14 +2270,24 @@ const AdminDashboard = () => {
                             <option value="Tây Bắc">Tây Bắc</option>
                           </select>
                         </div>
-                        <textarea
-                          name="description"
-                          placeholder="Mô tả chi tiết dự án"
-                          defaultValue={editingItem?.description || ''}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          rows="3"
-                          required
-                        />
+                        <div className="space-y-4">
+                          <label className="block text-sm font-medium text-gray-700">Mô tả chi tiết dự án đất</label>
+                          <div style={{backgroundColor: 'white'}}>
+                            <ReactQuill
+                              value={landDescription || editingItem?.description || ''}
+                              onChange={setLandDescription}
+                              modules={quillModules}
+                              formats={quillFormats}
+                              theme="snow"
+                              placeholder="Nhập mô tả chi tiết về dự án đất..."
+                              style={{
+                                minHeight: '200px',
+                                backgroundColor: 'white'
+                              }}
+                            />
+                          </div>
+                          <input type="hidden" name="description" value={landDescription || editingItem?.description || ''} />
+                        </div>
                         <div className="space-y-4">
                           <h4 className="font-medium text-gray-700">Upload ảnh dự án</h4>
                           <div className="flex items-center justify-center w-full">
