@@ -323,60 +323,6 @@ const AdminDashboard = () => {
     setTestImages([]);
   };
 
-  // Image preview component
-  const ImagePreview = ({ images, type, onRemove }) => {
-    if (type === 'news') {
-      // Single image for news
-      return images ? (
-        <div className="mt-4">
-          <div className="relative inline-block">
-            <img 
-              src={images.base64} 
-              alt={images.name}
-              className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-            />
-            <button
-              type="button"
-              onClick={() => onRemove(0, type)}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-            >
-              ×
-            </button>
-            <p className="text-xs text-gray-500 mt-1 max-w-32 truncate">{images.name}</p>
-          </div>
-        </div>
-      ) : null;
-    } else {
-      // Multiple images for property/land
-      return images && images.length > 0 ? (
-        <div className="mt-4">
-          <div className="grid grid-cols-3 gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="relative">
-                <img 
-                  src={image.base64} 
-                  alt={image.name}
-                  className="w-full h-24 object-cover rounded-lg border border-gray-200"
-                />
-                <button
-                  type="button"
-                  onClick={() => onRemove(index, type)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                >
-                  ×
-                </button>
-                <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-gray-600 mt-2">
-            {images.length} ảnh đã được chọn
-          </p>
-        </div>
-      ) : null;
-    }
-  };
-
   // Force refresh member data specifically
   const refreshMemberData = async () => {
     try {
