@@ -1088,6 +1088,8 @@ const PropertyDetailPage = () => {
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     fetchProperty();
@@ -1102,6 +1104,26 @@ const PropertyDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const nextImage = () => {
+    if (property?.images?.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (property?.images?.length > 1) {
+      setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
+    }
+  };
+
+  const openImageModal = () => {
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
   };
 
   const formatPrice = (price) => {
