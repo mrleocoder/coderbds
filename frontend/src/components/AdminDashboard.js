@@ -2459,41 +2459,57 @@ const AdminDashboard = () => {
 
                     {/* Member Post Approval Form */}
                     {modalType === 'memberPost' && (
-                      <form onSubmit={(e) => {
-                        e.preventDefault();
-                        toast.success('Đã duyệt tin member!');
-                        closeModal();
-                        fetchAdminData();
-                      }} className="space-y-4">
+                      <form onSubmit={handleMemberPostApproval} className="space-y-4">
                         <div className="bg-gray-50 p-4 rounded-lg mb-4">
                           <h4 className="font-medium text-gray-800 mb-2">Thông tin tin đăng</h4>
                           <p><strong>Tiêu đề:</strong> {editingItem?.title}</p>
                           <p><strong>Loại:</strong> {editingItem?.post_type}</p>
                           <p><strong>Giá:</strong> {editingItem?.price?.toLocaleString()} VNĐ</p>
                           <p><strong>Người đăng:</strong> {editingItem?.author_name}</p>
+                          <p><strong>Trạng thái hiện tại:</strong> 
+                            <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                              editingItem?.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              editingItem?.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              editingItem?.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {editingItem?.status === 'approved' ? 'Đã duyệt' :
+                               editingItem?.status === 'pending' ? 'Chờ duyệt' :
+                               editingItem?.status === 'rejected' ? 'Từ chối' : editingItem?.status}
+                            </span>
+                          </p>
                         </div>
                         <div className="space-y-4">
-                          <select
-                            defaultValue="approved"
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          >
-                            <option value="approved">Duyệt tin</option>
-                            <option value="rejected">Từ chối</option>
-                          </select>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Quyết định</label>
+                            <select
+                              id="approval_status"
+                              defaultValue={editingItem?.status || "approved"}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            >
+                              <option value="approved">Duyệt tin</option>
+                              <option value="rejected">Từ chối</option>
+                            </select>
+                          </div>
                           <div className="flex items-center">
                             <input
                               type="checkbox"
-                              defaultChecked={false}
-                              className="mr-2"
                               id="featured_post"
+                              defaultChecked={editingItem?.featured || false}
+                              className="mr-2"
                             />
                             <label htmlFor="featured_post" className="text-sm text-gray-700">Tin nổi bật</label>
                           </div>
-                          <textarea
-                            placeholder="Ghi chú từ admin (tùy chọn)"
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                            rows="3"
-                          />
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Ghi chú từ admin</label>
+                            <textarea
+                              id="admin_notes"
+                              placeholder="Nhập ghi chú hoặc lý do từ chối (tùy chọn)"
+                              defaultValue={editingItem?.admin_notes || editingItem?.rejection_reason || ''}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                              rows="3"
+                            />
+                          </div>
                         </div>
                         <div className="flex justify-end space-x-4 border-t pt-4">
                           <button
@@ -2507,7 +2523,7 @@ const AdminDashboard = () => {
                             type="submit"
                             className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                           >
-                            <i className="fas fa-check mr-2"></i>Duyệt tin
+                            <i className="fas fa-check mr-2"></i>Xác nhận
                           </button>
                         </div>
                       </form>
