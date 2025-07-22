@@ -122,64 +122,43 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      console.log('Fetching admin data with token:', !!token);
+      if (!token) {
+        console.error('No auth token found');
+        toast.error('Vui lòng đăng nhập lại');
+        return;
+      }
+
+      console.log('Fetching admin data with token:', token?.substring(0, 50) + '...');
+      console.log('Backend URL:', API);
+
+      const headers = { Authorization: `Bearer ${token}` };
+
+      console.log('Making API calls to admin endpoints...');
       
       const [propertiesRes, newsRes, simsRes, landsRes, ticketsRes, membersRes, depositsRes, memberPostsRes, settingsRes, statsRes] = await Promise.all([
-        axios.get(`${API}/properties?limit=50`, { headers }),
-        axios.get(`${API}/news?limit=50`, { headers }),
-        axios.get(`${API}/sims?limit=50`, { headers }),
-        axios.get(`${API}/lands?limit=50`, { headers }),
-        axios.get(`${API}/tickets?limit=50`, { headers }),
-        axios.get(`${API}/admin/members?limit=50`, { headers }),
-        axios.get(`${API}/admin/transactions?limit=50`, { headers }),
-        axios.get(`${API}/admin/member-posts?limit=50`, { headers }),
-        axios.get(`${API}/admin/settings`, { headers }),
-        axios.get(`${API}/admin/dashboard/stats`, { headers })
+        axios.get(`${API}/properties?limit=50`, { headers }).catch(e => {console.error('Properties API error:', e); return {data: []};}),
+        axios.get(`${API}/news?limit=50`, { headers }).catch(e => {console.error('News API error:', e); return {data: []};}),
+        axios.get(`${API}/sims?limit=50`, { headers }).catch(e => {console.error('Sims API error:', e); return {data: []};}),
+        axios.get(`${API}/lands?limit=50`, { headers }).catch(e => {console.error('Lands API error:', e); return {data: []};}),
+        axios.get(`${API}/tickets?limit=50`, { headers }).catch(e => {console.error('Tickets API error:', e); return {data: []};}),
+        axios.get(`${API}/admin/users`, { headers }).catch(e => {console.error('Members API error:', e); return {data: []};}),
+        axios.get(`${API}/admin/transactions`, { headers }).catch(e => {console.error('Transactions API error:', e); return {data: []};}),
+        axios.get(`${API}/admin/posts`, { headers }).catch(e => {console.error('Member posts API error:', e); return {data: []};}),
+        axios.get(`${API}/admin/settings`, { headers }).catch(e => {console.error('Settings API error:', e); return {data: {}};}),
+        axios.get(`${API}/admin/dashboard/stats`, { headers }).catch(e => {console.error('Stats API error:', e); return {data: {}};})
       ]);
 
-      // Fetch traffic data  
-      const trafficRes = await axios.get(`${API}/analytics/traffic`, { headers });
-      
-      // Generate last 30 days traffic data if API doesn't exist
-      const generateTrafficData = () => {
-        const last30Days = [];
-        const labels = [];
-        const pageviews = [];
-        const visitors = [];
-        
-        for (let i = 29; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          labels.push(date.toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' }));
-          pageviews.push(Math.floor(Math.random() * 200) + 50);
-          visitors.push(Math.floor(Math.random() * 100) + 20);
-        }
-        
-        return {
-          labels,
-          datasets: [
-            {
-              label: 'Lượt truy cập',
-              data: pageviews,
-              borderColor: 'rgb(16, 185, 129)',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              tension: 0.4,
-            },
-            {
-              label: 'Người dùng',
-              data: visitors,
-              borderColor: 'rgb(59, 130, 246)',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              tension: 0.4,
-            }
-          ]
-        };
-      };
+      console.log('API responses received:', {
+        properties: propertiesRes.data?.length,
+        news: newsRes.data?.length,
+        sims: simsRes.data?.length,
+        lands: landsRes.data?.length,
+        tickets: ticketsRes.data?.length,
+        stats: Object.keys(statsRes.data || {}).length
+      });
 
-      setTrafficData(trafficRes.data?.success ? trafficRes.data : generateTrafficData());
-      
+      // Set data
       setProperties(propertiesRes.data || []);
       setNews(newsRes.data || []);
       setSims(simsRes.data || []);
@@ -190,10 +169,18 @@ const AdminDashboard = () => {
       setMemberPosts(memberPostsRes.data || []);
       setSiteSettings(settingsRes.data || {});
       setStats(statsRes.data || {});
+
+      console.log('Admin data loaded successfully');
       
     } catch (error) {
-      console.error('Error fetching admin data:', error);
-      toast.error('Không thể tải dữ liệu admin. Vui lòng thử lại.');
+      console.error('Critical error in fetchAdminData:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      
+      toast.error('Không thể tải dữ liệu admin. Vui lòng kiểm tra kết nối.');
     } finally {
       setLoading(false);
     }
