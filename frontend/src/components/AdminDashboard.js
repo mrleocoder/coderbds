@@ -5,6 +5,8 @@ import axios from "axios";
 import Modal from './Modal';
 import TicketDetail from './TicketDetail';
 import DepositDetail from './DepositDetail';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   Chart as ChartJS,
   CategoryScale,
