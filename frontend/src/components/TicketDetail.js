@@ -63,13 +63,25 @@ const TicketDetail = ({ ticket, onClose, onUpdate }) => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      await axios.put(`${API}/tickets/${ticket.id}`, {
+      console.log('Updating ticket status to:', ticketStatus);
+      
+      const updateData = {
         status: ticketStatus,
-        admin_notes: `Cập nhật trạng thái thành ${ticketStatus}`
-      }, { headers });
+        admin_notes: newMessage.trim() || `Cập nhật trạng thái thành ${ticketStatus === 'open' ? 'đang xử lý' : ticketStatus === 'resolved' ? 'đã giải quyết' : 'đã đóng'}`
+      };
+      
+      console.log('Sending update data:', updateData);
+      
+      await axios.put(`${API}/tickets/${ticket.id}`, updateData, { headers });
 
-      toast.success('Cập nhật ticket thành công');
+      // Send notification message if there's a message
+      if (newMessage.trim()) {
+        await sendMessage();
+      }
+
+      toast.success(`Đã cập nhật ticket thành ${ticketStatus === 'open' ? 'đang xử lý' : ticketStatus === 'resolved' ? 'đã giải quyết' : 'đã đóng'}`);
       onUpdate && onUpdate();
+      onClose();
     } catch (error) {
       console.error('Error updating ticket:', error);
       toast.error('Không thể cập nhật ticket');
