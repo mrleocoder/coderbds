@@ -193,10 +193,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate }) => {
         <div className="flex justify-end space-x-4 border-t pt-4">
           <button
             type="button"
-            onClick={() => {
-              updateTicketStatus();
-              onClose();
-            }}
+            onClick={updateTicketStatus}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <i className="fas fa-save mr-2"></i>
