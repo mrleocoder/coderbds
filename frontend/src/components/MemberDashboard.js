@@ -596,7 +596,9 @@ const MemberDashboard = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {userPosts.length > 0 ? userPosts.map((post) => (
+                  {userPosts.length > 0 ? (
+                    <>
+                      {userPosts.slice(0, showPosts).map((post) => (
                     <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
                         <div className="flex-1">
