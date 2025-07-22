@@ -1861,32 +1861,54 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">
                                   <span className="font-semibold">Click để upload</span> ảnh đại diện
                                 </p>
-                                <p className="text-xs text-red-600 font-bold">TEST VERSION</p>
+                                <p className="text-xs text-gray-400">Chỉ được upload 1 ảnh</p>
                               </div>
                               <input 
                                 type="file" 
-                                name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onClick={() => alert('Input clicked!')}
                                 onChange={(e) => {
-                                  alert('🔥 FILE SELECTED!');
-                                  
                                   const file = e.target.files[0];
                                   if (file) {
-                                    alert('File: ' + file.name);
-                                    
-                                    // Simple preview without FileReader first
-                                    const container = document.getElementById('simple-preview');
-                                    if (container) {
-                                      container.innerHTML = '<div style="background:#e6f7ff;padding:10px;border-radius:8px;margin-top:10px;"><p style="color:#0066cc;font-weight:bold;">✅ File selected: ' + file.name + '</p></div>';
-                                    }
+                                    const reader = new FileReader();
+                                    reader.onload = function(event) {
+                                      // Clear existing previews
+                                      const existing = document.getElementById('news-preview-container');
+                                      if (existing) existing.innerHTML = '';
+                                      
+                                      // Create preview element
+                                      const previewDiv = document.createElement('div');
+                                      previewDiv.id = 'news-preview-container';
+                                      previewDiv.innerHTML = `
+                                        <div style="margin-top: 15px; padding: 15px; border: 1px solid #d1d5db; border-radius: 8px; background-color: #f9fafb;">
+                                          <div style="display: flex; align-items: center; gap: 15px;">
+                                            <img src="${event.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb;" />
+                                            <div style="flex: 1;">
+                                              <p style="margin: 0; font-weight: 600; color: #374151; font-size: 14px;">${file.name}</p>
+                                              <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 12px;">Size: ${(file.size / 1024).toFixed(1)} KB</p>
+                                            </div>
+                                            <button 
+                                              onclick="this.closest('#news-preview-container').remove()"
+                                              style="background-color: #dc2626; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center;"
+                                              onmouseover="this.style.backgroundColor='#b91c1c'"
+                                              onmouseout="this.style.backgroundColor='#dc2626'"
+                                            >
+                                              ×
+                                            </button>
+                                          </div>
+                                        </div>
+                                      `;
+                                      
+                                      // Insert after upload area
+                                      const uploadArea = e.target.closest('.space-y-4');
+                                      uploadArea.appendChild(previewDiv);
+                                    };
+                                    reader.readAsDataURL(file);
                                   }
                                 }}
                               />
                             </label>
                           </div>
-                          <div id="simple-preview" style={{minHeight: '20px'}}></div>
                         </div>
                         <div className="flex items-center">
                           <input
