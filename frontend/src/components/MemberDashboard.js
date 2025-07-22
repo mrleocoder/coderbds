@@ -96,6 +96,7 @@ const MemberDashboard = () => {
   useEffect(() => {
     if (user) {
       fetchMemberData();
+      fetchMessages(); // Fetch messages when component loads
     }
   }, [user]);
 
