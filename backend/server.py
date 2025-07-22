@@ -178,6 +178,8 @@ class SiteSettings(BaseModel):
     contact_button_2_link: str = "https://t.me/bdsvietnam"
     contact_button_3_text: str = "WhatsApp"
     contact_button_3_link: str = "https://wa.me/1234567890"
+    working_hours: Optional[str] = "8:00 - 18:00, Thứ 2 - Chủ nhật"
+    holidays: Optional[str] = "Tết Nguyên Đán, 30/4, 1/5"
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class SiteSettingsUpdate(BaseModel):
@@ -203,6 +205,8 @@ class SiteSettingsUpdate(BaseModel):
     contact_button_2_link: Optional[str] = None
     contact_button_3_text: Optional[str] = None
     contact_button_3_link: Optional[str] = None
+    working_hours: Optional[str] = None
+    holidays: Optional[str] = None
 
 # Pydantic Models
 class Property(BaseModel):
