@@ -10,6 +10,8 @@ const LandDetailPage = () => {
   const navigate = useNavigate();
   const [land, setLand] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     fetchLand();
@@ -24,6 +26,26 @@ const LandDetailPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const nextImage = () => {
+    if (land?.images?.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % land.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (land?.images?.length > 1) {
+      setCurrentImageIndex((prev) => (prev - 1 + land.images.length) % land.images.length);
+    }
+  };
+
+  const openImageModal = () => {
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
   };
 
   const formatPrice = (price) => {
