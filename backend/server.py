@@ -548,6 +548,9 @@ class Transaction(BaseModel):
     description: str
     reference_id: Optional[str] = None  # For post fees, etc.
     admin_notes: Optional[str] = None
+    transfer_bill: Optional[str] = None  # Base64 encoded image of transfer receipt
+    transaction_id: Optional[str] = None  # Bank transaction ID
+    method: Optional[str] = None  # Payment method (bank transfer, etc.)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
@@ -557,10 +560,14 @@ class TransactionCreate(BaseModel):
     transaction_type: TransactionType
     description: str
     reference_id: Optional[str] = None
+    transfer_bill: Optional[str] = None
+    transaction_id: Optional[str] = None
+    method: Optional[str] = None
 
 class DepositRequest(BaseModel):
     amount: float
     description: Optional[str] = "Nạp tiền vào tài khoản"
+    transfer_bill: Optional[str] = None  # Base64 encoded image of transfer receipt
 
 # Enhanced Post Models (for approval workflow)
 class PostBase(BaseModel):
