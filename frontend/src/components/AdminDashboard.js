@@ -296,7 +296,9 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       console.log('🔄 Force refreshing member data...');
-      const membersRes = await axios.get(`${API}/admin/users`, { headers });
+      // Add timestamp to prevent caching
+      const timestamp = Date.now();
+      const membersRes = await axios.get(`${API}/admin/users?t=${timestamp}`, { headers });
       setMembers(membersRes.data || []);
       console.log('✅ Member data refreshed:', membersRes.data?.length, 'members');
       
