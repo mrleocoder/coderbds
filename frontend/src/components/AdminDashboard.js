@@ -339,16 +339,28 @@ const AdminDashboard = () => {
 
       console.log('Member data to send:', memberData);
       console.log('API URL:', `${API}/admin/users/${editingItem.id}`);
-      console.log('Headers:', headers);
 
       const response = await axios.put(`${API}/admin/users/${editingItem.id}`, memberData, { headers });
-      console.log('API Response:', response.data);
+      console.log('✅ API Response:', response.data);
       
-      toast.success('Cập nhật thành viên thành công!');
+      // Close modal first
       closeModal();
       
+      // Show success message
+      toast.success('Cập nhật thành viên thành công!');
+      
+      // Wait a bit and then refresh data
       console.log('Refreshing admin data...');
-      await fetchAdminData(); // Refresh data
+      setTimeout(async () => {
+        try {
+          await fetchAdminData();
+          console.log('✅ Admin data refreshed successfully');
+        } catch (refreshError) {
+          console.error('❌ Error refreshing data:', refreshError);
+          toast.warning('Dữ liệu đã được cập nhật nhưng có lỗi khi refresh. Hãy reload trang để thấy thay đổi.');
+        }
+      }, 500);
+      
       console.log('=== MEMBER UPDATE DEBUG END ===');
       
     } catch (error) {
