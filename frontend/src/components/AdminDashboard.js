@@ -2218,6 +2218,9 @@ const AdminDashboard = () => {
                             width: parseFloat(formData.get('width')) || null,
                             length: parseFloat(formData.get('length')) || null,
                             address: formData.get('address'),
+                            district: formData.get('district') || 'N/A', // Add missing required field
+                            city: formData.get('city') || 'Hồ Chí Minh', // Add missing required field
+                            status: 'for_sale', // Add missing required field
                             legal_status: formData.get('legal_status'),
                             contact_phone: formData.get('contact_phone'),
                             orientation: formData.get('orientation'),
