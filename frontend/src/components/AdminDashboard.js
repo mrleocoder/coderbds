@@ -289,6 +289,23 @@ const AdminDashboard = () => {
     setEditingItem(null);
   };
 
+  const handleSiteSettingsSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      console.log('Updating site settings:', siteSettings);
+      
+      await axios.put(`${API}/admin/settings`, siteSettings, { headers });
+      toast.success('Cập nhật cài đặt website thành công!');
+      await fetchAdminData(); // Refresh data to show updated settings
+    } catch (error) {
+      console.error('Error updating site settings:', error);
+      toast.error('Có lỗi xảy ra khi cập nhật cài đặt. Vui lòng thử lại.');
+    }
+  };
+
   const handleMemberSubmit = async (e) => {
     e.preventDefault();
     try {
