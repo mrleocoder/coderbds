@@ -1313,6 +1313,77 @@ async def adjust_user_balance(
     
     return {"message": f"User balance adjusted by {amount:,.0f} VNĐ"}
 
+# User Profile Update Model for Admin
+class AdminUserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    status: Optional[UserStatus] = None
+    admin_notes: Optional[str] = None
+    wallet_balance: Optional[float] = None
+
+@api_router.put("/admin/users/{user_id}")
+async def update_user_profile(
+    user_id: str,
+    user_update: AdminUserUpdate,
+    current_admin: User = Depends(get_current_admin)
+):
+    """Update user profile information - Admin only"""
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Don't allow modifying other admin users unless it's self-update
+    if user["role"] == "admin" and current_admin.id != user_id:
+        raise HTTPException(status_code=403, detail="Cannot modify other admin users")
+    
+    # Prepare update data
+    update_data = {"updated_at": datetime.utcnow()}
+    
+    # Update allowed fields
+    if user_update.full_name is not None:
+        update_data["full_name"] = user_update.full_name
+    if user_update.phone is not None:
+        update_data["phone"] = user_update.phone
+    if user_update.address is not None:
+        update_data["address"] = user_update.address
+    if user_update.status is not None:
+        update_data["status"] = user_update.status
+    if user_update.admin_notes is not None:
+        update_data["admin_notes"] = user_update.admin_notes
+    
+    # Handle wallet balance separately if provided
+    if user_update.wallet_balance is not None and user_update.wallet_balance != user.get("wallet_balance", 0):
+        current_balance = user.get("wallet_balance", 0)
+        adjustment = user_update.wallet_balance - current_balance
+        
+        # Update balance
+        update_data["wallet_balance"] = user_update.wallet_balance
+        
+        # Create transaction record for balance adjustment
+        if adjustment != 0:
+            transaction_dict = {
+                "id": str(uuid.uuid4()),
+                "user_id": user_id,
+                "amount": abs(adjustment),
+                "transaction_type": "deposit" if adjustment > 0 else "withdraw",
+                "status": "completed",
+                "description": f"Balance adjustment by admin: {current_admin.username}",
+                "admin_notes": f"Balance adjusted from {current_balance:,.0f} to {user_update.wallet_balance:,.0f} VNĐ",
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "completed_at": datetime.utcnow()
+            }
+            await db.transactions.insert_one(transaction_dict)
+    
+    # Update user document
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    return {"message": "User profile updated successfully"}
+
 @api_router.get("/admin/dashboard/stats")
 async def get_admin_dashboard_stats(current_admin: User = Depends(get_current_admin)):
     """Get admin dashboard statistics"""
