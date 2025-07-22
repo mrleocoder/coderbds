@@ -2305,6 +2305,22 @@ const AdminDashboard = () => {
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                             required
                           />
+                          <input
+                            type="text"
+                            name="district"
+                            placeholder="Quận/Huyện"
+                            defaultValue={editingItem?.district || ''}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
+                          <input
+                            type="text"
+                            name="city"
+                            placeholder="Thành phố"
+                            defaultValue={editingItem?.city || 'Hồ Chí Minh'}
+                            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            required
+                          />
                           <select
                             name="legal_status"
                             defaultValue={editingItem?.legal_status || 'Sổ đỏ'}
