@@ -255,6 +255,8 @@ const MemberDashboard = () => {
     setSelectedTicket(ticket);
     setShowChatModal(true);
   };
+
+  const handleDeposit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
