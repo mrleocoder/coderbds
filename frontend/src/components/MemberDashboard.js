@@ -192,6 +192,17 @@ const MemberDashboard = () => {
   // State for editing post
   const [editingPost, setEditingPost] = useState(null);
 
+  // Messages states
+  const [systemMessages, setSystemMessages] = useState([]);
+  const [privateMessages, setPrivateMessages] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [messageType, setMessageType] = useState('system'); // 'system' or 'private'
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [newPrivateMessage, setNewPrivateMessage] = useState('');
+  const [showSystemMessages, setShowSystemMessages] = useState(10);
+  const [showPrivateMessages, setShowPrivateMessages] = useState(10);
+
   const handleDeposit = async (e) => {
     e.preventDefault();
     try {
