@@ -1771,6 +1771,7 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">
                                   <span className="font-semibold">Click để upload</span> hoặc kéo thả ảnh
                                 </p>
+                                <p className="text-xs text-gray-400">Có thể upload nhiều ảnh</p>
                               </div>
                               <input 
                                 type="file" 
@@ -1778,9 +1779,21 @@ const AdminDashboard = () => {
                                 className="hidden" 
                                 multiple 
                                 accept="image/*"
+                                onChange={(e) => {
+                                  if (e.target.files.length > 0) {
+                                    handleImageUpload(e.target.files, 'property');
+                                  }
+                                }}
                               />
                             </label>
                           </div>
+                          
+                          {/* Property Images Preview */}
+                          <ImagePreview 
+                            images={propertyImages} 
+                            type="property" 
+                            onRemove={removeImage} 
+                          />
                         </div>
                         <div className="flex items-center">
                           <input
