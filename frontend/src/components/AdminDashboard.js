@@ -1861,84 +1861,37 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">
                                   <span className="font-semibold">Click để upload</span> ảnh đại diện
                                 </p>
-                                <p className="text-xs text-gray-400">Chỉ được upload 1 ảnh</p>
+                                <p className="text-xs text-gray-400">TEST VERSION - Chỉ được upload 1 ảnh</p>
                               </div>
                               <input 
                                 type="file" 
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onChange={(e) => {
-                                  console.log('🎯 File input change triggered!');
-                                  alert('File input clicked!');
-                                  
-                                  const files = e.target.files;
-                                  console.log('Files selected:', files.length);
-                                  
-                                  if (files.length > 0) {
-                                    const file = files[0];
-                                    console.log('File details:', file.name, file.size);
-                                    alert(`Selected file: ${file.name}`);
-                                    
-                                    // Test FileReader
-                                    const reader = new FileReader();
-                                    reader.onload = function(event) {
-                                      console.log('✅ FileReader loaded successfully');
-                                      alert('FileReader loaded!');
-                                      
-                                      // Create a simple preview
-                                      const previewDiv = document.createElement('div');
-                                      previewDiv.innerHTML = `
-                                        <div style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-                                          <img src="${event.target.result}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;" />
-                                          <p style="margin: 5px 0 0 0; font-size: 12px;">${file.name}</p>
-                                          <button onclick="this.parentElement.remove()" style="background: red; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; margin-top: 5px;">×</button>
-                                        </div>
-                                      `;
-                                      
-                                      // Insert after the upload area
-                                      const uploadArea = e.target.closest('.space-y-4');
-                                      uploadArea.appendChild(previewDiv);
-                                      
-                                      alert('Preview added!');
+                                onchange="
+                                  alert('🎯 ONCLICK TRIGGERED!'); 
+                                  console.log('File input triggered'); 
+                                  var file = this.files[0]; 
+                                  if (file) {
+                                    alert('File selected: ' + file.name);
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                      alert('FileReader complete!');
+                                      var preview = document.createElement('div');
+                                      preview.innerHTML = '<div style=\"margin-top:10px;padding:10px;border:1px solid #ccc;border-radius:8px;background:#f9f9f9;\"><img src=\"' + e.target.result + '\" style=\"width:100px;height:100px;object-fit:cover;border-radius:4px;\" /><p style=\"margin:5px 0 0 0;font-size:12px;color:#666;\">' + file.name + '</p><button onclick=\"this.parentElement.parentElement.remove()\" style=\"background:red;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;margin-top:5px;font-size:12px;\">Xóa ảnh</button></div>';
+                                      var container = this.closest('.space-y-4');
+                                      container.appendChild(preview.firstChild);
+                                      alert('✅ Preview added successfully!');
                                     };
                                     reader.readAsDataURL(file);
+                                  } else {
+                                    alert('No file selected!');
                                   }
-                                }}
+                                "
                               />
                             </label>
                           </div>
-                          
-                          {/* Test Image Preview */}
-                          {testImages.length > 0 && (
-                            <div className="mt-4">
-                              <h5 className="font-medium text-gray-700 mb-2">Ảnh đã chọn:</h5>
-                              <div className="space-y-2">
-                                {testImages.map((image, index) => (
-                                  <div key={index} className="flex items-center justify-between p-2 border border-gray-200 rounded-lg">
-                                    <div className="flex items-center space-x-3">
-                                      <img 
-                                        src={image.base64} 
-                                        alt={image.name}
-                                        className="w-16 h-16 object-cover rounded border"
-                                      />
-                                      <div>
-                                        <p className="text-sm font-medium text-gray-800">{image.name}</p>
-                                        <p className="text-xs text-gray-500">{(image.size / 1024).toFixed(1)} KB</p>
-                                      </div>
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeTestImage(index)}
-                                      className="text-red-500 hover:text-red-700 font-bold text-lg"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <div id="image-preview-container"></div>
                         </div>
                         <div className="flex items-center">
                           <input
