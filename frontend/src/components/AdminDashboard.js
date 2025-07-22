@@ -289,6 +289,22 @@ const AdminDashboard = () => {
     setEditingItem(null);
   };
 
+  // Force refresh member data specifically
+  const refreshMemberData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      console.log('🔄 Force refreshing member data...');
+      const membersRes = await axios.get(`${API}/admin/users`, { headers });
+      setMembers(membersRes.data || []);
+      console.log('✅ Member data refreshed:', membersRes.data?.length, 'members');
+      
+    } catch (error) {
+      console.error('❌ Error refreshing member data:', error);
+    }
+  };
+
   const handleSiteSettingsSubmit = async (e) => {
     e.preventDefault();
     try {
