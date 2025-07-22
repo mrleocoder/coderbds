@@ -1912,15 +1912,28 @@ const AdminDashboard = () => {
                                 <p className="text-sm text-gray-500">
                                   <span className="font-semibold">Click để upload</span> ảnh đại diện
                                 </p>
+                                <p className="text-xs text-gray-400">Chỉ được upload 1 ảnh</p>
                               </div>
                               <input 
                                 type="file" 
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
+                                onChange={(e) => {
+                                  if (e.target.files.length > 0) {
+                                    handleImageUpload(e.target.files, 'news');
+                                  }
+                                }}
                               />
                             </label>
                           </div>
+                          
+                          {/* News Image Preview */}
+                          <ImagePreview 
+                            images={newsImage} 
+                            type="news" 
+                            onRemove={removeImage} 
+                          />
                         </div>
                         <div className="flex items-center">
                           <input
