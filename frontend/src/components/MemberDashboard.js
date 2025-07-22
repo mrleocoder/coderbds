@@ -649,7 +649,22 @@ const MemberDashboard = () => {
                         </div>
                       </div>
                     </div>
-                  )) : (
+                  )) 
+                      
+                      {/* Load More Button */}
+                      {userPosts.length > showPosts && (
+                        <div className="text-center mt-6">
+                          <button
+                            onClick={() => setShowPosts(prev => prev + 10)}
+                            className="px-6 py-2 text-emerald-600 hover:text-emerald-700 font-medium border border-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                          >
+                            <i className="fas fa-plus mr-2"></i>
+                            Xem thêm ({userPosts.length - showPosts} tin còn lại)
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
                     <div className="text-center py-8">
                       <i className="fas fa-list text-6xl text-gray-300 mb-4"></i>
                       <p className="text-gray-500">Bạn chưa có tin đăng nào</p>
