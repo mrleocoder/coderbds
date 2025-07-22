@@ -6024,6 +6024,338 @@ class BDSVietnamAPITester:
             self.log_test("Admin Authentication & Authorization", False, f"Error: {str(e)}")
             return False
 
+    def test_critical_backend_fixes(self):
+        """Test the critical backend fixes mentioned in the review request"""
+        print("\n🎯 TESTING CRITICAL BACKEND FIXES")
+        print("=" * 80)
+        print("Testing the specific issues mentioned in the review request:")
+        print("1. Bank Info Sync - Admin settings API")
+        print("2. Deposit Approval Status Logic")
+        print("3. Admin Save Operations (Fixed WYSIWYG content)")
+        print("4. Contact Info Sync")
+        print("=" * 80)
+        
+        # 1. BANK INFO SYNC TESTING
+        print("\n🏦 1. TESTING BANK INFO SYNC")
+        print("-" * 50)
+        
+        # Test public settings endpoint
+        try:
+            response = self.session.get(f"{self.base_url}/settings")
+            if response.status_code == 200:
+                public_settings = response.json()
+                bank_fields = ["bank_account_number", "bank_account_holder", "bank_name", "bank_branch", "bank_qr_code"]
+                missing_bank_fields = [field for field in bank_fields if field not in public_settings]
+                
+                if not missing_bank_fields:
+                    self.log_test("Public Settings - Bank Info", True, f"All bank fields present: {bank_fields}")
+                else:
+                    self.log_test("Public Settings - Bank Info", False, f"Missing bank fields: {missing_bank_fields}")
+            else:
+                self.log_test("Public Settings - Bank Info", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Public Settings - Bank Info", False, f"Error: {str(e)}")
+        
+        # Test admin settings endpoint
+        try:
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                admin_settings = response.json()
+                bank_fields = ["bank_account_number", "bank_account_holder", "bank_name", "bank_branch", "bank_qr_code"]
+                missing_bank_fields = [field for field in bank_fields if field not in admin_settings]
+                
+                if not missing_bank_fields:
+                    self.log_test("Admin Settings - Bank Info", True, f"All bank fields present: {bank_fields}")
+                else:
+                    self.log_test("Admin Settings - Bank Info", False, f"Missing bank fields: {missing_bank_fields}")
+            else:
+                self.log_test("Admin Settings - Bank Info", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Settings - Bank Info", False, f"Error: {str(e)}")
+        
+        # Test bank info update
+        bank_update_data = {
+            "bank_account_number": "9876543210",
+            "bank_account_holder": "CONG TY TNHH BDS VIET NAM TEST",
+            "bank_name": "Ngân hàng BIDV",
+            "bank_branch": "Chi nhánh Test",
+            "bank_qr_code": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        }
+        
+        try:
+            response = self.session.put(f"{self.base_url}/admin/settings", json=bank_update_data)
+            if response.status_code == 200:
+                self.log_test("Admin Settings - Bank Info Update", True, "Bank info updated successfully")
+                
+                # Verify update by getting settings again
+                verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                if verify_response.status_code == 200:
+                    updated_settings = verify_response.json()
+                    if updated_settings.get("bank_account_number") == bank_update_data["bank_account_number"]:
+                        self.log_test("Admin Settings - Bank Info Verification", True, "Bank info update verified")
+                    else:
+                        self.log_test("Admin Settings - Bank Info Verification", False, "Bank info not updated correctly")
+                else:
+                    self.log_test("Admin Settings - Bank Info Verification", False, f"Verification failed: {verify_response.status_code}")
+            else:
+                self.log_test("Admin Settings - Bank Info Update", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Settings - Bank Info Update", False, f"Error: {str(e)}")
+        
+        # 2. DEPOSIT APPROVAL STATUS LOGIC TESTING
+        print("\n💰 2. TESTING DEPOSIT APPROVAL STATUS LOGIC")
+        print("-" * 50)
+        
+        # First create a test deposit
+        member_token = self.test_enhanced_user_login()
+        if member_token and member_token != "existing_user":
+            original_headers = self.session.headers.copy()
+            self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+            
+            deposit_data = {
+                "amount": 500000.0,
+                "description": "Test deposit for approval testing",
+                "transfer_bill": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            }
+            
+            try:
+                response = self.session.post(f"{self.base_url}/wallet/deposit", json=deposit_data)
+                if response.status_code == 200:
+                    data = response.json()
+                    test_transaction_id = data.get("transaction_id")
+                    self.log_test("Create Test Deposit", True, f"Test deposit created: {test_transaction_id}")
+                    
+                    # Restore admin headers
+                    self.session.headers.update(original_headers)
+                    
+                    # Test admin transactions list
+                    try:
+                        response = self.session.get(f"{self.base_url}/admin/transactions")
+                        if response.status_code == 200:
+                            transactions = response.json()
+                            pending_transactions = [t for t in transactions if t.get("status") == "pending"]
+                            self.log_test("Admin Transactions List", True, f"Retrieved {len(transactions)} transactions, {len(pending_transactions)} pending")
+                        else:
+                            self.log_test("Admin Transactions List", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        self.log_test("Admin Transactions List", False, f"Error: {str(e)}")
+                    
+                    # Test approve transaction
+                    if test_transaction_id:
+                        try:
+                            response = self.session.put(f"{self.base_url}/admin/transactions/{test_transaction_id}/approve")
+                            if response.status_code == 200:
+                                self.log_test("Approve Transaction", True, "Transaction approved successfully")
+                                
+                                # Verify status change
+                                verify_response = self.session.get(f"{self.base_url}/admin/transactions")
+                                if verify_response.status_code == 200:
+                                    updated_transactions = verify_response.json()
+                                    approved_transaction = next((t for t in updated_transactions if t.get("id") == test_transaction_id), None)
+                                    if approved_transaction and approved_transaction.get("status") == "completed":
+                                        self.log_test("Verify Transaction Approval", True, "Status changed to completed")
+                                    else:
+                                        self.log_test("Verify Transaction Approval", False, f"Status not updated correctly: {approved_transaction.get('status') if approved_transaction else 'Not found'}")
+                                else:
+                                    self.log_test("Verify Transaction Approval", False, f"Verification failed: {verify_response.status_code}")
+                            else:
+                                self.log_test("Approve Transaction", False, f"Status: {response.status_code}")
+                        except Exception as e:
+                            self.log_test("Approve Transaction", False, f"Error: {str(e)}")
+                    
+                    # Create another test deposit for rejection testing
+                    self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+                    try:
+                        response = self.session.post(f"{self.base_url}/wallet/deposit", json={
+                            "amount": 300000.0,
+                            "description": "Test deposit for rejection testing"
+                        })
+                        if response.status_code == 200:
+                            data = response.json()
+                            reject_transaction_id = data.get("transaction_id")
+                            
+                            # Restore admin headers
+                            self.session.headers.update(original_headers)
+                            
+                            # Test reject transaction
+                            try:
+                                response = self.session.put(
+                                    f"{self.base_url}/admin/transactions/{reject_transaction_id}/reject",
+                                    params={"admin_notes": "Test rejection - insufficient documentation"}
+                                )
+                                if response.status_code == 200:
+                                    self.log_test("Reject Transaction", True, "Transaction rejected successfully")
+                                    
+                                    # Verify status change
+                                    verify_response = self.session.get(f"{self.base_url}/admin/transactions")
+                                    if verify_response.status_code == 200:
+                                        updated_transactions = verify_response.json()
+                                        rejected_transaction = next((t for t in updated_transactions if t.get("id") == reject_transaction_id), None)
+                                        if rejected_transaction and rejected_transaction.get("status") == "failed":
+                                            self.log_test("Verify Transaction Rejection", True, "Status changed to failed")
+                                        else:
+                                            self.log_test("Verify Transaction Rejection", False, f"Status not updated correctly: {rejected_transaction.get('status') if rejected_transaction else 'Not found'}")
+                                    else:
+                                        self.log_test("Verify Transaction Rejection", False, f"Verification failed: {verify_response.status_code}")
+                                else:
+                                    self.log_test("Reject Transaction", False, f"Status: {response.status_code}")
+                            except Exception as e:
+                                self.log_test("Reject Transaction", False, f"Error: {str(e)}")
+                        else:
+                            self.log_test("Create Test Deposit for Rejection", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        self.log_test("Create Test Deposit for Rejection", False, f"Error: {str(e)}")
+                else:
+                    self.log_test("Create Test Deposit", False, f"Status: {response.status_code}")
+                    self.session.headers.update(original_headers)
+            except Exception as e:
+                self.log_test("Create Test Deposit", False, f"Error: {str(e)}")
+                self.session.headers.update(original_headers)
+        else:
+            self.log_test("Deposit Approval Testing", False, "Could not get member token for deposit testing")
+        
+        # 3. ADMIN SAVE OPERATIONS TESTING (Fixed WYSIWYG content)
+        print("\n💾 3. TESTING ADMIN SAVE OPERATIONS")
+        print("-" * 50)
+        
+        # Test property creation with description
+        property_data = {
+            "title": "Test Property with Rich Description",
+            "description": "<p>This is a <strong>rich text description</strong> with <em>HTML formatting</em>. It includes:</p><ul><li>Bullet points</li><li>Multiple paragraphs</li><li>Special characters: áéíóú</li></ul><p>This tests the WYSIWYG content saving functionality.</p>",
+            "property_type": "apartment",
+            "status": "for_sale",
+            "price": 3500000000,
+            "area": 75.0,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "Test Address for WYSIWYG",
+            "district": "Test District",
+            "city": "Test City",
+            "contact_phone": "0901234567"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/properties", json=property_data)
+            if response.status_code == 200:
+                data = response.json()
+                property_id = data.get("id")
+                if property_id and data.get("description") == property_data["description"]:
+                    self.log_test("Admin Property Save - WYSIWYG Content", True, f"Property created with rich description preserved")
+                    self.created_property_ids.append(property_id)
+                else:
+                    self.log_test("Admin Property Save - WYSIWYG Content", False, "Description not preserved correctly")
+            else:
+                self.log_test("Admin Property Save - WYSIWYG Content", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Property Save - WYSIWYG Content", False, f"Error: {str(e)}")
+        
+        # Test news creation with content
+        news_data = {
+            "title": "Test News with Rich Content",
+            "content": "<h2>Breaking News</h2><p>This is a <strong>comprehensive news article</strong> with rich formatting:</p><blockquote><p>This is a quote from an expert in the field.</p></blockquote><p>The article continues with more <em>detailed information</em> and includes special characters: áéíóú ñç</p><h3>Key Points:</h3><ol><li>First important point</li><li>Second crucial detail</li><li>Final summary</li></ol>",
+            "excerpt": "Test news article with rich HTML content for WYSIWYG testing",
+            "category": "Test Category",
+            "tags": ["test", "wysiwyg", "content"],
+            "published": True,
+            "author": "Test Author"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/news", json=news_data)
+            if response.status_code == 200:
+                data = response.json()
+                news_id = data.get("id")
+                if news_id and data.get("content") == news_data["content"]:
+                    self.log_test("Admin News Save - WYSIWYG Content", True, f"News created with rich content preserved")
+                    self.created_news_ids.append(news_id)
+                else:
+                    self.log_test("Admin News Save - WYSIWYG Content", False, "Content not preserved correctly")
+            else:
+                self.log_test("Admin News Save - WYSIWYG Content", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin News Save - WYSIWYG Content", False, f"Error: {str(e)}")
+        
+        # Test land creation with description
+        land_data = {
+            "title": "Test Land with Rich Description",
+            "description": "<p>This is a <strong>detailed land description</strong> with formatting:</p><ul><li>Prime location</li><li>Great investment opportunity</li><li>Ready for development</li></ul><p>Contact us for more information about this <em>excellent property</em>.</p>",
+            "land_type": "residential",
+            "status": "for_sale",
+            "price": 2500000000,
+            "area": 200.0,
+            "address": "Test Land Address",
+            "district": "Test District",
+            "city": "Test City",
+            "legal_status": "Sổ đỏ",
+            "contact_phone": "0901234567"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/lands", json=land_data)
+            if response.status_code == 200:
+                data = response.json()
+                land_id = data.get("id")
+                if land_id and data.get("description") == land_data["description"]:
+                    self.log_test("Admin Land Save - WYSIWYG Content", True, f"Land created with rich description preserved")
+                    self.created_land_ids.append(land_id)
+                else:
+                    self.log_test("Admin Land Save - WYSIWYG Content", False, "Description not preserved correctly")
+            else:
+                self.log_test("Admin Land Save - WYSIWYG Content", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Admin Land Save - WYSIWYG Content", False, f"Error: {str(e)}")
+        
+        # 4. CONTACT INFO SYNC TESTING
+        print("\n📞 4. TESTING CONTACT INFO SYNC")
+        print("-" * 50)
+        
+        # Test working_hours and holidays fields
+        try:
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                settings = response.json()
+                contact_fields = ["working_hours", "holidays", "contact_phone", "contact_email", "contact_address"]
+                missing_contact_fields = [field for field in contact_fields if field not in settings]
+                
+                if not missing_contact_fields:
+                    self.log_test("Contact Info Sync - All Fields", True, f"All contact fields present: {contact_fields}")
+                else:
+                    self.log_test("Contact Info Sync - All Fields", False, f"Missing contact fields: {missing_contact_fields}")
+                
+                # Test updating contact info
+                contact_update = {
+                    "working_hours": "8:00 - 18:00, Thứ 2 - Thứ 6",
+                    "holidays": "Tết Nguyên Đán, 30/4, 1/5, 2/9",
+                    "contact_phone": "1900 555 666",
+                    "contact_email": "contact@bdsvietnam-test.com",
+                    "contact_address": "456 Test Street, District 1, Ho Chi Minh City"
+                }
+                
+                update_response = self.session.put(f"{self.base_url}/admin/settings", json=contact_update)
+                if update_response.status_code == 200:
+                    self.log_test("Contact Info Update", True, "Contact info updated successfully")
+                    
+                    # Verify update
+                    verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                    if verify_response.status_code == 200:
+                        updated_settings = verify_response.json()
+                        if (updated_settings.get("working_hours") == contact_update["working_hours"] and
+                            updated_settings.get("contact_phone") == contact_update["contact_phone"]):
+                            self.log_test("Contact Info Verification", True, "Contact info update verified")
+                        else:
+                            self.log_test("Contact Info Verification", False, "Contact info not updated correctly")
+                    else:
+                        self.log_test("Contact Info Verification", False, f"Verification failed: {verify_response.status_code}")
+                else:
+                    self.log_test("Contact Info Update", False, f"Status: {update_response.status_code}")
+            else:
+                self.log_test("Contact Info Sync - All Fields", False, f"Status: {response.status_code}")
+        except Exception as e:
+            self.log_test("Contact Info Sync - All Fields", False, f"Error: {str(e)}")
+        
+        print("\n🎯 CRITICAL BACKEND FIXES TESTING COMPLETED")
+        print("=" * 80)
+
     def run_all_tests(self):
         """Run all backend API tests with focus on critical backend fixes"""
         print("🚀 Starting BDS Vietnam Backend API Testing - CRITICAL BACKEND FIXES")
