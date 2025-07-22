@@ -118,6 +118,10 @@ const MemberDashboard = () => {
       if (balanceRes.data.balance !== user.wallet_balance) {
         updateUser({ ...user, wallet_balance: balanceRes.data.balance });
       }
+      
+      // Also fetch site settings for bank info
+      await fetchSiteSettings();
+      
     } catch (error) {
       console.error('Error fetching member data:', error);
     } finally {
