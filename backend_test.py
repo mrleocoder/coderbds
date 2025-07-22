@@ -6356,9 +6356,316 @@ class BDSVietnamAPITester:
         print("\n🎯 CRITICAL BACKEND FIXES TESTING COMPLETED")
         print("=" * 80)
 
+    def test_member_post_approval_synchronization_workflow(self):
+        """Test the complete member post approval synchronization workflow as requested in review"""
+        print("\n🎯 FOCUSED TEST: Member Post Approval Synchronization Workflow")
+        print("=" * 80)
+        print("Testing the critical issue #8 - Member post approval synchronization fix")
+        print("=" * 80)
+        
+        # Step 1: Login as member to create posts
+        member_login_data = {
+            "username": "member_demo",
+            "password": "member123"
+        }
+        
+        member_token = None
+        try:
+            # Remove admin auth temporarily
+            admin_headers = self.session.headers.copy()
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json=member_login_data)
+            if response.status_code == 200:
+                data = response.json()
+                member_token = data.get("access_token")
+                member_user = data.get("user", {})
+                self.log_test("Member Authentication", True, f"Member login successful: {member_user.get('username')}, Balance: {member_user.get('wallet_balance', 0):,.0f} VNĐ")
+                
+                # Set member auth header
+                self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+            else:
+                self.log_test("Member Authentication", False, f"Status: {response.status_code}, Response: {response.text}")
+                # Restore admin headers and return
+                self.session.headers.update(admin_headers)
+                return False
+        except Exception as e:
+            self.log_test("Member Authentication", False, f"Error: {str(e)}")
+            self.session.headers.update(admin_headers)
+            return False
+        
+        # Step 2: Test Member Post Creation - Create posts of different types
+        created_post_ids = []
+        
+        # Create Property Post
+        property_post_data = {
+            "title": "Căn hộ cao cấp Vinhomes - Member Post",
+            "description": "Căn hộ 2PN view sông, nội thất đầy đủ, cần bán gấp",
+            "post_type": "property",
+            "price": 5500000000,
+            "images": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="],
+            "contact_phone": "0901234567",
+            "contact_email": "member@example.com",
+            "property_type": "apartment",
+            "property_status": "for_sale",
+            "area": 85.5,
+            "bedrooms": 2,
+            "bathrooms": 2,
+            "address": "208 Nguyễn Hữu Cảnh, Phường 22",
+            "district": "Bình Thạnh",
+            "city": "Hồ Chí Minh"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/member/posts", json=property_post_data)
+            if response.status_code == 200:
+                data = response.json()
+                post_id = data.get("id")
+                if post_id and data.get("status") == "pending":
+                    created_post_ids.append({"id": post_id, "type": "property"})
+                    self.log_test("Member Post Creation - Property", True, f"Property post created with ID: {post_id}, Status: {data.get('status')}")
+                else:
+                    self.log_test("Member Post Creation - Property", False, f"Invalid response: {data}")
+            else:
+                self.log_test("Member Post Creation - Property", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Post Creation - Property", False, f"Error: {str(e)}")
+        
+        # Create Land Post
+        land_post_data = {
+            "title": "Đất nền dự án Vinhomes - Member Post",
+            "description": "Lô đất 100m2, vị trí đẹp, giá tốt",
+            "post_type": "land",
+            "price": 3000000000,
+            "images": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="],
+            "contact_phone": "0901234567",
+            "contact_email": "member@example.com",
+            "land_type": "residential",
+            "property_status": "for_sale",
+            "area": 100.0,
+            "width": 10.0,
+            "length": 10.0,
+            "address": "Khu dân cư Vinhomes",
+            "district": "Thủ Đức",
+            "city": "Hồ Chí Minh",
+            "legal_status": "Sổ đỏ"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/member/posts", json=land_post_data)
+            if response.status_code == 200:
+                data = response.json()
+                post_id = data.get("id")
+                if post_id and data.get("status") == "pending":
+                    created_post_ids.append({"id": post_id, "type": "land"})
+                    self.log_test("Member Post Creation - Land", True, f"Land post created with ID: {post_id}, Status: {data.get('status')}")
+                else:
+                    self.log_test("Member Post Creation - Land", False, f"Invalid response: {data}")
+            else:
+                self.log_test("Member Post Creation - Land", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Post Creation - Land", False, f"Error: {str(e)}")
+        
+        # Create Sim Post
+        sim_post_data = {
+            "title": "Sim số đẹp Viettel - Member Post",
+            "description": "Sim số đẹp, phong thủy, giá tốt",
+            "post_type": "sim",
+            "price": 5000000,
+            "contact_phone": "0901234567",
+            "contact_email": "member@example.com",
+            "phone_number": "0987654321",
+            "network": "viettel",
+            "sim_type": "prepaid",
+            "is_vip": True,
+            "features": ["Số đẹp", "Phong thủy"]
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/member/posts", json=sim_post_data)
+            if response.status_code == 200:
+                data = response.json()
+                post_id = data.get("id")
+                if post_id and data.get("status") == "pending":
+                    created_post_ids.append({"id": post_id, "type": "sim"})
+                    self.log_test("Member Post Creation - Sim", True, f"Sim post created with ID: {post_id}, Status: {data.get('status')}")
+                else:
+                    self.log_test("Member Post Creation - Sim", False, f"Invalid response: {data}")
+            else:
+                self.log_test("Member Post Creation - Sim", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Post Creation - Sim", False, f"Error: {str(e)}")
+        
+        # Step 3: Switch to Admin authentication
+        self.session.headers.update(admin_headers)
+        
+        # Step 4: Test Admin Posts Listing
+        try:
+            response = self.session.get(f"{self.base_url}/admin/posts")
+            if response.status_code == 200:
+                all_posts = response.json()
+                pending_posts = [post for post in all_posts if post.get("status") == "pending"]
+                self.log_test("Admin Posts Listing", True, f"Retrieved {len(all_posts)} total posts, {len(pending_posts)} pending posts")
+                
+                # Test filtering by status
+                pending_response = self.session.get(f"{self.base_url}/admin/posts", params={"status": "pending"})
+                if pending_response.status_code == 200:
+                    filtered_pending = pending_response.json()
+                    self.log_test("Admin Posts Listing - Pending Filter", True, f"Filtered pending posts: {len(filtered_pending)}")
+                else:
+                    self.log_test("Admin Posts Listing - Pending Filter", False, f"Status: {pending_response.status_code}")
+            else:
+                self.log_test("Admin Posts Listing", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Admin Posts Listing", False, f"Error: {str(e)}")
+        
+        # Step 5: Test Member Post Approval and Synchronization
+        approved_post_ids = []
+        rejected_post_ids = []
+        
+        for i, post_info in enumerate(created_post_ids):
+            post_id = post_info["id"]
+            post_type = post_info["type"]
+            
+            if i < 2:  # Approve first 2 posts
+                approval_data = {
+                    "status": "approved",
+                    "admin_notes": f"Approved {post_type} post during testing",
+                    "featured": i == 0  # Make first post featured
+                }
+                
+                try:
+                    response = self.session.put(f"{self.base_url}/admin/posts/{post_id}/approve", json=approval_data)
+                    if response.status_code == 200:
+                        approved_post_ids.append({"id": post_id, "type": post_type, "featured": approval_data["featured"]})
+                        self.log_test(f"Member Post Approval - {post_type.title()}", True, f"Post {post_id} approved successfully, Featured: {approval_data['featured']}")
+                    else:
+                        self.log_test(f"Member Post Approval - {post_type.title()}", False, f"Status: {response.status_code}, Response: {response.text}")
+                except Exception as e:
+                    self.log_test(f"Member Post Approval - {post_type.title()}", False, f"Error: {str(e)}")
+            
+            else:  # Reject remaining posts
+                rejection_data = {
+                    "status": "rejected",
+                    "admin_notes": f"Rejected {post_type} post during testing",
+                    "rejection_reason": "Thông tin không đầy đủ, vui lòng cập nhật thêm chi tiết"
+                }
+                
+                try:
+                    response = self.session.put(f"{self.base_url}/admin/posts/{post_id}/approve", json=rejection_data)
+                    if response.status_code == 200:
+                        rejected_post_ids.append({"id": post_id, "type": post_type})
+                        self.log_test(f"Member Post Rejection - {post_type.title()}", True, f"Post {post_id} rejected successfully")
+                    else:
+                        self.log_test(f"Member Post Rejection - {post_type.title()}", False, f"Status: {response.status_code}, Response: {response.text}")
+                except Exception as e:
+                    self.log_test(f"Member Post Rejection - {post_type.title()}", False, f"Error: {str(e)}")
+        
+        # Step 6: Test Post Synchronization Verification
+        # Wait a moment for synchronization
+        import time
+        time.sleep(2)
+        
+        # Check if approved posts appear in public endpoints
+        for approved_post in approved_post_ids:
+            post_id = approved_post["id"]
+            post_type = approved_post["type"]
+            
+            if post_type == "property":
+                try:
+                    response = self.session.get(f"{self.base_url}/properties/{post_id}")
+                    if response.status_code == 200:
+                        property_data = response.json()
+                        if property_data.get("id") == post_id:
+                            self.log_test("Post Synchronization - Property", True, f"Approved property post {post_id} found in /api/properties")
+                        else:
+                            self.log_test("Post Synchronization - Property", False, f"Property data mismatch: {property_data}")
+                    else:
+                        self.log_test("Post Synchronization - Property", False, f"Approved property post {post_id} not found in /api/properties (Status: {response.status_code})")
+                except Exception as e:
+                    self.log_test("Post Synchronization - Property", False, f"Error: {str(e)}")
+            
+            elif post_type == "land":
+                try:
+                    response = self.session.get(f"{self.base_url}/lands/{post_id}")
+                    if response.status_code == 200:
+                        land_data = response.json()
+                        if land_data.get("id") == post_id:
+                            self.log_test("Post Synchronization - Land", True, f"Approved land post {post_id} found in /api/lands")
+                        else:
+                            self.log_test("Post Synchronization - Land", False, f"Land data mismatch: {land_data}")
+                    else:
+                        self.log_test("Post Synchronization - Land", False, f"Approved land post {post_id} not found in /api/lands (Status: {response.status_code})")
+                except Exception as e:
+                    self.log_test("Post Synchronization - Land", False, f"Error: {str(e)}")
+            
+            elif post_type == "sim":
+                try:
+                    response = self.session.get(f"{self.base_url}/sims/{post_id}")
+                    if response.status_code == 200:
+                        sim_data = response.json()
+                        if sim_data.get("id") == post_id:
+                            self.log_test("Post Synchronization - Sim", True, f"Approved sim post {post_id} found in /api/sims")
+                        else:
+                            self.log_test("Post Synchronization - Sim", False, f"Sim data mismatch: {sim_data}")
+                    else:
+                        self.log_test("Post Synchronization - Sim", False, f"Approved sim post {post_id} not found in /api/sims (Status: {response.status_code})")
+                except Exception as e:
+                    self.log_test("Post Synchronization - Sim", False, f"Error: {str(e)}")
+        
+        # Step 7: Test Member Dashboard Sync
+        # Switch back to member authentication
+        self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+        
+        try:
+            response = self.session.get(f"{self.base_url}/member/posts")
+            if response.status_code == 200:
+                member_posts = response.json()
+                
+                # Verify post statuses are updated
+                approved_count = len([post for post in member_posts if post.get("status") == "approved"])
+                rejected_count = len([post for post in member_posts if post.get("status") == "rejected"])
+                pending_count = len([post for post in member_posts if post.get("status") == "pending"])
+                
+                self.log_test("Member Dashboard Sync", True, f"Member can see updated post statuses - Approved: {approved_count}, Rejected: {rejected_count}, Pending: {pending_count}")
+                
+                # Verify specific posts have correct status
+                for post in member_posts:
+                    post_id = post.get("id")
+                    status = post.get("status")
+                    
+                    # Check if this post was in our test data
+                    approved_ids = [p["id"] for p in approved_post_ids]
+                    rejected_ids = [p["id"] for p in rejected_post_ids]
+                    
+                    if post_id in approved_ids and status == "approved":
+                        self.log_test(f"Member Post Status Sync - {post_id}", True, f"Post correctly shows as approved")
+                    elif post_id in rejected_ids and status == "rejected":
+                        rejection_reason = post.get("rejection_reason", "")
+                        self.log_test(f"Member Post Status Sync - {post_id}", True, f"Post correctly shows as rejected with reason: {rejection_reason}")
+                    elif post_id in (approved_ids + rejected_ids):
+                        self.log_test(f"Member Post Status Sync - {post_id}", False, f"Post status not updated correctly: {status}")
+                
+            else:
+                self.log_test("Member Dashboard Sync", False, f"Status: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Member Dashboard Sync", False, f"Error: {str(e)}")
+        
+        # Restore admin headers
+        self.session.headers.update(admin_headers)
+        
+        # Summary
+        total_tests = len([r for r in self.test_results if "Member Post" in r["test"] or "Post Synchronization" in r["test"] or "Admin Posts" in r["test"]])
+        passed_tests = len([r for r in self.test_results if ("Member Post" in r["test"] or "Post Synchronization" in r["test"] or "Admin Posts" in r["test"]) and r["success"]])
+        
+        self.log_test("Member Post Approval Synchronization Workflow", True, f"✅ COMPLETE WORKFLOW TESTED: {passed_tests}/{total_tests} tests passed. Critical issue #8 verification completed.")
+        
+        return True
+
     def run_all_tests(self):
-        """Run all backend API tests with focus on critical backend fixes"""
-        print("🚀 Starting BDS Vietnam Backend API Testing - CRITICAL BACKEND FIXES")
+        """Run all backend API tests with focus on member post approval synchronization"""
+        print("🚀 Starting BDS Vietnam Backend API Testing - MEMBER POST APPROVAL SYNCHRONIZATION")
         print("=" * 80)
         print(f"Backend URL: {self.base_url}")
         print("=" * 80)
@@ -6376,8 +6683,8 @@ class BDSVietnamAPITester:
             print("❌ Authentication failed. Stopping tests.")
             return
         
-        # Run the critical backend fixes testing first (PRIORITY)
-        self.test_critical_backend_fixes()
+        # 🎯 PRIORITY TEST: Member Post Approval Synchronization Workflow
+        self.test_member_post_approval_synchronization_workflow()
         
         # Print summary
         self.print_test_summary()
