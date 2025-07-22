@@ -1855,7 +1855,7 @@ const AdminDashboard = () => {
                             category: formData.get('category'),
                             author: formData.get('author'),
                             excerpt: formData.get('excerpt'),
-                            content: formData.get('content'),
+                            content: newsContent || editingItem?.content || '',
                             published: formData.get('published') === 'on',
                             featured_image: featuredImage || editingItem?.featured_image
                           };
