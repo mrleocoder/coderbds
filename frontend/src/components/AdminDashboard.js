@@ -2212,6 +2212,11 @@ const AdminDashboard = () => {
                           </button>
                           <button
                             type="submit"
+                            onClick={(e) => {
+                              console.log('🚨 SUBMIT BUTTON CLICKED!');
+                              alert('Submit button clicked!');
+                              // Let form submission handle the rest
+                            }}
                             className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                           >
                             <i className="fas fa-save mr-2"></i>Cập nhật
