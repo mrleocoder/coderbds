@@ -1706,11 +1706,30 @@ const AdminDashboard = () => {
                           </div>
                           
                           {/* Property Images Preview */}
-                          <ImagePreview 
-                            images={propertyImages} 
-                            type="property" 
-                            onRemove={removeImage} 
-                          />
+                          {testImages.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="font-medium text-gray-700 mb-2">Ảnh đã chọn:</h5>
+                              <div className="grid grid-cols-3 gap-4">
+                                {testImages.map((image, index) => (
+                                  <div key={index} className="relative">
+                                    <img 
+                                      src={image.base64} 
+                                      alt={image.name}
+                                      className="w-full h-24 object-cover rounded border"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeTestImage(index)}
+                                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                                    >
+                                      ×
+                                    </button>
+                                    <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center">
                           <input
