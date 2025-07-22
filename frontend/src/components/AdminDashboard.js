@@ -283,69 +283,36 @@ const AdminDashboard = () => {
     setShowModal(true);
   };
 
-  // Image upload states
-  const [propertyImages, setPropertyImages] = useState([]);
-  const [newsImage, setNewsImage] = useState(null);
-  const [landImages, setLandImages] = useState([]);
-
-  // Image upload handler
-  const handleImageUpload = (files, type) => {
-    const promises = Array.from(files).map(file => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          resolve({
-            file: file,
-            base64: e.target.result,
-            name: file.name,
-            size: file.size
-          });
+  // Test simple image upload functionality
+  const [testImages, setTestImages] = useState([]);
+  
+  const handleTestImageUpload = (event) => {
+    const files = event.target.files;
+    console.log('🖼️ Files selected:', files.length);
+    
+    // Convert to array and process each file
+    Array.from(files).forEach((file, index) => {
+      console.log(`File ${index + 1}:`, file.name, file.size);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = {
+          name: file.name,
+          size: file.size,
+          base64: e.target.result
         };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.all(promises).then(imageData => {
-      if (type === 'property' || type === 'land') {
-        // Multiple images for properties and lands
-        if (type === 'property') {
-          setPropertyImages(prev => [...prev, ...imageData]);
-        } else {
-          setLandImages(prev => [...prev, ...imageData]);
-        }
-        toast.success(`Đã thêm ${imageData.length} ảnh`);
-      } else if (type === 'news') {
-        // Single image for news
-        if (imageData.length > 1) {
-          toast.warning('Tin tức chỉ được upload 1 ảnh. Chỉ ảnh đầu tiên được sử dụng.');
-        }
-        setNewsImage(imageData[0]);
-        toast.success('Đã thêm ảnh cho tin tức');
-      }
+        
+        setTestImages(prev => [...prev, imageData]);
+        console.log('✅ Image loaded:', file.name);
+        alert(`Đã upload ảnh: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
     });
   };
-
-  // Remove image handler
-  const removeImage = (index, type) => {
-    if (type === 'property') {
-      setPropertyImages(prev => prev.filter((_, i) => i !== index));
-    } else if (type === 'land') {
-      setLandImages(prev => prev.filter((_, i) => i !== index));
-    } else if (type === 'news') {
-      setNewsImage(null);
-    }
-    toast.success('Đã xóa ảnh');
-  };
-
-  // Clear images when modal closes
-  const closeModal = () => {
-    setShowModal(false);
-    setModalType('');
-    setEditingItem(null);
-    // Clear image states
-    setPropertyImages([]);
-    setNewsImage(null);
-    setLandImages([]);
+  
+  const removeTestImage = (index) => {
+    setTestImages(prev => prev.filter((_, i) => i !== index));
+    alert(`Đã xóa ảnh thứ ${index + 1}`);
   };
 
   // Image preview component
