@@ -6024,6 +6024,87 @@ class BDSVietnamAPITester:
             self.log_test("Admin Authentication & Authorization", False, f"Error: {str(e)}")
             return False
 
+    def run_all_tests(self):
+        """Run all backend API tests with focus on critical backend fixes"""
+        print("🚀 Starting BDS Vietnam Backend API Testing - CRITICAL BACKEND FIXES")
+        print("=" * 80)
+        print(f"Backend URL: {self.base_url}")
+        print("=" * 80)
+        
+        # Test API connectivity first
+        if not self.test_api_root():
+            print("❌ Cannot connect to API. Stopping tests.")
+            return
+        
+        # Create demo admin user if needed
+        self.test_create_demo_admin_user()
+        
+        # Test authentication
+        if not self.test_authentication():
+            print("❌ Authentication failed. Stopping tests.")
+            return
+        
+        # Run the critical backend fixes testing first (PRIORITY)
+        self.test_critical_backend_fixes()
+        
+        # Print summary
+        self.print_test_summary()
+
+    def print_test_summary(self):
+        """Print comprehensive test summary"""
+        print("\n" + "=" * 80)
+        print("📊 CRITICAL BACKEND FIXES TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t["success"]])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"✅ Passed: {passed_tests}")
+        print(f"❌ Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        # Group results by category
+        categories = {
+            "Bank Info Sync": [],
+            "Deposit Approval": [],
+            "Admin Save Operations": [],
+            "Contact Info Sync": [],
+            "Other": []
+        }
+        
+        for test in self.test_results:
+            test_name = test["test"]
+            if "Bank" in test_name or "Settings" in test_name:
+                categories["Bank Info Sync"].append(test)
+            elif "Deposit" in test_name or "Transaction" in test_name or "Approve" in test_name or "Reject" in test_name:
+                categories["Deposit Approval"].append(test)
+            elif "Save" in test_name or "Create" in test_name or "WYSIWYG" in test_name:
+                categories["Admin Save Operations"].append(test)
+            elif "Contact" in test_name or "working_hours" in test_name or "holidays" in test_name:
+                categories["Contact Info Sync"].append(test)
+            else:
+                categories["Other"].append(test)
+        
+        for category, tests in categories.items():
+            if tests:
+                print(f"\n📋 {category.upper()}:")
+                for test in tests:
+                    status = "✅" if test["success"] else "❌"
+                    print(f"   {status} {test['test']}")
+                    if not test["success"]:
+                        print(f"      └─ {test['details']}")
+        
+        # Critical issues summary
+        critical_failures = [t for t in self.test_results if not t["success"]]
+        if critical_failures:
+            print(f"\n🚨 CRITICAL ISSUES FOUND ({len(critical_failures)}):")
+            for failure in critical_failures:
+                print(f"   ❌ {failure['test']}: {failure['details']}")
+        else:
+            print("\n🎉 ALL CRITICAL BACKEND FIXES ARE WORKING CORRECTLY!")
+
 if __name__ == "__main__":
     import sys
     tester = BDSVietnamAPITester()
