@@ -5616,12 +5616,440 @@ class BDSVietnamAPITester:
         else:
             print("  None - All critical functionality working")
 
+    def test_priority_backend_fixes(self):
+        """Test the newly implemented backend fixes as requested in review"""
+        print("\n🎯 PRIORITY TESTING: Newly Implemented Backend Fixes")
+        print("=" * 80)
+        
+        # 1. Website Settings with Working Hours and Holidays
+        print("\n1️⃣ Testing Website Settings with Working Hours and Holidays...")
+        self.test_website_settings_working_hours_holidays()
+        
+        # 2. Member Update Endpoint
+        print("\n2️⃣ Testing Member Update Endpoint...")
+        self.test_member_update_endpoint()
+        
+        # 3. Transaction Model with Transfer Bill
+        print("\n3️⃣ Testing Transaction Model with Transfer Bill...")
+        self.test_transaction_transfer_bill()
+        
+        # 4. Authentication and Authorization
+        print("\n4️⃣ Testing Authentication and Authorization...")
+        self.test_admin_authentication_authorization()
+
+    def test_website_settings_working_hours_holidays(self):
+        """Test website settings with working_hours and holidays fields"""
+        try:
+            # Test GET /api/admin/settings - verify working_hours and holidays fields are present
+            response = self.session.get(f"{self.base_url}/admin/settings")
+            if response.status_code == 200:
+                settings = response.json()
+                
+                # Check if working_hours and holidays fields exist
+                has_working_hours = "working_hours" in settings
+                has_holidays = "holidays" in settings
+                
+                if has_working_hours and has_holidays:
+                    self.log_test("Website Settings - Working Hours & Holidays Fields Present", True, 
+                                f"Both fields present: working_hours='{settings.get('working_hours')}', holidays='{settings.get('holidays')}'")
+                else:
+                    missing_fields = []
+                    if not has_working_hours:
+                        missing_fields.append("working_hours")
+                    if not has_holidays:
+                        missing_fields.append("holidays")
+                    self.log_test("Website Settings - Working Hours & Holidays Fields Present", False, 
+                                f"Missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Website Settings - GET", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+            
+            # Test PUT /api/admin/settings - test saving working_hours and holidays
+            update_data = {
+                "working_hours": "8:00 - 18:00, Thứ 2 - Thứ 6",
+                "holidays": "Tết Nguyên Đán, 30/4, 1/5, 2/9"
+            }
+            
+            response = self.session.put(f"{self.base_url}/admin/settings", json=update_data)
+            if response.status_code == 200:
+                self.log_test("Website Settings - Update Working Hours & Holidays", True, 
+                            f"Settings updated successfully")
+                
+                # Verify persistence by getting settings again
+                verify_response = self.session.get(f"{self.base_url}/admin/settings")
+                if verify_response.status_code == 200:
+                    updated_settings = verify_response.json()
+                    
+                    if (updated_settings.get("working_hours") == update_data["working_hours"] and 
+                        updated_settings.get("holidays") == update_data["holidays"]):
+                        self.log_test("Website Settings - Verify Persistence", True, 
+                                    f"Working hours and holidays persisted correctly")
+                        return True
+                    else:
+                        self.log_test("Website Settings - Verify Persistence", False, 
+                                    f"Data not persisted correctly: working_hours='{updated_settings.get('working_hours')}', holidays='{updated_settings.get('holidays')}'")
+                        return False
+                else:
+                    self.log_test("Website Settings - Verify Persistence", False, 
+                                f"Could not verify persistence: {verify_response.status_code}")
+                    return False
+            else:
+                self.log_test("Website Settings - Update Working Hours & Holidays", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Website Settings - Working Hours & Holidays", False, f"Error: {str(e)}")
+            return False
+
+    def test_member_update_endpoint(self):
+        """Test the new member update endpoint PUT /api/admin/users/{user_id}"""
+        try:
+            # First get a list of users to find a test user ID
+            response = self.session.get(f"{self.base_url}/admin/users")
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test("Member Update - Get Users List", True, f"Retrieved {len(users)} users")
+                
+                # Find a member user (not admin) for testing
+                test_user_id = None
+                test_user_data = None
+                for user in users:
+                    if user.get("role") == "member":
+                        test_user_id = user.get("id")
+                        test_user_data = user
+                        break
+                
+                if not test_user_id:
+                    self.log_test("Member Update - Find Test User", False, "No member users found for testing")
+                    return False
+                
+                self.log_test("Member Update - Find Test User", True, f"Using user ID: {test_user_id}")
+                
+                # Test the PUT /api/admin/users/{user_id} endpoint
+                original_balance = test_user_data.get("wallet_balance", 0)
+                update_data = {
+                    "full_name": "Updated Test Member Name",
+                    "phone": "0987654321",
+                    "address": "123 Updated Address, Ho Chi Minh City",
+                    "status": "active",
+                    "admin_notes": "Updated during backend testing",
+                    "wallet_balance": original_balance + 100000  # Add 100,000 VND
+                }
+                
+                response = self.session.put(f"{self.base_url}/admin/users/{test_user_id}", json=update_data)
+                if response.status_code == 200:
+                    self.log_test("Member Update - PUT Endpoint", True, f"Member updated successfully")
+                    
+                    # Verify the update by getting the user again
+                    verify_response = self.session.get(f"{self.base_url}/admin/users/{test_user_id}")
+                    if verify_response.status_code == 200:
+                        updated_user = verify_response.json()
+                        
+                        # Check if all fields were updated
+                        checks = [
+                            updated_user.get("full_name") == update_data["full_name"],
+                            updated_user.get("phone") == update_data["phone"],
+                            updated_user.get("address") == update_data["address"],
+                            updated_user.get("status") == update_data["status"],
+                            updated_user.get("wallet_balance") == update_data["wallet_balance"]
+                        ]
+                        
+                        if all(checks):
+                            self.log_test("Member Update - Verify Update", True, 
+                                        f"All fields updated correctly including wallet balance")
+                            
+                            # Check if balance adjustment created a transaction record
+                            transactions_response = self.session.get(f"{self.base_url}/admin/transactions")
+                            if transactions_response.status_code == 200:
+                                transactions = transactions_response.json()
+                                
+                                # Look for recent transaction for this user
+                                balance_transaction = None
+                                for txn in transactions:
+                                    if (txn.get("user_id") == test_user_id and 
+                                        txn.get("amount") == 100000 and
+                                        "Balance adjustment" in txn.get("description", "")):
+                                        balance_transaction = txn
+                                        break
+                                
+                                if balance_transaction:
+                                    self.log_test("Member Update - Balance Adjustment Transaction", True, 
+                                                f"Transaction record created for balance adjustment: {balance_transaction.get('id')}")
+                                else:
+                                    self.log_test("Member Update - Balance Adjustment Transaction", False, 
+                                                f"No transaction record found for balance adjustment")
+                            else:
+                                self.log_test("Member Update - Balance Adjustment Transaction", False, 
+                                            f"Could not check transactions: {transactions_response.status_code}")
+                            
+                            return True
+                        else:
+                            failed_checks = []
+                            if updated_user.get("full_name") != update_data["full_name"]:
+                                failed_checks.append("full_name")
+                            if updated_user.get("phone") != update_data["phone"]:
+                                failed_checks.append("phone")
+                            if updated_user.get("address") != update_data["address"]:
+                                failed_checks.append("address")
+                            if updated_user.get("status") != update_data["status"]:
+                                failed_checks.append("status")
+                            if updated_user.get("wallet_balance") != update_data["wallet_balance"]:
+                                failed_checks.append("wallet_balance")
+                            
+                            self.log_test("Member Update - Verify Update", False, 
+                                        f"Failed to update fields: {failed_checks}")
+                            return False
+                    else:
+                        self.log_test("Member Update - Verify Update", False, 
+                                    f"Could not verify update: {verify_response.status_code}")
+                        return False
+                        
+                elif response.status_code == 405:
+                    self.log_test("Member Update - PUT Endpoint", False, 
+                                f"405 Method Not Allowed - PUT /api/admin/users/{{user_id}} endpoint not implemented")
+                    return False
+                else:
+                    self.log_test("Member Update - PUT Endpoint", False, 
+                                f"Status: {response.status_code}, Response: {response.text}")
+                    return False
+            else:
+                self.log_test("Member Update - Get Users List", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Member Update Endpoint", False, f"Error: {str(e)}")
+            return False
+
+    def test_transaction_transfer_bill(self):
+        """Test transaction model with transfer_bill field"""
+        try:
+            # First login as a member to create a deposit
+            member_token = self.test_enhanced_user_login()
+            if not member_token or member_token == "existing_user":
+                # Try to get existing member token
+                login_data = {"username": "testmember", "password": "test123"}
+                headers = self.session.headers.copy()
+                if 'Authorization' in self.session.headers:
+                    del self.session.headers['Authorization']
+                
+                login_response = self.session.post(f"{self.base_url}/auth/login", json=login_data)
+                self.session.headers.update(headers)
+                
+                if login_response.status_code == 200:
+                    member_token = login_response.json().get("access_token")
+                else:
+                    self.log_test("Transaction Transfer Bill - Member Login", False, "Could not get member token")
+                    return False
+            
+            # Set member auth header
+            original_headers = self.session.headers.copy()
+            self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+            
+            # Test POST /api/wallet/deposit with transfer_bill field
+            deposit_data = {
+                "amount": 500000.0,
+                "description": "Test deposit with transfer bill",
+                "transfer_bill": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            }
+            
+            response = self.session.post(f"{self.base_url}/wallet/deposit", json=deposit_data)
+            
+            # Restore admin headers
+            self.session.headers.update(original_headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                transaction_id = data.get("transaction_id")
+                
+                if transaction_id:
+                    self.log_test("Transaction Transfer Bill - Create Deposit", True, 
+                                f"Deposit created with transfer bill: {transaction_id}")
+                    
+                    # Test GET /api/admin/transactions - verify transfer_bill field is returned
+                    transactions_response = self.session.get(f"{self.base_url}/admin/transactions")
+                    if transactions_response.status_code == 200:
+                        transactions = transactions_response.json()
+                        
+                        # Find our transaction
+                        test_transaction = None
+                        for txn in transactions:
+                            if txn.get("id") == transaction_id:
+                                test_transaction = txn
+                                break
+                        
+                        if test_transaction:
+                            has_transfer_bill = "transfer_bill" in test_transaction
+                            transfer_bill_value = test_transaction.get("transfer_bill")
+                            
+                            if has_transfer_bill and transfer_bill_value:
+                                self.log_test("Transaction Transfer Bill - Field Present", True, 
+                                            f"transfer_bill field present and contains data")
+                                
+                                # Test deposit approval process to ensure bill images persist
+                                approve_response = self.session.put(f"{self.base_url}/admin/transactions/{transaction_id}/approve")
+                                if approve_response.status_code == 200:
+                                    self.log_test("Transaction Transfer Bill - Approval Process", True, 
+                                                f"Deposit approved successfully")
+                                    
+                                    # Verify bill image persists after approval
+                                    verify_response = self.session.get(f"{self.base_url}/admin/transactions")
+                                    if verify_response.status_code == 200:
+                                        updated_transactions = verify_response.json()
+                                        
+                                        approved_transaction = None
+                                        for txn in updated_transactions:
+                                            if txn.get("id") == transaction_id:
+                                                approved_transaction = txn
+                                                break
+                                        
+                                        if (approved_transaction and 
+                                            approved_transaction.get("transfer_bill") == transfer_bill_value and
+                                            approved_transaction.get("status") == "completed"):
+                                            self.log_test("Transaction Transfer Bill - Persistence After Approval", True, 
+                                                        f"Transfer bill persisted after approval")
+                                            return True
+                                        else:
+                                            self.log_test("Transaction Transfer Bill - Persistence After Approval", False, 
+                                                        f"Transfer bill not persisted or status not updated")
+                                            return False
+                                    else:
+                                        self.log_test("Transaction Transfer Bill - Persistence After Approval", False, 
+                                                    f"Could not verify persistence: {verify_response.status_code}")
+                                        return False
+                                else:
+                                    self.log_test("Transaction Transfer Bill - Approval Process", False, 
+                                                f"Approval failed: {approve_response.status_code}")
+                                    return False
+                            else:
+                                self.log_test("Transaction Transfer Bill - Field Present", False, 
+                                            f"transfer_bill field missing or empty in transaction data")
+                                return False
+                        else:
+                            self.log_test("Transaction Transfer Bill - Find Transaction", False, 
+                                        f"Could not find transaction {transaction_id} in admin list")
+                            return False
+                    else:
+                        self.log_test("Transaction Transfer Bill - Get Admin Transactions", False, 
+                                    f"Status: {transactions_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Transaction Transfer Bill - Create Deposit", False, 
+                                f"No transaction ID returned")
+                    return False
+            else:
+                self.log_test("Transaction Transfer Bill - Create Deposit", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Transaction Transfer Bill", False, f"Error: {str(e)}")
+            return False
+
+    def test_admin_authentication_authorization(self):
+        """Test authentication and authorization for admin endpoints"""
+        try:
+            # Test that all admin endpoints require proper authentication
+            admin_endpoints = [
+                "/admin/settings",
+                "/admin/users",
+                "/admin/transactions",
+                "/admin/dashboard/stats"
+            ]
+            
+            # Save current auth header
+            original_headers = self.session.headers.copy()
+            
+            # Test without authentication
+            if 'Authorization' in self.session.headers:
+                del self.session.headers['Authorization']
+            
+            unauthorized_count = 0
+            for endpoint in admin_endpoints:
+                try:
+                    response = self.session.get(f"{self.base_url}{endpoint}")
+                    if response.status_code in [401, 403]:
+                        unauthorized_count += 1
+                        self.log_test(f"Admin Auth Required - {endpoint}", True, 
+                                    f"Unauthorized access blocked ({response.status_code})")
+                    else:
+                        self.log_test(f"Admin Auth Required - {endpoint}", False, 
+                                    f"Unauthorized access not blocked: {response.status_code}")
+                except Exception as e:
+                    self.log_test(f"Admin Auth Required - {endpoint}", False, f"Error: {str(e)}")
+            
+            # Restore auth header
+            self.session.headers.update(original_headers)
+            
+            # Test that member users cannot access admin endpoints
+            # First get a member token
+            member_token = self.test_enhanced_user_login()
+            if member_token and member_token != "existing_user":
+                # Set member auth header
+                self.session.headers.update({"Authorization": f"Bearer {member_token}"})
+                
+                member_blocked_count = 0
+                for endpoint in admin_endpoints:
+                    try:
+                        response = self.session.get(f"{self.base_url}{endpoint}")
+                        if response.status_code == 403:
+                            member_blocked_count += 1
+                            self.log_test(f"Member Access Blocked - {endpoint}", True, 
+                                        f"Member access properly blocked (403)")
+                        else:
+                            self.log_test(f"Member Access Blocked - {endpoint}", False, 
+                                        f"Member access not blocked: {response.status_code}")
+                    except Exception as e:
+                        self.log_test(f"Member Access Blocked - {endpoint}", False, f"Error: {str(e)}")
+                
+                # Restore admin auth header
+                self.session.headers.update(original_headers)
+                
+                if unauthorized_count == len(admin_endpoints) and member_blocked_count == len(admin_endpoints):
+                    self.log_test("Admin Authentication & Authorization", True, 
+                                f"All admin endpoints properly secured")
+                    return True
+                else:
+                    self.log_test("Admin Authentication & Authorization", False, 
+                                f"Security issues found: unauthorized_count={unauthorized_count}, member_blocked_count={member_blocked_count}")
+                    return False
+            else:
+                self.log_test("Admin Authentication & Authorization", False, 
+                            f"Could not get member token for testing")
+                return False
+                
+        except Exception as e:
+            self.log_test("Admin Authentication & Authorization", False, f"Error: {str(e)}")
+            return False
+
 if __name__ == "__main__":
     import sys
     tester = BDSVietnamAPITester()
     
+    # Check if priority backend fixes testing is requested
+    if len(sys.argv) > 1 and sys.argv[1] == "priority":
+        # Test API connectivity first
+        if not tester.test_api_root():
+            print("❌ API not accessible, stopping tests")
+            exit(1)
+        
+        # Create demo admin user if needed
+        tester.test_create_demo_admin_user()
+        
+        # Test authentication
+        if not tester.test_authentication():
+            print("❌ Authentication failed, stopping tests")
+            exit(1)
+        
+        # Run the priority backend fixes tests
+        tester.test_priority_backend_fixes()
+        
+        # Print summary
+        tester.print_test_summary()
     # Check if admin dashboard functionality testing is requested
-    if len(sys.argv) > 1 and sys.argv[1] == "admin-dashboard-review":
+    elif len(sys.argv) > 1 and sys.argv[1] == "admin-dashboard-review":
         # Test API connectivity first
         if not tester.test_api_root():
             print("❌ API not accessible, stopping tests")
