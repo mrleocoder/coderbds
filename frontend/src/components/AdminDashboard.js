@@ -2093,7 +2093,8 @@ const AdminDashboard = () => {
                             sim_type: formData.get('sim_type'),
                             price: parseFloat(formData.get('price')),
                             is_vip: formData.get('is_vip') === 'on',
-                            description: formData.get('description')
+                            description: formData.get('description'),
+                            features: [] // Add missing required field
                           };
 
                           if (editingItem) {
