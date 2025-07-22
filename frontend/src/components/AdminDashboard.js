@@ -2081,12 +2081,7 @@ const AdminDashboard = () => {
 
                     {/* Member Form */}
                     {modalType === 'member' && (
-                      <form onSubmit={(e) => {
-                        e.preventDefault();
-                        toast.success('Cập nhật thành viên thành công!');
-                        closeModal();
-                        fetchAdminData();
-                      }} className="space-y-4">
+                      <form onSubmit={handleMemberSubmit} className="space-y-4">
                         <div className="bg-gray-50 p-4 rounded-lg mb-4">
                           <h4 className="font-medium text-gray-800 mb-2">Thông tin hiện tại</h4>
                           <p><strong>Username:</strong> {editingItem?.username}</p>
@@ -2096,17 +2091,20 @@ const AdminDashboard = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <input
                             type="text"
+                            name="full_name"
                             placeholder="Họ và tên"
                             defaultValue={editingItem?.full_name || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           />
                           <input
                             type="tel"
+                            name="phone"
                             placeholder="Số điện thoại"
                             defaultValue={editingItem?.phone || ''}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           />
                           <select
+                            name="status"
                             defaultValue={editingItem?.status || 'active'}
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           >
@@ -2116,18 +2114,22 @@ const AdminDashboard = () => {
                           </select>
                           <input
                             type="number"
-                            placeholder="Điều chỉnh số dư ví"
+                            name="wallet_adjustment"
+                            placeholder="Điều chỉnh số dư ví (+/-)"
                             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           />
                         </div>
                         <textarea
+                          name="address"
                           placeholder="Địa chỉ"
                           defaultValue={editingItem?.address || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           rows="2"
                         />
                         <textarea
+                          name="admin_notes"
                           placeholder="Ghi chú từ admin"
+                          defaultValue={editingItem?.admin_notes || ''}
                           className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
                           rows="2"
                         />
