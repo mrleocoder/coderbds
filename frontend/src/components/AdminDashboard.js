@@ -289,17 +289,36 @@ const AdminDashboard = () => {
     setEditingItem(null);
   };
 
-  const handleSiteSettingsSubmit = async (e) => {
+  const handleMemberSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      await axios.put(`${API}/admin/settings`, siteSettings, { headers });
-      toast.success('Cập nhật cài đặt website thành công!');
+      const formData = new FormData(e.target);
+      const memberData = {
+        full_name: formData.get('full_name'),
+        phone: formData.get('phone'),
+        address: formData.get('address'),
+        status: formData.get('status'),
+        admin_notes: formData.get('admin_notes')
+      };
+
+      // Handle wallet balance adjustment if provided
+      const walletAdjustment = parseFloat(formData.get('wallet_adjustment') || 0);
+      if (walletAdjustment !== 0) {
+        memberData.wallet_balance = (editingItem.wallet_balance || 0) + walletAdjustment;
+      }
+
+      console.log('Updating member:', editingItem.id, 'with data:', memberData);
+
+      await axios.put(`${API}/admin/users/${editingItem.id}`, memberData, { headers });
+      toast.success('Cập nhật thành viên thành công!');
+      closeModal();
+      fetchAdminData(); // Refresh data
     } catch (error) {
-      console.error('Error updating site settings:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật cài đặt. Vui lòng thử lại.');
+      console.error('Error updating member:', error);
+      toast.error('Có lỗi xảy ra khi cập nhật thành viên. Vui lòng thử lại.');
     }
   };
 
