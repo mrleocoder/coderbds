@@ -1696,40 +1696,55 @@ const AdminDashboard = () => {
                               </div>
                               <input 
                                 type="file" 
-                                name="images" 
                                 className="hidden" 
                                 multiple 
                                 accept="image/*"
-                                onChange={handleTestImageUpload}
+                                onChange={(e) => {
+                                  const files = e.target.files;
+                                  if (files.length > 0) {
+                                    // Get or create container
+                                    let container = document.getElementById('property-preview-container');
+                                    if (!container) {
+                                      container = document.createElement('div');
+                                      container.id = 'property-preview-container';
+                                      container.style.marginTop = '15px';
+                                      e.target.closest('.space-y-4').appendChild(container);
+                                    }
+                                    
+                                    // Process each file
+                                    Array.from(files).forEach((file, index) => {
+                                      const reader = new FileReader();
+                                      reader.onload = function(event) {
+                                        const imageDiv = document.createElement('div');
+                                        imageDiv.style.marginBottom = '10px';
+                                        imageDiv.innerHTML = `
+                                          <div style="padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; background-color: #f9fafb;">
+                                            <div style="display: flex; align-items: center; gap: 15px;">
+                                              <img src="${event.target.result}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;" />
+                                              <div style="flex: 1;">
+                                                <p style="margin: 0; font-weight: 600; color: #374151; font-size: 13px;">${file.name}</p>
+                                                <p style="margin: 3px 0 0 0; color: #6b7280; font-size: 11px;">${(file.size / 1024).toFixed(1)} KB</p>
+                                              </div>
+                                              <button 
+                                                onclick="this.closest('div').parentElement.remove()"
+                                                style="background-color: #dc2626; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; font-weight: bold;"
+                                                onmouseover="this.style.backgroundColor='#b91c1c'"
+                                                onmouseout="this.style.backgroundColor='#dc2626'"
+                                              >
+                                                ×
+                                              </button>
+                                            </div>
+                                          </div>
+                                        `;
+                                        container.appendChild(imageDiv);
+                                      };
+                                      reader.readAsDataURL(file);
+                                    });
+                                  }
+                                }}
                               />
                             </label>
                           </div>
-                          
-                          {/* Property Images Preview */}
-                          {testImages.length > 0 && (
-                            <div className="mt-4">
-                              <h5 className="font-medium text-gray-700 mb-2">Ảnh đã chọn:</h5>
-                              <div className="grid grid-cols-3 gap-4">
-                                {testImages.map((image, index) => (
-                                  <div key={index} className="relative">
-                                    <img 
-                                      src={image.base64} 
-                                      alt={image.name}
-                                      className="w-full h-24 object-cover rounded border"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => removeTestImage(index)}
-                                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                                    >
-                                      ×
-                                    </button>
-                                    <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
                         <div className="flex items-center">
                           <input
