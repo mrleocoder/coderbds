@@ -1907,21 +1907,41 @@ const AdminDashboard = () => {
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onChange={(e) => {
-                                  if (e.target.files.length > 0) {
-                                    handleImageUpload(e.target.files, 'news');
-                                  }
-                                }}
+                                onChange={handleTestImageUpload}
                               />
                             </label>
                           </div>
                           
-                          {/* News Image Preview */}
-                          <ImagePreview 
-                            images={newsImage} 
-                            type="news" 
-                            onRemove={removeImage} 
-                          />
+                          {/* Test Image Preview */}
+                          {testImages.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="font-medium text-gray-700 mb-2">Ảnh đã chọn:</h5>
+                              <div className="space-y-2">
+                                {testImages.map((image, index) => (
+                                  <div key={index} className="flex items-center justify-between p-2 border border-gray-200 rounded-lg">
+                                    <div className="flex items-center space-x-3">
+                                      <img 
+                                        src={image.base64} 
+                                        alt={image.name}
+                                        className="w-16 h-16 object-cover rounded border"
+                                      />
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-800">{image.name}</p>
+                                        <p className="text-xs text-gray-500">{(image.size / 1024).toFixed(1)} KB</p>
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeTestImage(index)}
+                                      className="text-red-500 hover:text-red-700 font-bold text-lg"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center">
                           <input
