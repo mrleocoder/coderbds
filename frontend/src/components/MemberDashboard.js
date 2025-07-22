@@ -13,6 +13,7 @@ const MemberDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [userPosts, setUserPosts] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [siteSettings, setSiteSettings] = useState({});
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [depositStep, setDepositStep] = useState(1); // 1: amount, 2: bank details & upload, 3: confirmation
   const [showCreatePostForm, setShowCreatePostForm] = useState(false);
