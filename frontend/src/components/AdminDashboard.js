@@ -1902,14 +1902,24 @@ const AdminDashboard = () => {
                           rows="2"
                           required
                         />
-                        <textarea
-                          name="content"
-                          placeholder="Nội dung chi tiết"
-                          defaultValue={editingItem?.content || ''}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
-                          rows="4"
-                          required
-                        />
+                        <div className="space-y-4">
+                          <label className="block text-sm font-medium text-gray-700">Nội dung chi tiết</label>
+                          <div style={{backgroundColor: 'white'}}>
+                            <ReactQuill
+                              value={newsContent || editingItem?.content || ''}
+                              onChange={setNewsContent}
+                              modules={quillModules}
+                              formats={quillFormats}
+                              theme="snow"
+                              placeholder="Nhập nội dung chi tiết bài viết..."
+                              style={{
+                                minHeight: '200px',
+                                backgroundColor: 'white'
+                              }}
+                            />
+                          </div>
+                          <input type="hidden" name="content" value={newsContent || editingItem?.content || ''} />
+                        </div>
                         <div className="space-y-4">
                           <h4 className="font-medium text-gray-700">Upload ảnh đại diện</h4>
                           <div className="flex items-center justify-center w-full">
