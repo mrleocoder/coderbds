@@ -202,6 +202,7 @@ const MemberDashboard = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [newPrivateMessage, setNewPrivateMessage] = useState('');
   const [showSystemMessages, setShowSystemMessages] = useState(10);
+  const [showPrivateMessages, setShowPrivateMessages] = useState(10);
   // State for post pagination  
   const [showPosts, setShowPosts] = useState(10);
 
