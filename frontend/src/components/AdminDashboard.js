@@ -360,6 +360,10 @@ const AdminDashboard = () => {
     setEditingItem(null);
     // Clear test images when modal closes
     setTestImages([]);
+    // Clear editor content
+    setNewsContent('');
+    setPropertyDescription('');
+    setLandDescription('');
   };
 
   // Force refresh member data specifically
