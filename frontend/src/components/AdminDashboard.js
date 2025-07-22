@@ -312,7 +312,16 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
+      console.log('=== MEMBER UPDATE DEBUG START ===');
+      console.log('Form element:', e.target);
+      console.log('editingItem:', editingItem);
+      
       const formData = new FormData(e.target);
+      console.log('FormData entries:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: "${value}"`);
+      }
+      
       const memberData = {
         full_name: formData.get('full_name'),
         phone: formData.get('phone'),
@@ -325,17 +334,42 @@ const AdminDashboard = () => {
       const walletAdjustment = parseFloat(formData.get('wallet_adjustment') || 0);
       if (walletAdjustment !== 0) {
         memberData.wallet_balance = (editingItem.wallet_balance || 0) + walletAdjustment;
+        console.log(`Wallet adjustment: ${walletAdjustment}, New balance: ${memberData.wallet_balance}`);
       }
 
-      console.log('Updating member:', editingItem.id, 'with data:', memberData);
+      console.log('Member data to send:', memberData);
+      console.log('API URL:', `${API}/admin/users/${editingItem.id}`);
+      console.log('Headers:', headers);
 
-      await axios.put(`${API}/admin/users/${editingItem.id}`, memberData, { headers });
+      const response = await axios.put(`${API}/admin/users/${editingItem.id}`, memberData, { headers });
+      console.log('API Response:', response.data);
+      
       toast.success('Cập nhật thành viên thành công!');
       closeModal();
-      fetchAdminData(); // Refresh data
+      
+      console.log('Refreshing admin data...');
+      await fetchAdminData(); // Refresh data
+      console.log('=== MEMBER UPDATE DEBUG END ===');
+      
     } catch (error) {
-      console.error('Error updating member:', error);
-      toast.error('Có lỗi xảy ra khi cập nhật thành viên. Vui lòng thử lại.');
+      console.error('💥 Error updating member:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: error.config
+      });
+      
+      if (error.response?.status === 404) {
+        toast.error('Không tìm thấy thành viên này!');
+      } else if (error.response?.status === 403) {
+        toast.error('Không có quyền cập nhật thành viên!');
+      } else if (error.response?.status === 422) {
+        toast.error('Dữ liệu không hợp lệ: ' + (error.response?.data?.detail || 'Kiểm tra lại thông tin'));
+      } else {
+        toast.error('Có lỗi xảy ra khi cập nhật thành viên. Vui lòng thử lại.');
+      }
     }
   };
 
