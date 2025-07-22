@@ -964,7 +964,187 @@ const MemberDashboard = () => {
 
             {/* Messages Tab */}
             {activeTab === 'messages' && (
-              <Messages user={user} />
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Tin nhắn</h2>
+                </div>
+
+                {/* Message Type Toggle */}
+                <div className="flex space-x-4 mb-6 border-b border-gray-200">
+                  <button
+                    onClick={() => setMessageType('system')}
+                    className={`pb-3 px-1 border-b-2 font-medium text-sm ${
+                      messageType === 'system'
+                        ? 'border-emerald-600 text-emerald-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <i className="fas fa-bell mr-2"></i>
+                    Tin nhắn từ hệ thống ({systemMessages.length})
+                  </button>
+                  <button
+                    onClick={() => setMessageType('private')}
+                    className={`pb-3 px-1 border-b-2 font-medium text-sm ${
+                      messageType === 'private'
+                        ? 'border-emerald-600 text-emerald-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <i className="fas fa-comments mr-2"></i>
+                    Tin nhắn riêng ({privateMessages.length})
+                  </button>
+                </div>
+
+                {/* System Messages */}
+                {messageType === 'system' && (
+                  <div className="space-y-4">
+                    {systemMessages.slice(0, showSystemMessages).map((message, index) => (
+                      <div key={index} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-sm font-medium text-blue-800">Thông báo hệ thống</span>
+                          <span className="text-xs text-blue-600">
+                            {new Date(message.created_at).toLocaleDateString('vi-VN')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-blue-700">{message.content}</p>
+                      </div>
+                    ))}
+                    
+                    {systemMessages.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <i className="fas fa-bell text-4xl mb-4"></i>
+                        <p>Chưa có tin nhắn từ hệ thống</p>
+                      </div>
+                    )}
+                    
+                    {systemMessages.length > showSystemMessages && (
+                      <div className="text-center">
+                        <button
+                          onClick={() => setShowSystemMessages(prev => prev + 10)}
+                          className="px-4 py-2 text-emerald-600 hover:text-emerald-700 font-medium"
+                        >
+                          Xem thêm
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Private Messages */}
+                {messageType === 'private' && (
+                  <div className="space-y-4">
+                    {tickets.slice(0, showPrivateMessages).map((ticket) => (
+                      <div key={ticket.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-800">{ticket.subject}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{ticket.description}</p>
+                          </div>
+                          <div className="flex items-center space-x-3 ml-4">
+                            <span className={`text-xs px-2 py-1 rounded ${
+                              ticket.status === 'open' ? 'bg-green-100 text-green-800' :
+                              ticket.status === 'resolved' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {ticket.status === 'open' ? 'Đang mở' :
+                               ticket.status === 'resolved' ? 'Đã giải quyết' : 'Đã đóng'}
+                            </span>
+                            <button
+                              onClick={() => openChatModal(ticket)}
+                              className="bg-emerald-600 text-white px-3 py-1 rounded text-xs hover:bg-emerald-700 transition-colors"
+                            >
+                              <i className="fas fa-eye mr-1"></i>
+                              Xem
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          <i className="fas fa-clock mr-1"></i>
+                          {new Date(ticket.created_at).toLocaleDateString('vi-VN')} lúc {new Date(ticket.created_at).toLocaleTimeString('vi-VN')}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {tickets.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <i className="fas fa-comments text-4xl mb-4"></i>
+                        <p>Chưa có tin nhắn riêng nào</p>
+                      </div>
+                    )}
+                    
+                    {tickets.length > showPrivateMessages && (
+                      <div className="text-center">
+                        <button
+                          onClick={() => setShowPrivateMessages(prev => prev + 10)}
+                          className="px-4 py-2 text-emerald-600 hover:text-emerald-700 font-medium"
+                        >
+                          Xem thêm
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Private Chat Modal */}
+                {showChatModal && selectedTicket && (
+                  <Modal isOpen={showChatModal} onClose={() => setShowChatModal(false)}>
+                    <div className="max-w-2xl w-full">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold">Chat với Admin - {selectedTicket.subject}</h3>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          selectedTicket.status === 'open' ? 'bg-green-100 text-green-800' :
+                          selectedTicket.status === 'resolved' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {selectedTicket.status === 'open' ? 'Đang mở' :
+                           selectedTicket.status === 'resolved' ? 'Đã giải quyết' : 'Đã đóng'}
+                        </span>
+                      </div>
+                      
+                      {/* Chat Messages */}
+                      <div className="border rounded-lg h-96 overflow-y-auto p-4 bg-gray-50 mb-4 space-y-3">
+                        {selectedTicket.messages?.map((msg, index) => (
+                          <div key={index} className={`flex ${msg.from_type === 'member' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
+                              msg.from_type === 'member' 
+                                ? 'bg-emerald-600 text-white' 
+                                : 'bg-white border border-gray-200'
+                            }`}>
+                              <p className="text-sm">{msg.message}</p>
+                              <p className={`text-xs mt-1 ${
+                                msg.from_type === 'member' ? 'text-emerald-100' : 'text-gray-500'
+                              }`}>
+                                {new Date(msg.created_at).toLocaleTimeString('vi-VN')}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Send Message */}
+                      {selectedTicket.status !== 'closed' && (
+                        <div className="flex space-x-2">
+                          <input
+                            type="text"
+                            value={newPrivateMessage}
+                            onChange={(e) => setNewPrivateMessage(e.target.value)}
+                            placeholder="Nhập tin nhắn..."
+                            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-emerald-500 focus:border-emerald-500"
+                            onKeyPress={(e) => e.key === 'Enter' && sendPrivateMessage(selectedTicket.id)}
+                          />
+                          <button
+                            onClick={() => sendPrivateMessage(selectedTicket.id)}
+                            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                            disabled={!newPrivateMessage.trim()}
+                          >
+                            <i className="fas fa-paper-plane"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </Modal>
+                )}
+              </div>
             )}
 
             {/* Create Post Tab */}
