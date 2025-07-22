@@ -315,6 +315,14 @@ const AdminDashboard = () => {
     alert(`Đã xóa ảnh thứ ${index + 1}`);
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setModalType('');
+    setEditingItem(null);
+    // Clear test images when modal closes
+    setTestImages([]);
+  };
+
   // Image preview component
   const ImagePreview = ({ images, type, onRemove }) => {
     if (type === 'news') {
