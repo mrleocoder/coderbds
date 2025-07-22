@@ -63,10 +63,20 @@ const DepositDetail = ({ deposit, onClose, onUpdate }) => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      await axios.put(`${API}/admin/transactions/${deposit.id}/approve`, {
-        status: status,
-        admin_notes: `${status === 'approved' ? 'Đã duyệt' : 'Từ chối'} giao dịch nạp tiền`
-      }, { headers });
+      let endpoint;
+      let requestData;
+      
+      if (status === 'approved') {
+        endpoint = `${API}/admin/transactions/${deposit.id}/approve`;
+        requestData = {};
+      } else {
+        endpoint = `${API}/admin/transactions/${deposit.id}/reject`;
+        requestData = {
+          admin_notes: newMessage.trim() || 'Từ chối giao dịch nạp tiền'
+        };
+      }
+      
+      await axios.put(endpoint, requestData, { headers });
 
       // Send notification message to member
       if (newMessage.trim()) {
