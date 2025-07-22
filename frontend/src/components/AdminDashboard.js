@@ -1868,7 +1868,43 @@ const AdminDashboard = () => {
                                 name="featured_image" 
                                 className="hidden" 
                                 accept="image/*"
-                                onChange={handleTestImageUpload}
+                                onChange={(e) => {
+                                  console.log('🎯 File input change triggered!');
+                                  alert('File input clicked!');
+                                  
+                                  const files = e.target.files;
+                                  console.log('Files selected:', files.length);
+                                  
+                                  if (files.length > 0) {
+                                    const file = files[0];
+                                    console.log('File details:', file.name, file.size);
+                                    alert(`Selected file: ${file.name}`);
+                                    
+                                    // Test FileReader
+                                    const reader = new FileReader();
+                                    reader.onload = function(event) {
+                                      console.log('✅ FileReader loaded successfully');
+                                      alert('FileReader loaded!');
+                                      
+                                      // Create a simple preview
+                                      const previewDiv = document.createElement('div');
+                                      previewDiv.innerHTML = `
+                                        <div style="margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+                                          <img src="${event.target.result}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px;" />
+                                          <p style="margin: 5px 0 0 0; font-size: 12px;">${file.name}</p>
+                                          <button onclick="this.parentElement.remove()" style="background: red; color: white; border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; margin-top: 5px;">×</button>
+                                        </div>
+                                      `;
+                                      
+                                      // Insert after the upload area
+                                      const uploadArea = e.target.closest('.space-y-4');
+                                      uploadArea.appendChild(previewDiv);
+                                      
+                                      alert('Preview added!');
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
                               />
                             </label>
                           </div>
