@@ -203,7 +203,57 @@ const MemberDashboard = () => {
   const [showSystemMessages, setShowSystemMessages] = useState(10);
   const [showPrivateMessages, setShowPrivateMessages] = useState(10);
 
-  const handleDeposit = async (e) => {
+  // Fetch messages data
+  const fetchMessages = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Fetch system messages (admin notes from all operations)
+      const [messagesRes, ticketsRes] = await Promise.all([
+        axios.get(`${API}/messages?type=system`, { headers }),
+        axios.get(`${API}/member/tickets`, { headers })
+      ]);
+      
+      setSystemMessages(messagesRes.data || []);
+      setTickets(ticketsRes.data || []);
+      
+      // Extract private messages from tickets
+      const privateChats = ticketsRes.data?.filter(ticket => ticket.has_messages) || [];
+      setPrivateMessages(privateChats);
+      
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  // Send private message in ticket
+  const sendPrivateMessage = async (ticketId) => {
+    if (!newPrivateMessage.trim()) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.post(`${API}/tickets/${ticketId}/messages`, {
+        message: newPrivateMessage,
+        from_type: 'member'
+      }, { headers });
+      
+      setNewPrivateMessage('');
+      toast.success('Tin nhắn đã được gửi');
+      fetchMessages(); // Refresh messages
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Không thể gửi tin nhắn');
+    }
+  };
+
+  // Open chat modal
+  const openChatModal = (ticket) => {
+    setSelectedTicket(ticket);
+    setShowChatModal(true);
+  };
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
