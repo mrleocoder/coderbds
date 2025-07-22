@@ -597,59 +597,59 @@ const MemberDashboard = () => {
 
                 <div className="space-y-4">
                   {userPosts.length > 0 ? (
-                    <>
+                    <div className="space-y-4">
                       {userPosts.slice(0, showPosts).map((post) => (
-                    <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center space-x-2 mb-2">
-                            <h3 className="font-semibold text-lg">{post.title}</h3>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              post.status === 'approved' ? 'bg-green-100 text-green-800' :
-                              post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              post.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              {post.status === 'approved' ? 'Đã duyệt' :
-                               post.status === 'pending' ? 'Chờ duyệt' :
-                               post.status === 'rejected' ? 'Từ chối' : post.status}
-                            </span>
-                          </div>
-                          <p className="text-gray-600 mb-2 text-sm">{post.description?.substring(0, 100)}...</p>
-                          <div className="flex flex-wrap items-center space-x-4 text-xs text-gray-600">
-                            <span><i className="fas fa-tag text-emerald-600 mr-1"></i>{post.post_type}</span>
-                            <span><i className="fas fa-dollar-sign text-emerald-600 mr-1"></i>{post.price?.toLocaleString()} VNĐ</span>
-                            <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
-                          </div>
-                          {post.rejection_reason && (
-                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-                              <strong>Lý do từ chối:</strong> {post.rejection_reason}
+                        <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
+                            <div className="flex-1">
+                              <div className="flex flex-wrap items-center space-x-2 mb-2">
+                                <h3 className="font-semibold text-lg">{post.title}</h3>
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  post.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                  post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                  post.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {post.status === 'approved' ? 'Đã duyệt' :
+                                   post.status === 'pending' ? 'Chờ duyệt' :
+                                   post.status === 'rejected' ? 'Từ chối' : post.status}
+                                </span>
+                              </div>
+                              <p className="text-gray-600 mb-2 text-sm">{post.description?.substring(0, 100)}...</p>
+                              <div className="flex flex-wrap items-center space-x-4 text-xs text-gray-600">
+                                <span><i className="fas fa-tag text-emerald-600 mr-1"></i>{post.post_type}</span>
+                                <span><i className="fas fa-dollar-sign text-emerald-600 mr-1"></i>{post.price?.toLocaleString()} VNĐ</span>
+                                <span><i className="fas fa-calendar text-emerald-600 mr-1"></i>{new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
+                              </div>
+                              {post.rejection_reason && (
+                                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                                  <strong>Lý do từ chối:</strong> {post.rejection_reason}
+                                </div>
+                              )}
                             </div>
-                          )}
+                            <div className="flex space-x-2">
+                              {post.status !== 'approved' && (
+                                <button 
+                                  onClick={() => handleEditPost(post)}
+                                  className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm"
+                                  title="Chỉnh sửa tin đăng"
+                                >
+                                  <i className="fas fa-edit"></i>
+                                </button>
+                              )}
+                              {post.status !== 'approved' && (
+                                <button 
+                                  onClick={() => handleDeletePost(post.id)}
+                                  className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors text-sm"
+                                  title="Xóa tin đăng"
+                                >
+                                  <i className="fas fa-trash"></i>
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex space-x-2">
-                          {post.status !== 'approved' && (
-                            <button 
-                              onClick={() => handleEditPost(post)}
-                              className="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm"
-                              title="Chỉnh sửa tin đăng"
-                            >
-                              <i className="fas fa-edit"></i>
-                            </button>
-                          )}
-                          {post.status !== 'approved' && (
-                            <button 
-                              onClick={() => handleDeletePost(post.id)}
-                              className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors text-sm"
-                              title="Xóa tin đăng"
-                            >
-                              <i className="fas fa-trash"></i>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )) 
+                      ))}
                       
                       {/* Load More Button */}
                       {userPosts.length > showPosts && (
@@ -663,7 +663,7 @@ const MemberDashboard = () => {
                           </button>
                         </div>
                       )}
-                    </>
+                    </div>
                   ) : (
                     <div className="text-center py-8">
                       <i className="fas fa-list text-6xl text-gray-300 mb-4"></i>
